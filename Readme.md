@@ -1,0 +1,1 @@
+mplayer4anime uses GNU GPL v.3 license.
