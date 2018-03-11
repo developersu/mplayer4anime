@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
+   <children>
+      <VBox prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <children>
+            <HBox>
+               <children>
+                <Button mnemonicParsing="false" onAction="#play" text="▶" textAlignment="CENTER" textFill="#015e06" />
+                  <Pane HBox.hgrow="ALWAYS" />
+                  <CheckBox mnemonicParsing="false" fx:id="fullScreen" text="Fullscreen" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </HBox>
+            <SplitPane dividerPositions="0.5" prefHeight="257.0" prefWidth="313.0" VBox.vgrow="ALWAYS">
+              <items>
+                <AnchorPane prefHeight="160.0" prefWidth="100.0">
+                     <children>
+                        <VBox layoutX="87.0" layoutY="-11.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <HBox spacing="3.0" VBox.vgrow="NEVER">
+                                 <children>
+                                  <Button mnemonicParsing="false" onAction="#mkvOpenAction" text="MKV (Video)" />
+                                    <Pane HBox.hgrow="ALWAYS" />
+                                  <Button mnemonicParsing="false" onAction="#vUp" text="↑" textFill="#007f0e" />
+                                    <Button mnemonicParsing="false" onAction="#vDown" text="↓" textFill="#007f0e" />
+                                    <Button mnemonicParsing="false" onAction="#vDel" text="X" textFill="#a70000" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <ListView fx:id="mkvListView" VBox.vgrow="ALWAYS">
+
+                        </ListView>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+                <AnchorPane prefHeight="160.0" prefWidth="100.0">
+                     <children>
+                        <VBox layoutX="39.0" layoutY="42.0" prefHeight="398.0" prefWidth="316.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <children>
+                              <HBox spacing="3.0" VBox.vgrow="NEVER">
+                                 <children>
+                                  <Button mnemonicParsing="false" onAction="#mkaOpenAction" text="MKA (Audio)" />
+                                    <Pane HBox.hgrow="ALWAYS" />
+                                    <Button mnemonicParsing="false" onAction="#aUp" text="↑" textFill="#007f0e" />
+                                    <Button mnemonicParsing="false" onAction="#aDown" text="↓" textFill="#007f0e" />
+                                    <Button mnemonicParsing="false" onAction="#aDel" text="X" textFill="#a70000" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </VBox.margin>
+                              </HBox>
+                              <ListView fx:id="mkaListView" VBox.vgrow="ALWAYS">
+
+                        </ListView>
+                           </children>
+                        </VBox>
+                     </children>
+                  </AnchorPane>
+              </items>
+            </SplitPane>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>
