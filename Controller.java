@@ -3,11 +3,9 @@ package sample;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.ListCell;
+import javafx.scene.control.*;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.Stage;
-import javafx.scene.control.ListView;
 import javafx.util.Callback;
 
 import java.io.*;
@@ -34,6 +32,8 @@ public class Controller {
         System.out.println("executed");
     }
 */
+    @FXML
+    private ChoiceBox playerSelect;
 
     private void SetCellFactory (ListView<File> lv) {
         lv.setCellFactory(new Callback<ListView<File>, ListCell<File>>() {
@@ -59,6 +59,11 @@ public class Controller {
 
     @FXML
     public void initialize() {
+        playerSelect.setItems(FXCollections.observableArrayList(
+                "mplayer",
+                "mpv"));
+        playerSelect.setValue("mplayer");
+
         // Define CallFactory to handle MKV+MKA ListView
    //     SetCellFactory(mkvListView);
    //     SetCellFactory(mkaListView);
@@ -177,10 +182,11 @@ public class Controller {
         if (mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString() != null)
             if (mkaFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString() != null) {
                 try {
-                    Process mplayer = new ProcessBuilder("mplayer",
+                    Process mplayer = new ProcessBuilder(
+                            playerSelect.getValue().equals("mplayer")?"mplayer":"mpv",
                             fullScreen.isSelected()?"-fs":"",
                             mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString(),
-                            "-audiofile",
+                            playerSelect.getValue().equals("mplayer")?"-audiofile":"--audio-file",
                             mkaFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString()).start();
                     InputStream inputStream = mplayer.getInputStream();
                     InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
