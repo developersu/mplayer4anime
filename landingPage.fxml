@@ -11,6 +11,8 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.LinearGradient?>
+<?import javafx.scene.paint.Stop?>
 
 <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.Controller">
    <children>
@@ -18,10 +20,19 @@
          <children>
             <HBox>
                <children>
-                <Button mnemonicParsing="false" onAction="#play" text="▶" textAlignment="CENTER" textFill="#015e06">
+                <Button minHeight="26.0" minWidth="53.0" mnemonicParsing="false" onAction="#play" text="▶" textAlignment="CENTER">
                      <HBox.margin>
-                        <Insets />
-                     </HBox.margin></Button>
+                        <Insets left="5.0" right="5.0" />
+                     </HBox.margin>
+                     <textFill>
+                        <LinearGradient endX="0.6875" endY="0.6923076923076923">
+                           <stops>
+                              <Stop color="#4ef556" />
+                              <Stop color="#005126" offset="1.0" />
+                           </stops>
+                        </LinearGradient>
+                     </textFill></Button>
+                  <Button mnemonicParsing="false" onAction="#playNextTrack" text="▶|" />
                   <Pane HBox.hgrow="ALWAYS" />
                   <ChoiceBox fx:id="playerSelect" prefWidth="150.0" />
                   <CheckBox fx:id="fullScreen" mnemonicParsing="false" text="Fullscreen">
@@ -51,7 +62,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                  </VBox.margin>
                               </HBox>
-                              <ListView fx:id="mkvListView" VBox.vgrow="ALWAYS">
+                              <ListView fx:id="mkvListView" styleClass="landing" stylesheets="@res/landing.css" VBox.vgrow="ALWAYS">
 
                         </ListView>
                            </children>
@@ -74,7 +85,7 @@
                                     <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                  </VBox.margin>
                               </HBox>
-                              <ListView fx:id="mkaListView" VBox.vgrow="ALWAYS">
+                              <ListView fx:id="mkaListView" styleClass="landing" stylesheets="@res/landing.css" VBox.vgrow="ALWAYS">
 
                         </ListView>
                            </children>
@@ -86,7 +97,7 @@
             <HBox VBox.vgrow="NEVER">
                <children>
                   <Pane HBox.hgrow="ALWAYS" />
-                  <Label text="v0.2">
+                  <Label text="v0.3">
                      <HBox.margin>
                         <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
                      </HBox.margin>

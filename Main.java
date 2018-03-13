@@ -3,7 +3,7 @@ package sample;
 * Name: mplayer4anime                          *
 * Author: Dmitry Isaenko                       *
 * License: GNU GPL v.3                         *
-* Version: 0.2                                 *
+* Version: 0.3                                 *
 * Site: https://developersu.blogspot.com/      *
 * 2018, Russia                                 *
 ***********************************************/
@@ -29,7 +29,7 @@ public class Main extends Application {
         loader.setController(myController);
         Parent root = loader.load(getClass().getResource("landingPage.fxml"));
 
-        primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/sample/app.png")));
+        primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/sample/res/app.png")));
         primaryStage.setTitle("mplayer4anime");
         primaryStage.setMinWidth(400);
         primaryStage.setMinHeight(300);

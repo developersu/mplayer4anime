@@ -47,9 +47,13 @@ public class Controller {
 
                         String trimmedName;
 
-                        if (item != null){
+                        if (item == null || empty){
+                            setText(null);
+                        }
+                        else {
                             trimmedName = item.getName();
                             setText(trimmedName);
+
                         }
                     }
                 };
@@ -65,8 +69,8 @@ public class Controller {
         playerSelect.setValue("mplayer");
 
         // Define CallFactory to handle MKV+MKA ListView
-   //     SetCellFactory(mkvListView);
-   //     SetCellFactory(mkaListView);
+        SetCellFactory(mkvListView);
+        SetCellFactory(mkaListView);
     }
 
     public void mkvOpenAction() {
@@ -177,16 +181,27 @@ public class Controller {
     }
     @FXML
     private void aDel(){ mkaFileList.remove(mkaListView.getSelectionModel().getSelectedItem()); }
+
+    @FXML
+    private void playNextTrack(){
+        int index;
+        index = mkvListView.getSelectionModel().getSelectedIndex();
+        if (index+1 < mkvFileList.size() ) {
+            mkvListView.getSelectionModel().select(index+1);
+            play();
+        }
+    }
+
     @FXML
     private void play(){
-        if (mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString() != null)
-            if (mkaFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString() != null) {
+        if (mkvListView.getSelectionModel().getSelectedItem() != null) {
+            if (!mkaFileList.isEmpty() && mkvListView.getSelectionModel().getSelectedIndex() < mkaFileList.size() ) {
                 try {
                     Process mplayer = new ProcessBuilder(
-                            playerSelect.getValue().equals("mplayer")?"mplayer":"mpv",
-                            fullScreen.isSelected()?"-fs":"",
+                            playerSelect.getValue().equals("mplayer") ? "mplayer" : "mpv",
+                            fullScreen.isSelected() ? playerSelect.getValue().equals("mplayer") ? "-fs" : "--fs": "",
                             mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString(),
-                            playerSelect.getValue().equals("mplayer")?"-audiofile":"--audio-file",
+                            playerSelect.getValue().equals("mplayer") ? "-audiofile" : "--audio-file",
                             mkaFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString()).start();
                     InputStream inputStream = mplayer.getInputStream();
                     InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
@@ -196,12 +211,31 @@ public class Controller {
                     while ((lines = bufferReader.readLine()) != null)
                         System.out.println(lines);
 
-                } catch(IOException e){
-                e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                System.out.println("No audio pair found");
+                try {
+                    Process mplayer = new ProcessBuilder(
+                            playerSelect.getValue().equals("mplayer") ? "mplayer" : "mpv",
+                            fullScreen.isSelected() ? "-fs" : "",
+                            mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString()
+                    ).start();
+                    InputStream inputStream = mplayer.getInputStream();
+                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                    BufferedReader bufferReader = new BufferedReader(inputStreamReader);
+                    String lines;
+
+                    while ((lines = bufferReader.readLine()) != null)
+                        System.out.println(lines);
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-        }
-        else
-            System.out.println("FAILED");
+
+        } else { System.out.println("File not selected"); }
     }
 
 }
