@@ -1,12 +1,13 @@
 package sample;
 
+import javafx.application.HostServices;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.stage.DirectoryChooser;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import javafx.util.Callback;
+import sample.About.AboutWindow;
 
 import java.io.*;
 import java.util.Arrays;
@@ -19,21 +20,18 @@ public class Controller {
     private ListView<File> mkaListView;
 
     @FXML
-    private CheckBox fullScreen;
+    private CheckMenuItem fullScreen;
 
     private ObservableList<File> mkvFileList = FXCollections.observableArrayList();
 
     private ObservableList<File> mkaFileList = FXCollections.observableArrayList();
 
-    public Stage thisStage;
+    // Get host services for opening URLs etc.
+    private HostServices hostServices;
 
-/*    public Controller(Stage stage){
-        thisStage = stage;
-        System.out.println("executed");
+    public void setHostServices(HostServices hostServices) {
+        this.hostServices = hostServices;
     }
-*/
-    @FXML
-    private ChoiceBox playerSelect;
 
     private void SetCellFactory (ListView<File> lv) {
         lv.setCellFactory(new Callback<ListView<File>, ListCell<File>>() {
@@ -63,11 +61,6 @@ public class Controller {
 
     @FXML
     public void initialize() {
-        playerSelect.setItems(FXCollections.observableArrayList(
-                "mplayer",
-                "mpv"));
-        playerSelect.setValue("mplayer");
-
         // Define CallFactory to handle MKV+MKA ListView
         SetCellFactory(mkvListView);
         SetCellFactory(mkaListView);
@@ -90,7 +83,7 @@ public class Controller {
         dirSelect = new DirectoryChooser();
         dirSelect.setTitle("Select directory");
         dirSelect.setInitialDirectory(new File(System.getProperty("user.home")));
-        directoryReceived = dirSelect.showDialog(thisStage);
+        directoryReceived = dirSelect.showDialog(null);                 // TODO: Clarify how the fuck is it works
 
         // GET LIST OF MKV/MKA FILES within directory
         if (directoryReceived != null) {
@@ -136,7 +129,9 @@ public class Controller {
             System.out.println("-- No folder selected --");
         }
     }
-
+    /*
+     *               MKV Buttons
+     */
     @FXML
     private void vUp(){
         int index;
@@ -157,8 +152,12 @@ public class Controller {
             mkvListView.getSelectionModel().select(index+1);
         }
     }
+
     @FXML
     private void vDel(){ mkvFileList.remove(mkvListView.getSelectionModel().getSelectedItem()); }
+    /*
+     *           MKA Buttons
+     */
     @FXML
     private void aUp() {
         int index;
@@ -182,34 +181,81 @@ public class Controller {
     @FXML
     private void aDel(){ mkaFileList.remove(mkaListView.getSelectionModel().getSelectedItem()); }
 
+    /**             PLAYER COMMANDS          */
+    private boolean playerSingleCommand(String command){
+        if (player != null && player.isAlive()) {
+            playerIn.print(command);
+            playerIn.print("\n");
+            playerIn.flush();
+            return true;
+        } else { return false; }
+    }
     @FXML
-    private void playNextTrack(){
+    private void fullscreenBtn(){ playerSingleCommand("vo_fullscreen"); }
+    @FXML
+    private void muteBtn(){ playerSingleCommand("mute"); }
+    @FXML
+    private void playPrevTrackBtn(){
+        if (player != null && player.isAlive()) {
+            playerSingleCommand("quit");
+            while (player.isAlive());               // TODO: remove crutch, implement bike
+        }
+        int index;
+        index = mkvListView.getSelectionModel().getSelectedIndex();
+        if (index > 0) {
+            mkvListView.getSelectionModel().select(index-1);
+           playBtn();
+        }
+    }
+    @FXML
+    private void playNextTrackBtn(){
+        if (player != null && player.isAlive()) {
+            playerSingleCommand("quit");
+            while (player.isAlive());               // TODO: remove crutch, implement bike
+        }
         int index;
         index = mkvListView.getSelectionModel().getSelectedIndex();
         if (index+1 < mkvFileList.size() ) {
             mkvListView.getSelectionModel().select(index+1);
-            play();
+            playBtn();
         }
     }
 
+    private Process player;
+    private PrintStream playerIn;
+    private BufferedReader playerOutErr;
+
     @FXML
-    private void play(){
+    private void playBtn(){
         if (mkvListView.getSelectionModel().getSelectedItem() != null) {
             if (!mkaFileList.isEmpty() && mkvListView.getSelectionModel().getSelectedIndex() < mkaFileList.size() ) {
                 try {
-                    Process mplayer = new ProcessBuilder(
-                            playerSelect.getValue().equals("mplayer") ? "mplayer" : "mpv",
-                            fullScreen.isSelected() ? playerSelect.getValue().equals("mplayer") ? "-fs" : "--fs": "",
-                            mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString(),
-                            playerSelect.getValue().equals("mplayer") ? "-audiofile" : "--audio-file",
-                            mkaFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString()).start();
-                    InputStream inputStream = mplayer.getInputStream();
-                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                    BufferedReader bufferReader = new BufferedReader(inputStreamReader);
-                    String lines;
+                    if (player == null || !player.isAlive()) {
+                            player = new ProcessBuilder(
+                                    "mplayer" ,
+                                    "-slave",
+                                    "-quiet",
+                                    fullScreen.isSelected() ? "-fs" : "",
+                                    mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString(),
+                                    "-audiofile" ,
+                                    mkaFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString()
+                            ).start();
 
-                    while ((lines = bufferReader.readLine()) != null)
-                        System.out.println(lines);
+                            PipedInputStream readFrom = new PipedInputStream(256 * 1024);
+                            PipedOutputStream writeTo = new PipedOutputStream(readFrom);
+
+                            playerOutErr = new BufferedReader(new InputStreamReader(readFrom));
+
+                            new LineRedirecter(player.getInputStream(), writeTo).start();
+                            new LineRedirecter(player.getErrorStream(), writeTo).start();
+
+                            playerIn = new PrintStream(player.getOutputStream());
+                    }
+                    else  {
+                        playerIn.print("pause");
+                        playerIn.print("\n");
+                        playerIn.flush();
+                    }
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -217,18 +263,30 @@ public class Controller {
             } else {
                 System.out.println("No audio pair found");
                 try {
-                    Process mplayer = new ProcessBuilder(
-                            playerSelect.getValue().equals("mplayer") ? "mplayer" : "mpv",
-                            fullScreen.isSelected() ? "-fs" : "",
-                            mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString()
-                    ).start();
-                    InputStream inputStream = mplayer.getInputStream();
-                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
-                    BufferedReader bufferReader = new BufferedReader(inputStreamReader);
-                    String lines;
+                    if (player == null || !player.isAlive()) {
+                            player = new ProcessBuilder(
+                                    "mplayer",
+                                    "-slave",
+                                    "-quiet",
+                                    fullScreen.isSelected() ? "-fs" : "",
+                                    mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString()
+                            ).start();
 
-                    while ((lines = bufferReader.readLine()) != null)
-                        System.out.println(lines);
+                            PipedInputStream readFrom = new PipedInputStream(256 * 1024);
+                            PipedOutputStream writeTo = new PipedOutputStream(readFrom);
+
+                            playerOutErr = new BufferedReader(new InputStreamReader(readFrom));
+
+                            new LineRedirecter(player.getInputStream(), writeTo).start();
+                            new LineRedirecter(player.getErrorStream(), writeTo).start();
+
+                            playerIn = new PrintStream(player.getOutputStream());
+
+                    } else  {                                           // TODO Refactor
+                            playerIn.print("pause");
+                            playerIn.print("\n");
+                            playerIn.flush();
+                        }
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -238,4 +296,13 @@ public class Controller {
         } else { System.out.println("File not selected"); }
     }
 
+    @FXML
+    private void stopBtn(){playerSingleCommand("stop"); }
+    @FXML
+    private void volumeUpBtn(){ playerSingleCommand("volume +1 0"); }
+    @FXML
+    private void volumeDownBtn(){ playerSingleCommand("volume -1 0"); }
+
+    @FXML
+    private void infoBnt(){ new AboutWindow(this.hostServices); } // TODO: fix this shit with hostSerivces that doesn't work
 }

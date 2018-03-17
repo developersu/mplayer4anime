@@ -3,7 +3,7 @@ package sample;
 * Name: mplayer4anime                          *
 * Author: Dmitry Isaenko                       *
 * License: GNU GPL v.3                         *
-* Version: 0.3                                 *
+* Version: 0.4                                 *
 * Site: https://developersu.blogspot.com/      *
 * 2018, Russia                                 *
 ***********************************************/
@@ -18,16 +18,21 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
 
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
 
-        Controller myController = new Controller();
-        myController.thisStage = primaryStage;
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("landingPage.fxml"));
 
-        FXMLLoader loader = new FXMLLoader();
-        loader.setController(myController);
-        Parent root = loader.load(getClass().getResource("landingPage.fxml"));
+        Parent root = loader.load();
+
+        // tmp?
+        Controller controller = loader.getController();
+        controller.setHostServices(getHostServices());
+        // end
 
         primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/sample/res/app.png")));
         primaryStage.setTitle("mplayer4anime");
@@ -35,10 +40,5 @@ public class Main extends Application {
         primaryStage.setMinHeight(300);
         primaryStage.setScene(new Scene(root, 1200, 800));
         primaryStage.show();
-    }
-
-    public static void main(String[] args) {
-        launch(args);
-
     }
 }

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<VBox spacing="5.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="sample.About.AboutController">
+         <children>
+            <HBox>
+               <children>
+                  <ImageView pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../res/app.png" />
+                     </image>
+                     <HBox.margin>
+                        <Insets right="5.0" />
+                     </HBox.margin>
+                  </ImageView>
+                  <VBox>
+                     <children>
+                        <Label text="mplayer4amine distributes under GNU GPL v.3 license." wrapText="true" />
+                        <Label text="Release: v0.4" wrapText="true" />
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <Label text="Development &amp; maintenance by Dmitry Isaenko." wrapText="true" />
+            <Hyperlink onAction="#gitHubUrl" text="https://github.com/developersu/mplayer4anime" underline="true" wrapText="true">
+               <graphic>
+                  <SVGPath content="m 16.516036,0.10629161 c -8.996094,0 -16.28906297,7.29296899 -16.28906297,16.28906239 0,7.195312 4.66796897,13.300781 11.14062597,15.457031 0.8125,0.148438 1.113281,-0.355469 1.113281,-0.785156 0,-0.386719 -0.01563,-1.410156 -0.02344,-2.769532 C 7.92619,29.282073 6.969159,26.114104 6.969159,26.114104 6.23088,24.231291 5.160567,23.731291 5.160567,23.731291 3.680099,22.719573 5.273849,22.739104 5.273849,22.739104 c 1.632812,0.117187 2.492187,1.679687 2.492187,1.679687 1.453125,2.488282 3.816406,1.769532 4.742187,1.355469 0.148438,-1.054687 0.570313,-1.773437 1.035157,-2.179687 -3.617188,-0.410157 -7.421875,-1.808594 -7.421875,-8.050782 0,-1.777344 0.636718,-3.230468 1.679687,-4.371094 -0.167969,-0.414062 -0.726562,-2.0664056 0.15625,-4.3124994 0,0 1.371094,-0.4375 4.480469,1.6718758 1.300781,-0.3632818 2.695312,-0.5429688 4.078125,-0.5468758 1.382813,0.00391 2.777344,0.183594 4.078125,0.5468758 3.109375,-2.1093758 4.476562,-1.6718758 4.476562,-1.6718758 0.886719,2.2460938 0.328126,3.8984374 0.160157,4.3124994 1.046875,1.140626 1.675781,2.59375 1.675781,4.371094 0,6.257813 -3.808594,7.632813 -7.4375,8.039063 0.585938,0.5 1.105469,1.496093 1.105469,3.015625 0,2.175781 -0.01953,3.933594 -0.01953,4.46875 0,0.433594 0.292968,0.941406 1.121093,0.785156 C 28.141037,29.692229 32.8051,23.590666 32.8051,16.395354 32.8051,7.3992606 25.512131,0.10629161 16.516037,0.10629161" />
+               </graphic>
+            </Hyperlink>
+            <Hyperlink onAction="#bloggerUrl" text="https://developersu.blogspot.com/" underline="true" wrapText="true">
+               <graphic>
+                  <SVGPath content="m 65.189036,53.450219 0.1,-7.2 -0.1,-0.4 -0.2,-0.5 -0.4,-0.4 c -0.5,-0.4 -3.3,0 -4,-0.6 -0.5,-0.5 -0.6,-1.7 -0.8,-2.9 -0.3,-2.3 -0.5,-2.4 -0.8,-3.2 -1.3,-2.8 -4.8,-4.8 -7.3,-5.1 h -6.6 c -5.2,0 -9.4,4.2 -9.4,9.4 v 10.9 c 0,5.1 4.2,9.3 9.4,9.3 h 10.8 c 5.1,0 9.3,-4.2 9.3,-9.3 z m -20.2,-12.9 h 5.6 c 1.1,0 1.9,1 1.9,2.1 0,1.2 -0.9,2.1 -1.9,2.1 h -5.6 c -1.1,0 -1.9,-1 -1.9,-2.1 0,-1.1 0.9,-2.1 1.9,-2.1 z m -1.9,12.7 c 0,-1.2 0.8,-2.1 1.9,-2.1 h 11.1 c 1,0 1.9,1 1.9,2.1 0,1.1 -0.8,2.1 -1.9,2.1 h -11.1 c -1.1,0 -1.9,-1 -1.9,-2.1 z" fill="#f27e30" />
+               </graphic>
+            </Hyperlink>
+            <HBox VBox.vgrow="NEVER">
+               <children>
+                  <Pane HBox.hgrow="ALWAYS" />
+                  <Button fx:id="buttonOk" mnemonicParsing="false" onAction="#buttonClickOk" text="  OK  " />
+               </children>
+               <VBox.margin>
+                  <Insets top="10.0" />
+               </VBox.margin>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </VBox>
