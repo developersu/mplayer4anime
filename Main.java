@@ -3,7 +3,7 @@ package sample;
 * Name: mplayer4anime                          *
 * Author: Dmitry Isaenko                       *
 * License: GNU GPL v.3                         *
-* Version: 0.4                                 *
+* Version: 0.5                                 *
 * Site: https://developersu.blogspot.com/      *
 * 2018, Russia                                 *
 ***********************************************/
@@ -36,8 +36,8 @@ public class Main extends Application {
 
         primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/sample/res/app.png")));
         primaryStage.setTitle("mplayer4anime");
-        primaryStage.setMinWidth(400);
-        primaryStage.setMinHeight(300);
+        primaryStage.setMinWidth(500);
+        primaryStage.setMinHeight(375);
         primaryStage.setScene(new Scene(root, 1200, 800));
         primaryStage.show();
     }

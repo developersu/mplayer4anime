@@ -18,13 +18,21 @@ public class Controller {
     private ListView<File> mkvListView;
     @FXML
     private ListView<File> mkaListView;
+    @FXML
+    private ListView<File> subtListView;
 
+    @FXML
+    private ChoiceBox<String> subtType;
+    @FXML
+    private ChoiceBox<String> subtCodepage;
     @FXML
     private CheckMenuItem fullScreen;
 
     private ObservableList<File> mkvFileList = FXCollections.observableArrayList();
 
     private ObservableList<File> mkaFileList = FXCollections.observableArrayList();
+
+    private ObservableList<File> subtFileList = FXCollections.observableArrayList();
 
     // Get host services for opening URLs etc.
     private HostServices hostServices;
@@ -61,9 +69,24 @@ public class Controller {
 
     @FXML
     public void initialize() {
+        // Set default extension of the subtitles files:
+        subtType.setItems(FXCollections.observableArrayList(
+                ".ass",
+                ".str"
+        ));
+        subtType.setValue(".ass");
+        // Set default list of codepages of the subtitles files:
+        subtCodepage.setItems(FXCollections.observableArrayList(
+                "default",
+                "utf8",
+                "cp1251",
+                "koi8-r"
+        ));
+        subtCodepage.setValue("utf8");
         // Define CallFactory to handle MKV+MKA ListView
         SetCellFactory(mkvListView);
         SetCellFactory(mkaListView);
+        SetCellFactory(subtListView);
     }
 
     public void mkvOpenAction() {
@@ -73,6 +96,10 @@ public class Controller {
     public void mkaOpenAction() {
         fileFiltering(".mka");
     }
+
+    public void subtOpenAction() {
+        fileFiltering(subtType.getValue());
+    } // FIX
 
     private void fileFiltering (String key){
         File directoryReceived;      // Store files (folder) received from selector
@@ -120,6 +147,11 @@ public class Controller {
                     mkaFileList.addAll(files);
                     mkaListView.setItems(mkaFileList);
                     mkaListView.getSelectionModel().select(0);
+                } else if (key.equals(".srt") || key.equals(".ass")) {
+                    subtListView.getItems().clear(); // wipe elements from ListView
+                    subtFileList.addAll(files);
+                    subtListView.setItems(subtFileList);
+                    subtListView.getSelectionModel().select(0);
                 }
 
             } else {
@@ -180,6 +212,31 @@ public class Controller {
     }
     @FXML
     private void aDel(){ mkaFileList.remove(mkaListView.getSelectionModel().getSelectedItem()); }
+    /*
+     *           Subtitles Buttons
+     */
+    @FXML
+    private void sUp() {
+        int index;
+        index = subtListView.getSelectionModel().getSelectedIndex();
+        if (index > 0) {
+            subtFileList.add(index - 1, subtListView.getSelectionModel().getSelectedItem());
+            subtFileList.remove(index + 1);
+            subtListView.getSelectionModel().select(index - 1);
+        }
+    }
+    @FXML
+    private void sDown(){
+        int index;
+        index = subtListView.getSelectionModel().getSelectedIndex();
+        if (index+1 < subtFileList.size() ){
+            subtFileList.add(index+2, subtListView.getSelectionModel().getSelectedItem());
+            subtFileList.remove(index);
+            subtListView.getSelectionModel().select(index+1);
+        }
+    }
+    @FXML
+    private void sDel(){ subtFileList.remove(subtListView.getSelectionModel().getSelectedItem()); }
 
     /**             PLAYER COMMANDS          */
     private boolean playerSingleCommand(String command){
@@ -228,71 +285,45 @@ public class Controller {
     @FXML
     private void playBtn(){
         if (mkvListView.getSelectionModel().getSelectedItem() != null) {
-            if (!mkaFileList.isEmpty() && mkvListView.getSelectionModel().getSelectedIndex() < mkaFileList.size() ) {
-                try {
-                    if (player == null || !player.isAlive()) {
-                            player = new ProcessBuilder(
-                                    "mplayer" ,
-                                    "-slave",
-                                    "-quiet",
-                                    fullScreen.isSelected() ? "-fs" : "",
-                                    mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString(),
-                                    "-audiofile" ,
-                                    mkaFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString()
+            boolean Audio = !mkaFileList.isEmpty() && mkvListView.getSelectionModel().getSelectedIndex() < mkaFileList.size();
+            boolean Subtitles = !subtFileList.isEmpty() && mkvListView.getSelectionModel().getSelectedIndex() < subtFileList.size();
+            boolean SubCodepageDefault = subtCodepage.getValue().equals("default");
+            
+            try {
+                if (player == null || !player.isAlive()) {
+                    //System.out.println("mplayer"  + " " + "-slave"  + " " +"-quiet"  + " " + (fullScreen.isSelected() ? "-fs" : "")  + " " + mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString()  + " " + (Audio?"-audiofile":"")  + " " + (Audio?mkaFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString():"")  + " " + (Subtitles?"-sub":"")  + " " + (Subtitles?subtFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString():""));
+                    player = new ProcessBuilder(
+                            "mplayer" ,
+                            "-slave",
+                            Audio?"-audiofile":"",                                                 // FUCKING MAGIC! DON'T CHANGE SEQUENCE
+                            Audio?mkaFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString():"",
+                            "-quiet",
+                            fullScreen.isSelected() ? "-fs" : "",
+                            mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString(),
+                            Subtitles?"-sub":"",
+                            Subtitles?subtFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString():"",
+                            Subtitles?SubCodepageDefault?"":"-subcp":"",                           // Use subtitles -> YES -> Check if we need codepage
+                            Subtitles?SubCodepageDefault?"":subtCodepage.getValue():""
                             ).start();
 
-                            PipedInputStream readFrom = new PipedInputStream(256 * 1024);
-                            PipedOutputStream writeTo = new PipedOutputStream(readFrom);
+                    PipedInputStream readFrom = new PipedInputStream(256 * 1024);
+                    PipedOutputStream writeTo = new PipedOutputStream(readFrom);
 
-                            playerOutErr = new BufferedReader(new InputStreamReader(readFrom));
+                    playerOutErr = new BufferedReader(new InputStreamReader(readFrom));
 
-                            new LineRedirecter(player.getInputStream(), writeTo).start();
-                            new LineRedirecter(player.getErrorStream(), writeTo).start();
+                    new LineRedirecter(player.getInputStream(), writeTo).start();
+                    new LineRedirecter(player.getErrorStream(), writeTo).start();
 
-                            playerIn = new PrintStream(player.getOutputStream());
-                    }
-                    else  {
-                        playerIn.print("pause");
-                        playerIn.print("\n");
-                        playerIn.flush();
-                    }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
+                    playerIn = new PrintStream(player.getOutputStream());
+                } else  {
+                    playerIn.print("pause");
+                    playerIn.print("\n");
+                    playerIn.flush();
                 }
-            } else {
-                System.out.println("No audio pair found");
-                try {
-                    if (player == null || !player.isAlive()) {
-                            player = new ProcessBuilder(
-                                    "mplayer",
-                                    "-slave",
-                                    "-quiet",
-                                    fullScreen.isSelected() ? "-fs" : "",
-                                    mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString()
-                            ).start();
 
-                            PipedInputStream readFrom = new PipedInputStream(256 * 1024);
-                            PipedOutputStream writeTo = new PipedOutputStream(readFrom);
-
-                            playerOutErr = new BufferedReader(new InputStreamReader(readFrom));
-
-                            new LineRedirecter(player.getInputStream(), writeTo).start();
-                            new LineRedirecter(player.getErrorStream(), writeTo).start();
-
-                            playerIn = new PrintStream(player.getOutputStream());
-
-                    } else  {                                           // TODO Refactor
-                            playerIn.print("pause");
-                            playerIn.print("\n");
-                            playerIn.flush();
-                        }
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-
         } else { System.out.println("File not selected"); }
     }
 
