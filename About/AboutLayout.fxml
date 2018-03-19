@@ -26,7 +26,7 @@
                   <VBox>
                      <children>
                         <Label text="mplayer4amine distributes under GNU GPL v.3 license." wrapText="true" />
-                        <Label text="Release: v0.5" wrapText="true" />
+                        <Label text="Release: v0.5.1" wrapText="true" />
                      </children>
                   </VBox>
                </children>

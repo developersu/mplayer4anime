@@ -288,7 +288,7 @@ public class Controller {
             boolean Audio = !mkaFileList.isEmpty() && mkvListView.getSelectionModel().getSelectedIndex() < mkaFileList.size();
             boolean Subtitles = !subtFileList.isEmpty() && mkvListView.getSelectionModel().getSelectedIndex() < subtFileList.size();
             boolean SubCodepageDefault = subtCodepage.getValue().equals("default");
-            
+
             try {
                 if (player == null || !player.isAlive()) {
                     //System.out.println("mplayer"  + " " + "-slave"  + " " +"-quiet"  + " " + (fullScreen.isSelected() ? "-fs" : "")  + " " + mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString()  + " " + (Audio?"-audiofile":"")  + " " + (Audio?mkaFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString():"")  + " " + (Subtitles?"-sub":"")  + " " + (Subtitles?subtFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString():""));
