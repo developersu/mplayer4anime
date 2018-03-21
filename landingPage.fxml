@@ -73,7 +73,7 @@
                         <Pane HBox.hgrow="ALWAYS" />
                   <SplitMenuButton mnemonicParsing="false" onAction="#fullscreenBtn" styleClass="splitMenuButton" stylesheets="@res/landing.css">
                     <items>
-                        <CheckMenuItem fx:id="fullScreen" mnemonicParsing="false" text="Always start in fullscreen" />
+                        <CheckMenuItem fx:id="fullScreen" mnemonicParsing="false" text="%fullscreen_option" />
                     </items>
                      <graphic>
                         <SVGPath content="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z" fill="#e1e1e1" />
@@ -89,7 +89,7 @@
                                     <children>
                                         <HBox spacing="3.0" VBox.vgrow="NEVER">
                                             <children>
-                                                <Button mnemonicParsing="false" onAction="#mkvOpenAction" text="Video *.mkv">
+                                                <Button mnemonicParsing="false" onAction="#mkvOpenAction" text="%key_mkv_open">
                                        <graphic>
                                           <SVGPath content="M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,1 21,8H21L4,8V18L6.14,10H23.21L20.93,18.5C20.7,19.37 19.92,20 19,20Z" />
                                        </graphic></Button>
@@ -111,7 +111,7 @@
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                             </VBox.margin>
                                         </HBox>
-                                        <ListView fx:id="mkvListView" styleClass="landing" stylesheets="@res/landing.css" VBox.vgrow="ALWAYS">
+                                        <ListView fx:id="mkvListView" onKeyPressed="#vKeyPressed" styleClass="landing" stylesheets="@res/landing.css" VBox.vgrow="ALWAYS">
 
                                         </ListView>
                                     </children>
@@ -120,7 +120,7 @@
                         </AnchorPane>
                   <TabPane prefHeight="200.0" prefWidth="200.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
-                      <Tab text="Audio">
+                      <Tab text="%audio_tab">
                            <content>
                                     <AnchorPane prefHeight="160.0" prefWidth="100.0">
                                         <children>
@@ -128,7 +128,7 @@
                                                 <children>
                                                     <HBox spacing="3.0" VBox.vgrow="NEVER">
                                                         <children>
-                                                            <Button mnemonicParsing="false" onAction="#mkaOpenAction" text="Audio *.mka">
+                                                            <Button mnemonicParsing="false" onAction="#mkaOpenAction" text="%key_mka_open">
                                                    <graphic>
                                                       <SVGPath content="M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,1 21,8H21L4,8V18L6.14,10H23.21L20.93,18.5C20.7,19.37 19.92,20 19,20Z" />
                                                    </graphic>
@@ -154,7 +154,7 @@
                                                             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                                         </VBox.margin>
                                                     </HBox>
-                                                    <ListView fx:id="mkaListView" styleClass="landing" stylesheets="@res/landing.css" VBox.vgrow="ALWAYS">
+                                                    <ListView fx:id="mkaListView" onKeyPressed="#aKeyPressed" styleClass="landing" stylesheets="@res/landing.css" VBox.vgrow="ALWAYS">
 
                                         </ListView>
                                                 </children>
@@ -163,7 +163,7 @@
                                     </AnchorPane>
                            </content>
                         </Tab>
-                      <Tab text="Subtitles">
+                      <Tab text="%subtitles_tab">
                            <content>
                               <AnchorPane prefHeight="160.0" prefWidth="100.0">
                                  <children>
@@ -171,7 +171,7 @@
                                        <children>
                                           <HBox spacing="3.0" VBox.vgrow="NEVER">
                                              <children>
-                                                <Button mnemonicParsing="false" onAction="#subtOpenAction" text="Subtitles">
+                                                <Button mnemonicParsing="false" onAction="#subtOpenAction" text="%key_subt_open">
                                                    <graphic>
                                                       <SVGPath content="M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,1 21,8H21L4,8V18L6.14,10H23.21L20.93,18.5C20.7,19.37 19.92,20 19,20Z" />
                                                    </graphic>
@@ -199,7 +199,7 @@
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                              </VBox.margin>
                                           </HBox>
-                                          <ListView fx:id="subtListView" styleClass="landing" stylesheets="@res/landing.css" VBox.vgrow="ALWAYS" />
+                                          <ListView fx:id="subtListView" onKeyPressed="#sKeyPressed" styleClass="landing" stylesheets="@res/landing.css" VBox.vgrow="ALWAYS" />
                                        </children>
                                     </VBox>
                                  </children>

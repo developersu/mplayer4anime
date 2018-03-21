@@ -4,16 +4,44 @@ import javafx.application.HostServices;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.*;
 import javafx.util.Callback;
 import sample.About.AboutWindow;
 
 import java.io.*;
+import java.net.URL;
 import java.util.Arrays;
+import java.util.ResourceBundle;
 
-public class Controller {
+public class Controller  implements Initializable {
 
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        //System.out.println(resourceBundle.getLocale().toString());
+        //System.out.println(resourceBundle.getKeys());
+
+        // Set default extension of the subtitles files:
+        subtType.setItems(FXCollections.observableArrayList(
+                ".ass",
+                ".str"
+        ));
+        subtType.setValue(".ass");
+        // Set default list of codepages of the subtitles files:
+        subtCodepage.setItems(FXCollections.observableArrayList(
+                "default",
+                "utf8",
+                "cp1251",
+                "koi8-r"
+        ));
+        subtCodepage.setValue("utf8");
+        // Define CallFactory to handle MKV+MKA ListView
+        SetCellFactory(mkvListView);
+        SetCellFactory(mkaListView);
+        SetCellFactory(subtListView);
+    }
     @FXML
     private ListView<File> mkvListView;
     @FXML
@@ -65,28 +93,6 @@ public class Controller {
                 };
             }
         });
-    }
-
-    @FXML
-    public void initialize() {
-        // Set default extension of the subtitles files:
-        subtType.setItems(FXCollections.observableArrayList(
-                ".ass",
-                ".str"
-        ));
-        subtType.setValue(".ass");
-        // Set default list of codepages of the subtitles files:
-        subtCodepage.setItems(FXCollections.observableArrayList(
-                "default",
-                "utf8",
-                "cp1251",
-                "koi8-r"
-        ));
-        subtCodepage.setValue("utf8");
-        // Define CallFactory to handle MKV+MKA ListView
-        SetCellFactory(mkvListView);
-        SetCellFactory(mkaListView);
-        SetCellFactory(subtListView);
     }
 
     public void mkvOpenAction() {
@@ -336,4 +342,21 @@ public class Controller {
 
     @FXML
     private void infoBnt(){ new AboutWindow(this.hostServices); } // TODO: fix this shit with hostSerivces that doesn't work
+    // HANDLING KEYS
+    @FXML
+    private void vKeyPressed(KeyEvent event){
+        if (event.getCode().toString().equals("DELETE"))
+            vDel();
+    }
+    @FXML
+    private void aKeyPressed(KeyEvent event){
+        if (event.getCode().toString().equals("DELETE"))
+            aDel();
+    }
+    @FXML
+    private void sKeyPressed(KeyEvent event){
+        if (event.getCode().toString().equals("DELETE"))
+            sDel();
+    }
+
 }

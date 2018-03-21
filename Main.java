@@ -3,7 +3,7 @@ package sample;
 * Name: mplayer4anime                          *
 * Author: Dmitry Isaenko                       *
 * License: GNU GPL v.3                         *
-* Version: 0.5.2                               *
+* Version: 0.6                                 *
 * Site: https://developersu.blogspot.com/      *
 * 2018, Russia                                 *
 ***********************************************/
@@ -14,6 +14,9 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 
 public class Main extends Application {
@@ -26,6 +29,12 @@ public class Main extends Application {
     public void start(Stage primaryStage) throws Exception{
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("landingPage.fxml"));
+
+        if (Locale.getDefault().getISO3Language().equals("rus")) {
+            loader.setResources(ResourceBundle.getBundle("sample.localization.locale", new Locale("ru")));
+        } else {
+            loader.setResources(ResourceBundle.getBundle("sample.localization.locale", new Locale("en")));
+        }
 
         Parent root = loader.load();
 
