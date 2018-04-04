@@ -98,7 +98,12 @@
 .infoBtn:pressed {
     -fx-background-color: #d4d4d4;
 }
-
-.tabber .tab-debt {
-      -fx-background-color: red;
+/*
+.tabPane .tab:selected {
+    -fx-background-color: #f1f1f1;
 }
+
+.tabPane  .tab-header-background{
+    -fx-background-color: #b9b9b9;
+}
+*/

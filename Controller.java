@@ -62,6 +62,7 @@ public class Controller  implements Initializable {
 
     private ObservableList<File> subtFileList = FXCollections.observableArrayList();
 
+    private String folderToOpen;
     // Get host services for opening URLs etc.
     private HostServices hostServices;
 
@@ -115,7 +116,10 @@ public class Controller  implements Initializable {
         // Show directory selector
         dirSelect = new DirectoryChooser();
         dirSelect.setTitle("Select directory");
-        dirSelect.setInitialDirectory(new File(System.getProperty("user.home")));
+        if (folderToOpen == null)
+            dirSelect.setInitialDirectory(new File(System.getProperty("user.home")));
+        else
+            dirSelect.setInitialDirectory(new File(folderToOpen));
         directoryReceived = dirSelect.showDialog(null);                 // TODO: Clarify how the fuck is it works
 
         // GET LIST OF MKV/MKA FILES within directory
@@ -139,7 +143,12 @@ public class Controller  implements Initializable {
                 Arrays.sort(files);
                 // DEBUG START
                 for (File eachFile : files)
-                    System.out.println(eachFile.getAbsoluteFile() + " " + eachFile.getName());
+                    System.out.println(eachFile.getAbsoluteFile());
+
+                // Remember the folder used for MKV and reuse it when user opens MKA folder as new default path instead of user.home
+                folderToOpen = files[0].getParent();
+                    System.out.println(folderToOpen);
+
                 // DEBUG END
 
                 if (key.equals(".mkv")) {

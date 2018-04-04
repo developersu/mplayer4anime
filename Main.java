@@ -3,7 +3,7 @@ package sample;
 * Name: mplayer4anime                          *
 * Author: Dmitry Isaenko                       *
 * License: GNU GPL v.3                         *
-* Version: 0.6                                 *
+* Version: 0.6.1                               *
 * Site: https://developersu.blogspot.com/      *
 * 2018, Russia                                 *
 ***********************************************/

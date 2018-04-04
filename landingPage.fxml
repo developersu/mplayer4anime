@@ -83,7 +83,7 @@
                 </ToolBar>
                 <SplitPane dividerPositions="0.5" prefHeight="257.0" prefWidth="313.0" VBox.vgrow="ALWAYS">
                     <items>
-                        <AnchorPane prefHeight="160.0" prefWidth="100.0">
+                        <AnchorPane minWidth="200.0" prefHeight="160.0" prefWidth="200.0">
                             <children>
                                 <VBox layoutX="87.0" layoutY="-11.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                     <children>
@@ -118,7 +118,7 @@
                                 </VBox>
                             </children>
                         </AnchorPane>
-                  <TabPane prefHeight="200.0" prefWidth="200.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE">
+                  <TabPane minWidth="200.0" prefHeight="200.0" prefWidth="200.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
                       <Tab text="%audio_tab">
                            <content>
