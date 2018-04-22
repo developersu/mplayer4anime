@@ -10,6 +10,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.*;
 import javafx.util.Callback;
 import sample.About.AboutWindow;
+import sample.Settings.SettingsWindow;
 
 import java.io.*;
 import java.net.URL;
@@ -18,10 +19,19 @@ import java.util.ResourceBundle;
 
 public class Controller  implements Initializable {
 
+    // Class of settings used
+    private AppPreferences appPreferences;
+
+    private ResourceBundle resourceBundle;
+
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle) {
+    public void initialize(URL url, ResourceBundle rb) {
+        resourceBundle = rb;
         //System.out.println(resourceBundle.getLocale().toString());
         //System.out.println(resourceBundle.getKeys());
+
+        // Get preferences
+        appPreferences = new AppPreferences();
 
         // Set default extension of the subtitles files:
         subtType.setItems(FXCollections.observableArrayList(
@@ -88,7 +98,6 @@ public class Controller  implements Initializable {
                         else {
                             trimmedName = item.getName();
                             setText(trimmedName);
-
                         }
                     }
                 };
@@ -308,7 +317,7 @@ public class Controller  implements Initializable {
                 if (player == null || !player.isAlive()) {
                     //System.out.println("mplayer"  + " " + "-slave"  + " " +"-quiet"  + " " + (fullScreen.isSelected() ? "-fs" : "")  + " " + mkvFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString()  + " " + (Audio?"-audiofile":"")  + " " + (Audio?mkaFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString():"")  + " " + (Subtitles?"-sub":"")  + " " + (Subtitles?subtFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString():""));
                     player = new ProcessBuilder(
-                            "mplayer" ,
+                            appPreferences.getPath(),                                       // It's a chance for Windows ;)
                             "-slave",
                             Audio?"-audiofile":"",                                                 // FUCKING MAGIC! DON'T CHANGE SEQUENCE
                             Audio?mkaFileList.get(mkvListView.getSelectionModel().getSelectedIndex()).toPath().toString():"",
@@ -337,7 +346,14 @@ public class Controller  implements Initializable {
                 }
 
             } catch (IOException e) {
-                e.printStackTrace();
+                // e.printStackTrace();
+
+                Alert alertBox = new Alert(Alert.AlertType.ERROR);
+                alertBox.setTitle(resourceBundle.getString("Error"));
+                alertBox.setHeaderText(null);
+                alertBox.setContentText(resourceBundle.getString("unableToStartMplayerError"));
+                alertBox.show();
+                //System.out.println("Unable to start application!");
             }
         } else { System.out.println("File not selected"); }
     }
@@ -351,6 +367,10 @@ public class Controller  implements Initializable {
 
     @FXML
     private void infoBnt(){ new AboutWindow(this.hostServices); } // TODO: fix this shit with hostSerivces that doesn't work
+
+    @FXML
+    private void settingsBtn(){ new SettingsWindow(); }
+
     // HANDLING KEYS
     @FXML
     private void vKeyPressed(KeyEvent event){
@@ -367,5 +387,4 @@ public class Controller  implements Initializable {
         if (event.getCode().toString().equals("DELETE"))
             sDel();
     }
-
 }

@@ -21,7 +21,6 @@ public class AboutController {
     private void buttonClickOk(){
         Stage thisStage = (Stage) buttonOk.getScene().getWindow();
         thisStage.close();
-        //thisStage.ge
     }
     @FXML
     private void gitHubUrl(){

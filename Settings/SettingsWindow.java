@@ -1,6 +1,5 @@
-package sample.About;
+package sample.Settings;
 
-import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -12,15 +11,15 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
-public class AboutWindow {
+public class SettingsWindow {
 
-    public AboutWindow(HostServices hostServices){
+    public SettingsWindow(){
         Stage stageAbout = new Stage();
 
-        stageAbout.setMinWidth(415);
-        stageAbout.setMinHeight(220);
+        stageAbout.setMinWidth(570);
+        stageAbout.setMinHeight(150);
 
-        FXMLLoader loaderAbout = new FXMLLoader(getClass().getResource("AboutLayout.fxml"));
+        FXMLLoader loaderSettings = new FXMLLoader(getClass().getResource("SettingsLayout.fxml"));
         ResourceBundle resourceBundle;
 
         if (Locale.getDefault().getISO3Language().equals("rus")) {
@@ -28,16 +27,15 @@ public class AboutWindow {
         } else {
             resourceBundle = ResourceBundle.getBundle("sample.localization.locale", new Locale("en"));
         }
-        loaderAbout.setResources(resourceBundle);
+        loaderSettings.setResources(resourceBundle);
 
         try {
-            Parent parentAbout = loaderAbout.load();
-            AboutController abtController = loaderAbout.getController();
-            abtController.setHostServices(hostServices);
+            Parent parentAbout = loaderSettings.load();
+            //SettingsController settingsController = loaderSettings.getController();
 
-            stageAbout.setTitle(resourceBundle.getString("AboutName"));
+            stageAbout.setTitle(resourceBundle.getString("SettingsName"));
             stageAbout.getIcons().add(new Image(Main.class.getResourceAsStream("/sample/res/app.png"))); // TODO: change to something reliable
-            stageAbout.setScene(new Scene(parentAbout, 415, 220));
+            stageAbout.setScene(new Scene(parentAbout, 570, 150));
 
             stageAbout.show();
 

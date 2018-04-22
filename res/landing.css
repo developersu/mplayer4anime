@@ -89,13 +89,13 @@
    -fx-background-color: #4f6f8f;
 }
 
-.infoBtn {
+.transparentBtn {
     -fx-background-color: none;
 }
-.infoBtn:hover {
+.transparentBtn:hover {
     -fx-background-color: #e5e5e5;
 }
-.infoBtn:pressed {
+.transparentBtn:pressed {
     -fx-background-color: #d4d4d4;
 }
 /*
