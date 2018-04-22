@@ -16,7 +16,12 @@
             <Label text="%PathToMplayerLbl" />
             <Label fx:id="pathToMplayerLbl" text="???" />
             <Pane HBox.hgrow="ALWAYS" />
-            <Button mnemonicParsing="false" onAction="#clearPath" styleClass="transparentBtn" stylesheets="@../res/landing.css">
+            <Button mnemonicParsing="false" onAction="#findPathToMplayer">
+               <graphic>
+                  <SVGPath content="M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,1 21,8H21L4,8V18L6.14,10H23.21L20.93,18.5C20.7,19.37 19.92,20 19,20Z" />
+               </graphic>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#clearPath">
                <graphic>
                   <SVGPath content="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" fill="#cc0101" />
                </graphic>
@@ -28,11 +33,6 @@
             <Font name="System Italic" size="12.0" />
          </font>
       </Label>
-      <Button mnemonicParsing="false" onAction="#findPathToMplayer" text="%setPathBtn">
-         <graphic>
-            <SVGPath content="M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,1 21,8H21L4,8V18L6.14,10H23.21L20.93,18.5C20.7,19.37 19.92,20 19,20Z" />
-         </graphic>
-      </Button>
       <HBox prefWidth="200.0" spacing="5.0" VBox.vgrow="NEVER">
          <children>
             <Pane HBox.hgrow="ALWAYS" />
