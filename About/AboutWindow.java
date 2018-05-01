@@ -17,8 +17,8 @@ public class AboutWindow {
     public AboutWindow(HostServices hostServices){
         Stage stageAbout = new Stage();
 
-        stageAbout.setMinWidth(415);
-        stageAbout.setMinHeight(220);
+        stageAbout.setMinWidth(500);
+        stageAbout.setMinHeight(230);
 
         FXMLLoader loaderAbout = new FXMLLoader(getClass().getResource("AboutLayout.fxml"));
         ResourceBundle resourceBundle;
@@ -35,9 +35,14 @@ public class AboutWindow {
             AboutController abtController = loaderAbout.getController();
             abtController.setHostServices(hostServices);
 
-            stageAbout.setTitle(resourceBundle.getString("AboutName"));
-            stageAbout.getIcons().add(new Image(Main.class.getResourceAsStream("/sample/res/app.png"))); // TODO: change to something reliable
-            stageAbout.setScene(new Scene(parentAbout, 415, 220));
+            stageAbout.setTitle(resourceBundle.getString("about_AboutName"));
+            stageAbout.getIcons().addAll(
+                    new Image(Main.class.getResourceAsStream("/sample/res/app_icon32x32.png")),
+                    new Image(Main.class.getResourceAsStream("/sample/res/app_icon48x48.png")),
+                    new Image(Main.class.getResourceAsStream("/sample/res/app_icon64x64.png")),
+                    new Image(Main.class.getResourceAsStream("/sample/res/app_icon128x128.png"))
+            ); // TODO: change to something reliable
+            stageAbout.setScene(new Scene(parentAbout, 500, 230));
 
             stageAbout.show();
 

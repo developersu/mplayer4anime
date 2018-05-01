@@ -17,7 +17,7 @@ public class SettingsWindow {
         Stage stageAbout = new Stage();
 
         stageAbout.setMinWidth(570);
-        stageAbout.setMinHeight(150);
+        stageAbout.setMinHeight(450);
 
         FXMLLoader loaderSettings = new FXMLLoader(getClass().getResource("SettingsLayout.fxml"));
         ResourceBundle resourceBundle;
@@ -29,14 +29,19 @@ public class SettingsWindow {
         }
         loaderSettings.setResources(resourceBundle);
 
+
         try {
             Parent parentAbout = loaderSettings.load();
             //SettingsController settingsController = loaderSettings.getController();
 
-            stageAbout.setTitle(resourceBundle.getString("SettingsName"));
-            stageAbout.getIcons().add(new Image(Main.class.getResourceAsStream("/sample/res/app.png"))); // TODO: change to something reliable
-            stageAbout.setScene(new Scene(parentAbout, 570, 150));
-
+            stageAbout.setTitle(resourceBundle.getString("settings_SettingsName"));
+            stageAbout.getIcons().addAll(
+                    new Image(Main.class.getResourceAsStream("/sample/res/settings_icon32x32.png")),
+                    new Image(Main.class.getResourceAsStream("/sample/res/settings_icon48x48.png")),
+                    new Image(Main.class.getResourceAsStream("/sample/res/settings_icon64x64.png")),
+                    new Image(Main.class.getResourceAsStream("/sample/res/settings_icon128x128.png"))
+            );       // TODO: change to something reliable
+            stageAbout.setScene(new Scene(parentAbout, 570, 450));
             stageAbout.show();
 
         } catch (IOException e){

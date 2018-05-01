@@ -118,9 +118,9 @@
                                 </VBox>
                             </children>
                         </AnchorPane>
-                  <TabPane minWidth="200.0" prefHeight="200.0" prefWidth="200.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE">
+                  <TabPane fx:id="tabPane" minWidth="200.0" prefHeight="200.0" prefWidth="200.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE">
                     <tabs>
-                      <Tab text="%audio_tab">
+                      <Tab text="%main_tab_audio">
                            <content>
                                     <AnchorPane prefHeight="160.0" prefWidth="100.0">
                                         <children>
@@ -163,7 +163,7 @@
                                     </AnchorPane>
                            </content>
                         </Tab>
-                      <Tab text="%subtitles_tab">
+                      <Tab text="%main_tab_subtitles">
                            <content>
                               <AnchorPane prefHeight="160.0" prefWidth="100.0">
                                  <children>
@@ -176,7 +176,7 @@
                                                       <SVGPath content="M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,1 21,8H21L4,8V18L6.14,10H23.21L20.93,18.5C20.7,19.37 19.92,20 19,20Z" />
                                                    </graphic>
                                                 </Button>
-                                                <ChoiceBox fx:id="subtType" prefWidth="60.0" />
+                                                <ChoiceBox fx:id="subtExt" prefWidth="60.0" />
                                                 <ChoiceBox fx:id="subtCodepage" prefWidth="100.0" />
                                                 <Pane HBox.hgrow="ALWAYS" />
                                                 <Button mnemonicParsing="false" onAction="#sUp">

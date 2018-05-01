@@ -3,7 +3,7 @@ package sample;
 * Name: mplayer4anime                          *
 * Author: Dmitry Isaenko                       *
 * License: GNU GPL v.3                         *
-* Version: 0.7                                 *
+* Version: 0.8                                 *
 * Site: https://developersu.blogspot.com/      *
 * 2018, Russia                                 *
 ***********************************************/
@@ -27,7 +27,6 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-
         FXMLLoader loader = new FXMLLoader(getClass().getResource("landingPage.fxml"));
 
         if (Locale.getDefault().getISO3Language().equals("rus")) {
@@ -43,11 +42,18 @@ public class Main extends Application {
         controller.setHostServices(getHostServices());
         // end
 
-        primaryStage.getIcons().add(new Image(Main.class.getResourceAsStream("/sample/res/app.png")));
+        primaryStage.getIcons().addAll(
+                new Image(Main.class.getResourceAsStream("/sample/res/app_icon32x32.png")),
+                new Image(Main.class.getResourceAsStream("/sample/res/app_icon48x48.png")),
+                new Image(Main.class.getResourceAsStream("/sample/res/app_icon64x64.png")),
+                new Image(Main.class.getResourceAsStream("/sample/res/app_icon128x128.png"))
+        );
         primaryStage.setTitle("mplayer4anime");
         primaryStage.setMinWidth(500);
         primaryStage.setMinHeight(375);
         primaryStage.setScene(new Scene(root, 1200, 800));
+        // Make linkage to controller method to handle exit() event in there.
+        primaryStage.setOnHidden(e -> controller.shutdown());
         primaryStage.show();
     }
 }
