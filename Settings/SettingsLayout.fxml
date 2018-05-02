@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+<?import javafx.scene.text.Font?>
+
+<VBox spacing="5.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mplayer4anime.Settings.SettingsController">
+   <children>
+      <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
+         <children>
+            <Label text="%settings_PathToMplayerLbl" />
+            <Label fx:id="pathToMplayerLbl" text="-------" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <Button mnemonicParsing="false" onAction="#findPathToMplayer">
+               <graphic>
+                  <SVGPath content="M16,12A2,2 0 0,1 18,10A2,2 0 0,1 20,12A2,2 0 0,1 18,14A2,2 0 0,1 16,12M10,12A2,2 0 0,1 12,10A2,2 0 0,1 14,12A2,2 0 0,1 12,14A2,2 0 0,1 10,12M4,12A2,2 0 0,1 6,10A2,2 0 0,1 8,12A2,2 0 0,1 6,14A2,2 0 0,1 4,12Z" />
+               </graphic>
+            </Button>
+            <Button mnemonicParsing="false" onAction="#clearPath">
+               <graphic>
+                  <SVGPath content="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" fill="#cc0101" />
+               </graphic>
+            </Button>
+         </children>
+      </HBox>
+      <Label fx:id="unixOsInfoLbl" disable="true" minHeight="30.0" text="%settings_unixOsInformation" wrapText="true">
+         <font>
+            <Font name="System Italic" size="12.0" />
+         </font>
+      </Label>
+      <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+         <children>
+            <Label text="%settings_SubtitlesTabFirst" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <CheckBox fx:id="subtitlesFirstCheckBox" mnemonicParsing="false" />
+         </children>
+      </HBox>
+      <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
+         <children>
+            <Label text="%settings_LoadListsOnStart" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <CheckBox fx:id="listsLoadOnStartCheckBox" mnemonicParsing="false" />
+         </children>
+      </HBox>
+      <Label text="%settings_subsExtensionList" />
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" VBox.vgrow="ALWAYS">
+         <children>
+            <HBox alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <ListView fx:id="subsExtListView" onKeyPressed="#subsExtListKeyPressed" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                  <VBox spacing="5.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#subsExtUpRecord">
+                           <graphic>
+                              <SVGPath content="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                           </graphic>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#subsExtDownRecord">
+                           <graphic>
+                              <SVGPath content="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                           </graphic>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#subsExtRemoveRecord">
+                           <graphic>
+                              <SVGPath content="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" fill="#cc0101" />
+                           </graphic>
+                        </Button>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox spacing="5.0" VBox.vgrow="NEVER">
+               <children>
+                  <TextField fx:id="subsExtNewRecordText" HBox.hgrow="ALWAYS" />
+                  <Button fx:id="subsExtNewRecordBtn" mnemonicParsing="false" onAction="#subsExtAddNewRecord">
+                     <graphic>
+                        <SVGPath content="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="#007f08" />
+                     </graphic>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+      <Label text="%settings_subsCodepageList" />
+      <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0" VBox.vgrow="ALWAYS">
+         <children>
+            <HBox prefHeight="100.0" prefWidth="200.0" spacing="5.0" VBox.vgrow="ALWAYS">
+               <children>
+                  <ListView fx:id="subsCodepageListView" onKeyPressed="#subsCodepageListKeyPressed" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                  <VBox spacing="5.0">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#subsCodepageUpRecord">
+                           <graphic>
+                              <SVGPath content="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" />
+                           </graphic>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#subsCodepageDownRecord">
+                           <graphic>
+                              <SVGPath content="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" />
+                           </graphic>
+                        </Button>
+                        <Button mnemonicParsing="false" onAction="#subsCodepageRemoveRecord">
+                           <graphic>
+                              <SVGPath content="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" fill="#cc0101" />
+                           </graphic>
+                        </Button>
+                     </children>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox spacing="5.0" VBox.vgrow="NEVER">
+               <children>
+                  <TextField fx:id="subsCodepageNewRecordText" HBox.hgrow="ALWAYS" />
+                  <Button mnemonicParsing="false" onAction="#subsCodepageAddNewRecord">
+                     <graphic>
+                        <SVGPath content="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="#007f08" />
+                     </graphic>
+                  </Button>
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="5.0" />
+         </padding>
+      </VBox>
+      <HBox prefWidth="200.0" spacing="5.0" VBox.vgrow="NEVER">
+         <children>
+            <Pane HBox.hgrow="ALWAYS" />
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#Cancel" text="%CancelBtn" />
+            <Button mnemonicParsing="false" onAction="#Save" text="%SaveBtn" />
+         </children>
+      </HBox>
+   </children>
+   <padding>
+      <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+   </padding>
+</VBox>

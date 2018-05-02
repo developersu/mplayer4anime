@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckMenuItem?>
+<?import javafx.scene.control.SplitMenuButton?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToolBar?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.SVGPath?>
+
+<AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mplayer4anime.Controller">
+    <children>
+        <VBox prefHeight="400.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <children>
+                <ToolBar prefHeight="40.0" prefWidth="200.0" styleClass="topToolBar" stylesheets="@res/landing.css">
+                    <items>
+                  <HBox>
+                     <children>
+                        <Button minHeight="28.0" mnemonicParsing="false" onAction="#playPrevTrackBtn" styleClass="btnLeft" stylesheets="@res/landing.css">
+                           <graphic>
+                              <SVGPath content="M 12,12 3.5,6 12,0 Z M 0,0 V 12 H 2 V 0 Z" fill="#e1e1e1" />
+                           </graphic></Button>
+                              <Button minHeight="28.0" minWidth="53.0" mnemonicParsing="false" onAction="#playBtn" styleClass="btnCenter" stylesheets="@res/landing.css" textAlignment="CENTER">
+                           <graphic>
+                              <SVGPath content="M3,5V19L11,12M13,19H16V5H13M18,5V19H21V5" fill="#61dd4e" />
+                           </graphic>
+                        </Button>
+                        <Button minHeight="28.0" mnemonicParsing="false" onAction="#stopBtn" styleClass="btnCenter" stylesheets="@res/landing.css">
+                           <graphic>
+                              <SVGPath content="M18,18H6V6H18V18Z" fill="#e1e1e1" />
+                           </graphic>
+                        </Button>
+                              <Button minHeight="28.0" mnemonicParsing="false" onAction="#playNextTrackBtn" styleClass="btnRight" stylesheets="@res/landing.css">
+                           <graphic>
+                              <SVGPath content="M0,12 L8.5,6 L0,0 L0,12 L0,12 Z M10,0 L10,12 L12,12 L12,0 L10,0 L10,0 Z" fill="#e1e1e1" />
+                           </graphic></Button>
+                     </children>
+                     <opaqueInsets>
+                        <Insets />
+                     </opaqueInsets>
+                  </HBox>
+                  <Pane minWidth="20.0" />
+                  <HBox>
+                     <children>
+                        <Button minHeight="28.0" minWidth="36.0" mnemonicParsing="false" onAction="#volumeDownBtn" styleClass="btnLeft" stylesheets="@res/landing.css">
+                           <opaqueInsets>
+                              <Insets />
+                           </opaqueInsets>
+                           <graphic>
+                              <SVGPath content="M13.5,8 C13.5,6.2 12.5,4.7 11,4 L11,12 C12.5,11.3 13.5,9.8 13.5,8 L13.5,8 Z M0,5 L0,11 L4,11 L9,16 L9,0 L4,5 L0,5 L0,5 Z" fill="#e1e1e1" />
+                           </graphic>
+                        </Button>
+                        <Button minHeight="28.0" minWidth="36.0" mnemonicParsing="false" onAction="#volumeUpBtn" styleClass="btnRight" stylesheets="@res/landing.css">
+                           <graphic>
+                              <SVGPath content="M0,6 L0,12 L4,12 L9,17 L9,1 L4,6 L0,6 L0,6 Z M13.5,9 C13.5,7.2 12.5,5.7 11,5 L11,13 C12.5,12.3 13.5,10.8 13.5,9 L13.5,9 Z M11,0.2 L11,2.3 C13.9,3.2 16,5.8 16,9 C16,12.2 13.9,14.8 11,15.7 L11,17.8 C15,16.9 18,13.3 18,9 C18,4.7 15,1.1 11,0.2 L11,0.2 Z" fill="#e1e1e1" />
+                           </graphic>
+                        </Button>
+                     </children>
+                  </HBox>
+                  <Button minHeight="28.0" mnemonicParsing="false" onAction="#muteBtn" styleClass="btnSimple" stylesheets="@res/landing.css">
+                     <graphic>
+                        <SVGPath content="M3,9H7L12,4V20L7,15H3V9M16.59,12L14,9.41L15.41,8L18,10.59L20.59,8L22,9.41L19.41,12L22,14.59L20.59,16L18,13.41L15.41,16L14,14.59L16.59,12Z" fill="#e1e1e1" />
+                     </graphic>
+                  </Button>
+                        <Pane HBox.hgrow="ALWAYS" />
+                  <SplitMenuButton mnemonicParsing="false" onAction="#fullscreenBtn" styleClass="splitMenuButton" stylesheets="@res/landing.css">
+                    <items>
+                        <CheckMenuItem fx:id="fullScreen" mnemonicParsing="false" text="%fullscreen_option" />
+                    </items>
+                     <graphic>
+                        <SVGPath content="M5,5H10V7H7V10H5V5M14,5H19V10H17V7H14V5M17,14H19V19H14V17H17V14M10,17V19H5V14H7V17H10Z" fill="#e1e1e1" />
+                     </graphic>
+                  </SplitMenuButton>
+                    </items>
+                </ToolBar>
+                <SplitPane dividerPositions="0.5" prefHeight="257.0" prefWidth="313.0" VBox.vgrow="ALWAYS">
+                    <items>
+                        <!-- PAY ATTENTION! IN MAIN CONTROLLER THIS CONTROLLER CALLED AS @"fx:id"+"Controller" -->
+                        <fx:include fx:id="mkvPane" source="appPanes/mkvPane.fxml" />
+                        <TabPane fx:id="tabPane" minWidth="200.0" prefHeight="200.0" prefWidth="200.0" side="RIGHT" tabClosingPolicy="UNAVAILABLE">
+                    <tabs>
+                      <Tab text="%main_tab_audio">
+                          <fx:include fx:id="mkaPane" source="appPanes/mkaPane.fxml" />
+                      </Tab>
+                      <Tab text="%main_tab_subtitles">
+                          <fx:include fx:id="subPane" source="appPanes/subPane.fxml" />
+                      </Tab>
+                    </tabs>
+                  </TabPane>
+                    </items>
+                </SplitPane>
+                <HBox VBox.vgrow="NEVER">
+                    <children>
+                        <Pane HBox.hgrow="ALWAYS" />
+                  <Button mnemonicParsing="false" onAction="#settingsBtn" styleClass="transparentBtn" stylesheets="@res/landing.css">
+                     <graphic>
+                        <SVGPath content="M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z" fill="#686868" />
+                     </graphic>
+                  </Button>
+                  <Button mnemonicParsing="false" onAction="#infoBnt" styleClass="transparentBtn" stylesheets="@res/landing.css">
+                     <graphic>
+                        <SVGPath content="M13.5,4A1.5,1.5 0 0,0 12,5.5A1.5,1.5 0 0,0 13.5,7A1.5,1.5 0 0,0 15,5.5A1.5,1.5 0 0,0 13.5,4M13.14,8.77C11.95,8.87 8.7,11.46 8.7,11.46C8.5,11.61 8.56,11.6 8.72,11.88C8.88,12.15 8.86,12.17 9.05,12.04C9.25,11.91 9.58,11.7 10.13,11.36C12.25,10 10.47,13.14 9.56,18.43C9.2,21.05 11.56,19.7 12.17,19.3C12.77,18.91 14.38,17.8 14.54,17.69C14.76,17.54 14.6,17.42 14.43,17.17C14.31,17 14.19,17.12 14.19,17.12C13.54,17.55 12.35,18.45 12.19,17.88C12,17.31 13.22,13.4 13.89,10.71C14,10.07 14.3,8.67 13.14,8.77Z" fill="#686868f7" />
+                     </graphic>
+                  </Button>
+                    </children>
+                </HBox>
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>
