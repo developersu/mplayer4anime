@@ -40,23 +40,23 @@ public class AppPreferences {
         return preferences.getBoolean("LOAD_LISTS_ON_START", false);   // Don't populate lists by-default
     }
 
-    // Save lists itself of the latest opened folders (used only in Controller.class)
-    public void setList(String whichList, String value){
-        preferences.put(whichList, value);
-    }
-    // Return lists itself of the latest opened folders (used only in Controller.class)
-    public String getList(String whichList){
-        return preferences.get(whichList, "");
+    /** Convert strings array to singls string. Used in:
+     *                                                  setSubsExtensionsList
+     *                                                  setSubsCodepageList
+     */
+    private void storeSingleStringList(String whichList, String[] strArr){
+        StringBuilder collect = new StringBuilder();
+        for (String e : strArr) {
+            collect.append(e);
+            collect.append("@@@");  // If there is some idiot who will use @@@ in file extension I'll find him.
+        }
+        String strToStore = collect.toString();
+        preferences.put(whichList, strToStore);
     }
 
-    /** Handle lists of the subtitles extensions selector */
+     /** Handle lists of the subtitles extensions selector */
     public void setSubsExtensionsList(String[] subsList){
-        String stringToStore = "";
-        for (String e : subsList) {
-            stringToStore += e;
-            stringToStore += "@@@";         // If there is some idiot who will use @@@ in file extension I'll find him.
-        }
-        preferences.put("SUBS_EXTENSIONS_LIST", stringToStore);
+        storeSingleStringList("SUBS_EXTENSIONS_LIST", subsList);
     }
 
     public String[] getSubsExtensionsList(){
@@ -65,12 +65,7 @@ public class AppPreferences {
 
     /** Handle lists of the subtitles codepage selector */
     public void setSubsCodepageList(String[] subsCodepageList){
-        String stringToStore = "";
-        for (String e : subsCodepageList) {
-            stringToStore += e;
-            stringToStore += "@@@";         // If there is some idiot who will use @@@ in file extension I'll find him.
-        }
-        preferences.put("SUBS_CODEPAGE_LIST", stringToStore);
+        storeSingleStringList("SUBS_CODEPAGE_LIST", subsCodepageList);
     }
 
     public String[] getSubsCodepageList(){
@@ -80,6 +75,7 @@ public class AppPreferences {
     // Save & recover selected by user Subtitles format
     public void setLastTimeUsedSusExt(String selected){ preferences.put("SUBS_EXT_LAST_TIME_SELECTED", selected); }
     public String  getLastTimeUsedSubsExt(){ return preferences.get("SUBS_EXT_LAST_TIME_SELECTED", ""); }
+
     // Save & recover selected by user Subtitles codepage
     public void setLastTimeUsedSubsCodepage(String selected){ preferences.put("SUBS_CODEPAGE_LAST_TIME_SELECTED", selected); }
     public String  getLastTimeUsedSubsCodepage(){ return preferences.get("SUBS_CODEPAGE_LAST_TIME_SELECTED", ""); }
@@ -89,4 +85,22 @@ public class AppPreferences {
         return preferences.getBoolean("FULL_SCREEN_SELECTED", false);
     }
     public void setFullScreenSelected(boolean set){ preferences.putBoolean("FULL_SCREEN_SELECTED", set); }
+
+    /** Lists managment */
+    // Return lists itself of the latest opened folders (used only in Controller.class)
+    private String getList(String whichList){
+        return preferences.get(whichList, "");
+    }
+    // Save lists itself of the latest opened folders (used only in Controller.class)
+    private void setList(String whichList, String value){
+        preferences.put(whichList, value);
+    }
+
+    public String getListMKV(){ return getList("MKV"); }
+    public String getListMKA(){ return getList("MKA"); }
+    public String getListSUB(){ return getList("SUB"); }
+
+    public void setListMKV(String value){setList("MKV", value);}
+    public void setListMKA(String value){setList("MKA", value);}
+    public void setListSUB(String value){setList("SUB", value);}
 }

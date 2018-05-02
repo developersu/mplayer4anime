@@ -25,10 +25,19 @@ public class Controller implements Initializable {
     private ControllerMKA mkaPaneController;
 
     // Get preferences
-    // Class of settings used
     private AppPreferences appPreferences = new AppPreferences();
 
     private ResourceBundle resourceBundle;
+
+
+    @FXML
+    private CheckMenuItem fullScreen;
+
+    // Get host services for opening URLs etc.
+    private HostServices hostServices;
+
+    @FXML
+    private TabPane tabPane;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -61,27 +70,18 @@ public class Controller implements Initializable {
         /* Populating settings from the previous run /*/
         // Populating lists
         if (appPreferences.getLoadListsOnStart()){                                      // TODO: probably should be dedicated method in abstract class defined
-            if (!appPreferences.getList("MKV").isEmpty()){
-                mkvPaneController.getFilesFromFolder(new File(appPreferences.getList("MKV")), ".mkv");
+            if (!appPreferences.getListMKV().isEmpty()){
+                mkvPaneController.getFilesFromFolder(new File(appPreferences.getListMKV()), ".mkv");
             }
-            if (!appPreferences.getList("MKA").isEmpty()){
-                mkaPaneController.getFilesFromFolder(new File(appPreferences.getList("MKA")), ".mka");
+            if (!appPreferences.getListMKA().isEmpty()){
+                mkaPaneController.getFilesFromFolder(new File(appPreferences.getListMKA()), ".mka");
             }
-            if (!appPreferences.getList("SUB").isEmpty()){
-                subPaneController.getFilesFromFolder(new File(appPreferences.getList("SUB")), appPreferences.getLastTimeUsedSubsExt());
+            if (!appPreferences.getListSUB().isEmpty()){
+                subPaneController.getFilesFromFolder(new File(appPreferences.getListSUB()), appPreferences.getLastTimeUsedSubsExt());
             }
         }
         fullScreen.setSelected(appPreferences.getFullScreenSelected());
     }
-
-    @FXML
-    private CheckMenuItem fullScreen;
-
-    // Get host services for opening URLs etc.
-    private HostServices hostServices;
-
-    @FXML
-    private TabPane tabPane;
 
     public void setHostServices(HostServices hostServices) {
         this.hostServices = hostServices;
@@ -194,19 +194,19 @@ public class Controller implements Initializable {
 
         if (appPreferences.getLoadListsOnStart()) {
             if (mkvPaneController.paneFileList.isEmpty())
-                appPreferences.setList("MKV", "");
+                appPreferences.setListMKV("");
             else
-                appPreferences.setList("MKV", mkvPaneController.paneFileList.get(0).getParent());
+                appPreferences.setListMKV(mkvPaneController.paneFileList.get(0).getParent());
 
             if (mkaPaneController.paneFileList.isEmpty())
-                appPreferences.setList("MKA", "");
+                appPreferences.setListMKA("");
             else
-                appPreferences.setList("MKA", mkaPaneController.paneFileList.get(0).getParent());
+                appPreferences.setListMKA(mkaPaneController.paneFileList.get(0).getParent());
 
             if (subPaneController.paneFileList.isEmpty())
-                appPreferences.setList("SUB", "");
+                appPreferences.setListSUB("");
             else {
-                appPreferences.setList("SUB", subPaneController.paneFileList.get(0).getParent());
+                appPreferences.setListSUB(subPaneController.paneFileList.get(0).getParent());
             }
         }
         appPreferences.setLastTimeUsedSusExt(subPaneController.subtExt.getValue());
@@ -216,9 +216,9 @@ public class Controller implements Initializable {
         Platform.exit();
     }
 
+
     @FXML
     private void infoBnt(){ new AboutWindow(this.hostServices); } // TODO: fix this shit with hostSerivces that doesn't work @ linux
-
 
     /**             SETTINGS HANDLE          */
     @FXML

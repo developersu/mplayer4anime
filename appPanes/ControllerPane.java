@@ -18,7 +18,7 @@ import java.util.ResourceBundle;
 
 public abstract class ControllerPane  implements Initializable {
 
-    private ResourceBundle resourceBundle;            // TODO: consider access thorough mediator
+    private ResourceBundle resourceBundle;
     // use folderToOpen same variable in all panes
     private static String folderToOpen;
 
@@ -136,7 +136,6 @@ public abstract class ControllerPane  implements Initializable {
             paneListView.getSelectionModel().select(index+1);
         }
     }
-
     @FXML
     private void Del(){ paneFileList.remove(paneListView.getSelectionModel().getSelectedItem()); }
 
