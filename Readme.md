@@ -17,3 +17,16 @@ Just start it as usual Java application:
 ```
 $ java -jar mplayer4anime.jar
 ```
+
+## Run on windows
+Step 1.
+Download and install JRE (8 or later):
+http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html
+
+Step 2.
+Download and install (unpack) mplayer:
+http://oss.netfarm.it/mplayer/
+(see 'Build selection table', for example click 'generic')
+
+Step 3.
+Download and run jar file.

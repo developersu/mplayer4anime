@@ -55,22 +55,12 @@ public class AppPreferences {
     }
 
      /** Handle lists of the subtitles extensions selector */
-    public void setSubsExtensionsList(String[] subsList){
-        storeSingleStringList("SUBS_EXTENSIONS_LIST", subsList);
-    }
-
-    public String[] getSubsExtensionsList(){
-        return preferences.get("SUBS_EXTENSIONS_LIST", ".ass@@@.crt@@@").split("@@@");
-    }
+    public void setSubsExtensionsList(String[] subsList){ storeSingleStringList("SUBS_EXTENSIONS_LIST", subsList); }
+    public String[] getSubsExtensionsList(){ return preferences.get("SUBS_EXTENSIONS_LIST", ".ass@@@.crt@@@").split("@@@"); }
 
     /** Handle lists of the subtitles codepage selector */
-    public void setSubsCodepageList(String[] subsCodepageList){
-        storeSingleStringList("SUBS_CODEPAGE_LIST", subsCodepageList);
-    }
-
-    public String[] getSubsCodepageList(){
-        return preferences.get("SUBS_CODEPAGE_LIST", "default@@@utf8@@@cp1251@@@koi8-r").split("@@@");
-    }
+    public void setSubsCodepageList(String[] subsCodepageList){ storeSingleStringList("SUBS_CODEPAGE_LIST", subsCodepageList); }
+    public String[] getSubsCodepageList(){ return preferences.get("SUBS_CODEPAGE_LIST", "default@@@utf8@@@cp1251@@@koi8-r").split("@@@"); }
 
     // Save & recover selected by user Subtitles format
     public void setLastTimeUsedSusExt(String selected){ preferences.put("SUBS_EXT_LAST_TIME_SELECTED", selected); }

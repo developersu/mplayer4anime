@@ -29,7 +29,6 @@ public class Controller implements Initializable {
 
     private ResourceBundle resourceBundle;
 
-
     @FXML
     private CheckMenuItem fullScreen;
 
@@ -69,7 +68,7 @@ public class Controller implements Initializable {
 
         /* Populating settings from the previous run /*/
         // Populating lists
-        if (appPreferences.getLoadListsOnStart()){                                      // TODO: probably should be dedicated method in abstract class defined
+        if (appPreferences.getLoadListsOnStart()){         // TODO: probably should be dedicated method in abstract class defined
             if (!appPreferences.getListMKV().isEmpty()){
                 mkvPaneController.getFilesFromFolder(new File(appPreferences.getListMKV()), ".mkv");
             }
@@ -205,9 +204,8 @@ public class Controller implements Initializable {
 
             if (subPaneController.paneFileList.isEmpty())
                 appPreferences.setListSUB("");
-            else {
+            else
                 appPreferences.setListSUB(subPaneController.paneFileList.get(0).getParent());
-            }
         }
         appPreferences.setLastTimeUsedSusExt(subPaneController.subtExt.getValue());
         appPreferences.setLastTimeUsedSubsCodepage(subPaneController.subtCodepage.getValue());
@@ -226,8 +224,7 @@ public class Controller implements Initializable {
     // Get event that notify application in case some settings has been changed
     // This function called from MediatorControl after mediator receives request form SettingsController indicating that user updated some required fields.
     public void updateAfterSettingsChanged(){
-        //** update list of extensions */
-
+        /** update list of extensions */
         // Clear and update list
         String extensionPrevSelected = subPaneController.subtExt.getValue();
         subPaneController.subtExtList.clear();
@@ -240,8 +237,7 @@ public class Controller implements Initializable {
         // In case of application failure should be better to save this immediately
         appPreferences.setLastTimeUsedSusExt(subPaneController.subtExt.getValue());
 
-        //** update list of codepage */
-
+        /** update list of codepage */
         String codepagePrevSelected = subPaneController.subtCodepage.getValue();
         subPaneController.subtCodepageList.clear();
         subPaneController.subtCodepageList.setAll(appPreferences.getSubsCodepageList());
