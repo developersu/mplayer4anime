@@ -31,7 +31,7 @@
             </Button>
          </children>
       </HBox>
-      <Label fx:id="unixOsInfoLbl" disable="true" minHeight="30.0" text="%settings_unixOsInformation" wrapText="true">
+      <Label fx:id="unixOsInfoLbl" disable="true" minHeight="35.0" text="%settings_unixOsInformation" wrapText="true">
          <font>
             <Font name="System Italic" size="12.0" />
          </font>

@@ -134,9 +134,9 @@ public class SettingsController implements Initializable {
         resourceBundle = resBundle;
         appPreferences = new AppPreferences();
         pathToMplayerLbl.setText(appPreferences.getPath());
-        if (System.getProperty("os.name").contains("Windows")) {
-            unixOsInfoLbl.setVisible(false);
-        }
+
+        //    unixOsInfoLbl.setVisible(false);
+
         // Subtitles should be shown first? If TRUE, then set checkbox.
         subtitlesFirstCheckBox.setSelected(appPreferences.getSubtilesFirst());
         // Should application restore lists after startup?
@@ -172,7 +172,10 @@ public class SettingsController implements Initializable {
 
     @FXML
     private void clearPath(){
-        pathToMplayerLbl.setText("mplayer");
+        if (System.getProperty("os.name").contains("Windows"))
+            pathToMplayerLbl.setText("mplayer\\mplayer.exe");
+        else
+            pathToMplayerLbl.setText("mplayer");
     }
 
     @FXML
