@@ -76,6 +76,12 @@ public class AppPreferences {
     }
     public void setFullScreenSelected(boolean set){ preferences.putBoolean("FULL_SCREEN_SELECTED", set); }
 
+    // Save & recover Subtitles checkbox, if selected
+    public boolean getSubtitlesHideSelected(){
+        return preferences.getBoolean("FULL_SUBTITLES_HIDE_SELECTED", false);
+    }
+    public void setSubtitlesHideSelected(boolean set){ preferences.putBoolean("FULL_SUBTITLES_HIDE_SELECTED", set); }
+
     /** Lists managment */
     // Return lists itself of the latest opened folders (used only in Controller.class)
     private String getList(String whichList){

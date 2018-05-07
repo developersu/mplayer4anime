@@ -38,6 +38,9 @@ public class Controller implements Initializable {
     @FXML
     private TabPane tabPane;
 
+    @FXML
+    private CheckMenuItem subsHide;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Register this controller in mediator
@@ -80,6 +83,7 @@ public class Controller implements Initializable {
             }
         }
         fullScreen.setSelected(appPreferences.getFullScreenSelected());
+        subsHide.setSelected(appPreferences.getSubtitlesHideSelected());
     }
 
     public void setHostServices(HostServices hostServices) {
@@ -95,6 +99,31 @@ public class Controller implements Initializable {
             playerIn.flush();
             return true;
         } else { return false; }
+    }
+
+    @FXML
+    private void subsTriggerBtn(){
+        playerSingleCommand("get_sub_visibility");
+        String returnedStr;
+        int returnedInt = 1;
+        try {
+            while ((returnedStr = playerOutErr.readLine()) != null) {
+                //System.out.println(returnedStr);
+                if (returnedStr.startsWith("ANS_SUB_VISIBILITY=")) {
+                    returnedInt = Integer.parseInt(returnedStr.substring("ANS_SUB_VISIBILITY=".length()));
+                    break;
+                }
+            }
+        }
+        catch (IOException e) {
+            System.out.println("Can't determine if subtitles enabled/disabled");
+        }
+
+        if (returnedInt == 1)
+            playerSingleCommand("sub_visibility 0");
+        else
+            playerSingleCommand("sub_visibility 1");
+
     }
     @FXML
     private void fullscreenBtn(){ playerSingleCommand("vo_fullscreen"); }
@@ -148,6 +177,7 @@ public class Controller implements Initializable {
                             "-quiet",
                             fullScreen.isSelected() ? "-fs" : "",
                             mkvPaneController.paneFileList.get(mkvPaneController.paneListView.getSelectionModel().getSelectedIndex()).toPath().toString(),
+                            subsHide.isSelected()||Subtitles?"-nosub":"",      // Turn off subtitles embedded into MKV file (and replace by localy-stored subs file if needed)
                             Subtitles?"-sub":"",
                             Subtitles? subPaneController.paneFileList.get(mkvPaneController.paneListView.getSelectionModel().getSelectedIndex()).toPath().toString():"",
                             Subtitles?SubCodepageDefault?"":"-subcp":"",                           // Use subtitles -> YES -> Check if we need codepage
@@ -163,6 +193,14 @@ public class Controller implements Initializable {
                     new LineRedirecter(player.getErrorStream(), writeTo).start();
 
                     playerIn = new PrintStream(player.getOutputStream());
+
+                    /* If user desired to disable subtitles but populated the list in the SUB pane, then load them and disable visibility.
+                     * It's should be done this way because if we won't pass them to mplayer during start them user won't be able to enable them later on.
+                     * There is another bike could be implemented such as passing input file during load but it's far more dumb idea then current implementation.
+                     */
+                    if (subsHide.isSelected())
+                        playerSingleCommand("sub_visibility 0");
+
                 } else  {
                     playerIn.print("pause");
                     playerIn.print("\n");
@@ -210,6 +248,7 @@ public class Controller implements Initializable {
         appPreferences.setLastTimeUsedSusExt(subPaneController.subtExt.getValue());
         appPreferences.setLastTimeUsedSubsCodepage(subPaneController.subtCodepage.getValue());
         appPreferences.setFullScreenSelected(fullScreen.isSelected());
+        appPreferences.setSubtitlesHideSelected(subsHide.isSelected());
 
         Platform.exit();
     }
