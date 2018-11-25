@@ -18,6 +18,9 @@ Just start it as usual Java application:
 $ java -jar mplayer4anime.jar
 ```
 
+## Used libraries
+GSON: https://github.com/google/gson
+
 ## Run on windows
 Step 1.
 Download and install JRE (8 or later):
