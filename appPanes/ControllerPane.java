@@ -23,13 +23,48 @@ public abstract class ControllerPane  implements Initializable {
     private static String folderToOpen;
 
     @FXML
-    public ListView<File> paneListView;
-    public ObservableList<File> paneFileList = FXCollections.observableArrayList();
+    private ListView<File> paneListView;
+    private ObservableList<File> paneFileList = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL url, ResourceBundle resBundle) {
         SetCellFactory(paneListView);
         resourceBundle = resBundle;
+    }
+
+    /** Get index of the selected in pane element */
+    public int getElementSelectedIndex(){
+        return this.paneListView.getSelectionModel().getSelectedIndex();
+    }
+    /** Select element name (full path) using index recieved */
+    public String getElementSelected(){
+        if (this.paneListView.getSelectionModel().getSelectedItem() != null) {
+            return this.paneFileList.get(this.getElementSelectedIndex()).toPath().toString();
+        }
+        else {
+            return null;
+        }
+    }
+    /** Select element in pane using index recieved */
+    public void setElementSelectedByIndex(int index){
+        this.paneListView.getSelectionModel().select(index);
+    }
+    /** Get number of elements loaded into the pane */
+    public int getElementsCount(){
+        return this.paneFileList.size();
+    }
+    /** Check if there are any elements loaded */
+    public boolean isElementsListEmpty(){
+        return paneFileList.isEmpty();
+    }
+    /** Get all elements
+     * Used in Json playlist writer only */
+    public String[] getElementsAll(){
+        String[] elementsArray = new String[this.getElementsCount()];
+        for (int i = 0; i < elementsArray.length; i++){
+            elementsArray[i] = paneFileList.get(i).toString();
+        }
+        return  elementsArray;
     }
 
     private void SetCellFactory(ListView<File> lv) {
@@ -56,8 +91,10 @@ public abstract class ControllerPane  implements Initializable {
             }
         });
     }
-
-    protected void openFileChooser (String key){
+    /**
+     * Open file selector (Open folder button in UI).
+     * */
+    void openFileChooser (String key){
         File directoryReceived;      // Store files (folder) received from selector
         DirectoryChooser dirSelect;
 
@@ -68,17 +105,17 @@ public abstract class ControllerPane  implements Initializable {
             dirSelect.setInitialDirectory(new File(System.getProperty("user.home")));
         else
             dirSelect.setInitialDirectory(new File(folderToOpen));
-        directoryReceived = dirSelect.showDialog(null);                 // TODO: Clarify how the fuck is it works
+        directoryReceived = dirSelect.showDialog(paneListView.getScene().getWindow());
 
-        // GET LIST OF MKV/MKA FILES within directory
+        // GET LIST OF FILES from directory
         if (directoryReceived != null) {
-            getFilesFromFolder(directoryReceived, key);
+            setFilesFromFolder(directoryReceived, key);
         } else {
             System.out.println("\tNo folder selected");
         }
     }
 
-    public void getFilesFromFolder(File directoryReceived, String key){
+    private void setFilesFromFolder(File directoryReceived, String key) {
         File[] files;                // Store files mkv/mka
 
         files = directoryReceived.listFiles(new FilenameFilter() {
@@ -95,17 +132,33 @@ public abstract class ControllerPane  implements Initializable {
             }
         });
 
+        displayFiles(files);
+    }
+    /**
+     * Set files using lists. Used if playlist loaded
+     * */
+    public void setFilesFromList(String[] fileLocations){
+        if (fileLocations != null && fileLocations.length != 0) {
+            File[] files = new File[fileLocations.length];
+            for (int i=0; i < fileLocations.length; i++)
+                files[i] = new File(fileLocations[i]);
+            displayFiles(files);
+        }
+    }
+
+    private void displayFiles(File[] files){
         if (files != null && files.length > 0) {
             // spiced java magic
             Arrays.sort(files);
-            // DEBUG START
+
+            /* DEBUG START
             for (File eachFile : files)
                 System.out.println(eachFile.getAbsoluteFile());
-            // DEBUG END
+            DEBUG END */
 
             // Remember the folder used for MKV and reuse it when user opens MKA/subs folder (as new default path instead of user.home)
             folderToOpen = files[0].getParent();
-            System.out.println(folderToOpen);
+            //System.out.println(folderToOpen);
 
                 paneListView.getItems().clear(); // wipe elements from ListView
                 paneFileList.addAll(files);

@@ -2,11 +2,16 @@ package mplayer4anime;
 
 import javafx.application.HostServices;
 import javafx.application.Platform;
-import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
+
+import javafx.stage.Stage;
 import mplayer4anime.About.AboutWindow;
+import mplayer4anime.Playlists.JsonStorage;
+import mplayer4anime.Playlists.Playlists;
 import mplayer4anime.Settings.SettingsWindow;
 import mplayer4anime.appPanes.ControllerMKA;
 import mplayer4anime.appPanes.ControllerMKV;
@@ -14,6 +19,7 @@ import mplayer4anime.appPanes.ControllerSUB;
 
 import java.io.*;
 import java.net.URL;
+import java.util.ListIterator;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -23,7 +29,10 @@ public class Controller implements Initializable {
     private ControllerSUB subPaneController;
     @FXML
     private ControllerMKA mkaPaneController;
-
+    @FXML
+    private Label statusLbl;
+    @FXML
+    private Menu recentlyOpenedMenu;
     // Get preferences
     private AppPreferences appPreferences = new AppPreferences();
 
@@ -41,6 +50,7 @@ public class Controller implements Initializable {
     @FXML
     private CheckMenuItem subsHide;
 
+    private String currentPlaylistLocation = null;  //TODO: move to the constructor?
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Register this controller in mediator
@@ -49,49 +59,30 @@ public class Controller implements Initializable {
         resourceBundle = rb;
 
         // Set default extension of the subtitles files:
-        subPaneController.subtExtList = FXCollections.observableArrayList( appPreferences.getSubsExtensionsList() ); // Receive list from storage
-        subPaneController.subtExt.setItems(subPaneController.subtExtList);
-        if (appPreferences.getLastTimeUsedSubsExt().isEmpty())      // not sure that it's possible
-            subPaneController.subtExt.setValue(subPaneController.subtExtList.get(0));
-        else
-            subPaneController.subtExt.setValue(appPreferences.getLastTimeUsedSubsExt());
+        subPaneController.setSubtExt(appPreferences.getSubsExtensionsList(), appPreferences.getLastTimeUsedSubsExt());// Receive list from storage & set selected value
 
-        // Set default list of codepages of the subtitles files:
-        subPaneController.subtCodepageList = FXCollections.observableArrayList(appPreferences.getSubsCodepageList());
-        subPaneController.subtCodepage.setItems(subPaneController.subtCodepageList);
-        if (appPreferences.getLastTimeUsedSubsCodepage().isEmpty())
-            subPaneController.subtCodepage.setValue(subPaneController.subtCodepageList.get(0));
-        else
-            subPaneController.subtCodepage.setValue(appPreferences.getLastTimeUsedSubsCodepage());
+        // Set default list of encodings of the subtitles files:
+        subPaneController.setEncoding(appPreferences.getSubsEncodingList(), appPreferences.getLastTimeUsedSubsEncoding());
 
         // If subtitles should be opened first, per user's settings let's show it first
         if (appPreferences.getSubtilesFirst()){
             tabPane.getSelectionModel().select(1);  // 0 is mka 1 is subs
         }
 
-        /* Populating settings from the previous run /*/
-        // Populating lists
-        if (appPreferences.getLoadListsOnStart()){         // TODO: probably should be dedicated method in abstract class defined
-            if (!appPreferences.getListMKV().isEmpty()){
-                mkvPaneController.getFilesFromFolder(new File(appPreferences.getListMKV()), ".mkv");
-            }
-            if (!appPreferences.getListMKA().isEmpty()){
-                mkaPaneController.getFilesFromFolder(new File(appPreferences.getListMKA()), ".mka");
-            }
-            if (!appPreferences.getListSUB().isEmpty()){
-                subPaneController.getFilesFromFolder(new File(appPreferences.getListSUB()), appPreferences.getLastTimeUsedSubsExt());
-            }
-        }
         fullScreen.setSelected(appPreferences.getFullScreenSelected());
         subsHide.setSelected(appPreferences.getSubtitlesHideSelected());
+
+        String[] recentPlaylists = appPreferences.getRecentPlaylists();
+        for (int i = recentPlaylists.length-1; i >= 0; i--)
+            if (!recentPlaylists[i].isEmpty())
+                addRecentlyOpened(recentPlaylists[i]);
     }
 
     public void setHostServices(HostServices hostServices) {
         this.hostServices = hostServices;
     }
 
-    /**             PLAYER COMMANDS          */
-
+    /*             PLAYER COMMANDS          */
     private boolean playerSingleCommand(String command){
         if (player != null && player.isAlive()) {
             playerIn.print(command);
@@ -103,27 +94,26 @@ public class Controller implements Initializable {
 
     @FXML
     private void subsTriggerBtn(){
-        playerSingleCommand("get_sub_visibility");
-        String returnedStr;
-        int returnedInt = 1;
-        try {
-            while ((returnedStr = playerOutErr.readLine()) != null) {
-                //System.out.println(returnedStr);
-                if (returnedStr.startsWith("ANS_SUB_VISIBILITY=")) {
-                    returnedInt = Integer.parseInt(returnedStr.substring("ANS_SUB_VISIBILITY=".length()));
-                    break;
+        if (playerSingleCommand("get_sub_visibility")) {
+            String returnedStr;
+            int returnedInt = 1;
+            try {
+                while ((returnedStr = playerOutErr.readLine()) != null) {
+                    //System.out.println(returnedStr);
+                    if (returnedStr.startsWith("ANS_SUB_VISIBILITY=")) {
+                        returnedInt = Integer.parseInt(returnedStr.substring("ANS_SUB_VISIBILITY=".length()));
+                        break;
+                    }
                 }
+            } catch (IOException e) {
+                System.out.println("Can't determine whether subtitles enabled or disabled");
             }
-        }
-        catch (IOException e) {
-            System.out.println("Can't determine if subtitles enabled/disabled");
-        }
 
-        if (returnedInt == 1)
-            playerSingleCommand("sub_visibility 0");
-        else
-            playerSingleCommand("sub_visibility 1");
-
+            if (returnedInt == 1)
+                playerSingleCommand("sub_visibility 0");
+            else
+                playerSingleCommand("sub_visibility 1");
+        }
     }
     @FXML
     private void fullscreenBtn(){ playerSingleCommand("vo_fullscreen"); }
@@ -136,9 +126,9 @@ public class Controller implements Initializable {
             while (player.isAlive());               // TODO: remove crutch, implement bike
         }
         int index;
-        index = mkvPaneController.paneListView.getSelectionModel().getSelectedIndex();
+        index = mkvPaneController.getElementSelectedIndex();
         if (index > 0) {
-            mkvPaneController.paneListView.getSelectionModel().select(index-1);
+            mkvPaneController.setElementSelectedByIndex(index-1); // .selectNext / .selectPrevious
            playBtn();
         }
     }
@@ -149,9 +139,9 @@ public class Controller implements Initializable {
             while (player.isAlive());               // TODO: remove crutch, implement bike
         }
         int index;
-        index = mkvPaneController.paneListView.getSelectionModel().getSelectedIndex();
-        if (index+1 < mkvPaneController.paneFileList.size() ) {
-            mkvPaneController.paneListView.getSelectionModel().select(index+1);
+        index = mkvPaneController.getElementSelectedIndex();
+        if (index+1 < mkvPaneController.getElementsCount() ) {
+            mkvPaneController.setElementSelectedByIndex(index+1);
             playBtn();
         }
     }
@@ -162,10 +152,10 @@ public class Controller implements Initializable {
 
     @FXML
     private void playBtn(){
-        if (mkvPaneController.paneListView.getSelectionModel().getSelectedItem() != null) {
-            boolean Audio = !mkaPaneController.paneFileList.isEmpty() && mkvPaneController.paneListView.getSelectionModel().getSelectedIndex() < mkaPaneController.paneFileList.size();
-            boolean Subtitles = !subPaneController.paneFileList.isEmpty() && mkvPaneController.paneListView.getSelectionModel().getSelectedIndex() < subPaneController.paneFileList.size();
-            boolean SubCodepageDefault = subPaneController.subtCodepage.getValue().equals("default");
+        if (mkvPaneController.getElementSelected() != null) {
+            boolean Audio = !mkaPaneController.isElementsListEmpty() && mkvPaneController.getElementSelectedIndex() < mkaPaneController.getElementsCount();
+            boolean Subtitles = !subPaneController.isElementsListEmpty() && mkvPaneController.getElementSelectedIndex() < subPaneController.getElementsCount();
+            boolean SubEncodingDefault = subPaneController.getSelectedEncoding().equals("default");
 
             try {
                 if (player == null || !player.isAlive()) {
@@ -173,15 +163,15 @@ public class Controller implements Initializable {
                             appPreferences.getPath(),                                       // It's a chance for Windows ;)
                             "-slave",
                             Audio?"-audiofile":"",
-                            Audio? mkaPaneController.paneFileList.get(mkvPaneController.paneListView.getSelectionModel().getSelectedIndex()).toPath().toString():"",
+                            Audio? mkaPaneController.getElementSelected():"",
                             "-quiet",
                             fullScreen.isSelected() ? "-fs" : "",
-                            mkvPaneController.paneFileList.get(mkvPaneController.paneListView.getSelectionModel().getSelectedIndex()).toPath().toString(),
+                            mkvPaneController.getElementSelected(),
                             subsHide.isSelected()||Subtitles?"-nosub":"",      // Turn off subtitles embedded into MKV file (and replace by localy-stored subs file if needed)
                             Subtitles?"-sub":"",
-                            Subtitles? subPaneController.paneFileList.get(mkvPaneController.paneListView.getSelectionModel().getSelectedIndex()).toPath().toString():"",
-                            Subtitles?SubCodepageDefault?"":"-subcp":"",                           // Use subtitles -> YES -> Check if we need codepage
-                            Subtitles?SubCodepageDefault?"": subPaneController.subtCodepage.getValue():""
+                            Subtitles? subPaneController.getElementSelected():"",
+                            Subtitles?SubEncodingDefault?"":"-subcp":"",                           // Use subtitles -> YES -> Check if we need encoding
+                            Subtitles?SubEncodingDefault?"": subPaneController.getSelectedEncoding():""
                             ).start();
 
                     PipedInputStream readFrom = new PipedInputStream(256 * 1024);
@@ -200,19 +190,13 @@ public class Controller implements Initializable {
                      */
                     if (subsHide.isSelected())
                         playerSingleCommand("sub_visibility 0");
-
                 } else  {
                     playerIn.print("pause");
                     playerIn.print("\n");
                     playerIn.flush();
                 }
             } catch (IOException e) {
-                // e.printStackTrace();         // No need
-                Alert alertBox = new Alert(Alert.AlertType.ERROR);
-                alertBox.setTitle(resourceBundle.getString("Error"));
-                alertBox.setHeaderText(null);
-                alertBox.setContentText(resourceBundle.getString("unableToStartMplayerError"));
-                alertBox.show();
+                ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("ErrorUnableToStartMplayer"));
             }
         } else { System.out.println("File not selected"); }
     }
@@ -224,69 +208,140 @@ public class Controller implements Initializable {
     @FXML
     private void volumeDownBtn(){ playerSingleCommand("volume -1 0"); }
 
+    @FXML
+    private void closeBtn() {
+        Stage currentStage = (Stage) tabPane.getScene().getWindow();
+        currentStage.close();
+    }
+
     // Will be used to store lists previously opened.
     // Linkage established by ohHidden in Main.java class
-    public void shutdown(){
-        // If we should save/restore lists ...
-
-        if (appPreferences.getLoadListsOnStart()) {
-            if (mkvPaneController.paneFileList.isEmpty())
-                appPreferences.setListMKV("");
-            else
-                appPreferences.setListMKV(mkvPaneController.paneFileList.get(0).getParent());
-
-            if (mkaPaneController.paneFileList.isEmpty())
-                appPreferences.setListMKA("");
-            else
-                appPreferences.setListMKA(mkaPaneController.paneFileList.get(0).getParent());
-
-            if (subPaneController.paneFileList.isEmpty())
-                appPreferences.setListSUB("");
-            else
-                appPreferences.setListSUB(subPaneController.paneFileList.get(0).getParent());
-        }
-        appPreferences.setLastTimeUsedSusExt(subPaneController.subtExt.getValue());
-        appPreferences.setLastTimeUsedSubsCodepage(subPaneController.subtCodepage.getValue());
+    void shutdown(){
+        appPreferences.setLastTimeUsedSusExt(subPaneController.getSelectedExt());
+        appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getSelectedEncoding());
         appPreferences.setFullScreenSelected(fullScreen.isSelected());
         appPreferences.setSubtitlesHideSelected(subsHide.isSelected());
+
+        String[] storeRecentArr = new String[10];
+        for (int i =0; i < recentlyOpenedMenu.getItems().size() - 2 && !(i > 9); i++) {       // Don't take separator and Clean button
+            storeRecentArr[i] = (String) recentlyOpenedMenu.getItems().get(i).getUserData();
+        }
+        appPreferences.setRecentPlaylists(storeRecentArr);
 
         Platform.exit();
     }
 
-
     @FXML
-    private void infoBnt(){ new AboutWindow(this.hostServices); } // TODO: fix this shit with hostSerivces that doesn't work @ linux
+    private void infoBtn(){ new AboutWindow(this.hostServices); } // TODO: fix this shit with hostSerivces that doesn't work @ linux
 
     /**             SETTINGS HANDLE          */
     @FXML
     private void settingsBtn(){ new SettingsWindow(); }
     // Get event that notify application in case some settings has been changed
     // This function called from MediatorControl after mediator receives request form SettingsController indicating that user updated some required fields.
-    public void updateAfterSettingsChanged(){
-        /** update list of extensions */
+    void updateAfterSettingsChanged(){
+        /* update list of extensions */
         // Clear and update list
-        String extensionPrevSelected = subPaneController.subtExt.getValue();
-        subPaneController.subtExtList.clear();
-        subPaneController.subtExtList.setAll(appPreferences.getSubsExtensionsList());
-        // Try to restore previously selected element
-        if (subPaneController.subtExtList.contains(extensionPrevSelected))
-            subPaneController.subtExt.setValue(extensionPrevSelected);
-        else
-            subPaneController.subtExt.setValue(subPaneController.subtExtList.get(0));
+        subPaneController.setSubtExt(appPreferences.getSubsExtensionsList(), null);
         // In case of application failure should be better to save this immediately
-        appPreferences.setLastTimeUsedSusExt(subPaneController.subtExt.getValue());
+        appPreferences.setLastTimeUsedSusExt(subPaneController.getSelectedEncoding());
 
-        /** update list of codepage */
-        String codepagePrevSelected = subPaneController.subtCodepage.getValue();
-        subPaneController.subtCodepageList.clear();
-        subPaneController.subtCodepageList.setAll(appPreferences.getSubsCodepageList());
-        // Try to restore previously selected element
-        if (subPaneController.subtCodepageList.contains(codepagePrevSelected))
-            subPaneController.subtCodepage.setValue(codepagePrevSelected);
-        else
-            subPaneController.subtCodepage.setValue(subPaneController.subtCodepageList.get(0));
+        /* update list of encoding */
+        subPaneController.setEncoding(appPreferences.getSubsEncodingList(), null);
         // In case of application failure should be better to save this immediately
-        appPreferences.setLastTimeUsedSubsCodepage(subPaneController.subtCodepage.getValue());
+        appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getSelectedEncoding());
     }
 
+    @FXML
+    private void openBtn() {
+        JsonStorage jsonStorage = Playlists.Read(resourceBundle);
+        if (jsonStorage != null) {
+            mkvPaneController.setFilesFromList(jsonStorage.getVideo());
+            mkaPaneController.setFilesFromList(jsonStorage.getAudio());
+            subPaneController.setFilesFromList(jsonStorage.getSubs());
+            subPaneController.selectEncodingValue(jsonStorage.getSubEncoding(), appPreferences);
+
+            this.currentPlaylistLocation = Playlists.getPlaylistLocation();                 // TODO: Implement listener? mmm...
+            this.statusLbl.setText(currentPlaylistLocation);
+            addRecentlyOpened(currentPlaylistLocation);
+        }
+    }
+    @FXML
+    private void saveBtn() {
+        if (mkvPaneController.getElementsCount() == 0)
+            ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("ErrorUnableToSaveEmptyPlaylist"));
+        else {
+            JsonStorage jsonStorage = new JsonStorage(mkvPaneController.getElementsAll(), mkaPaneController.getElementsAll(), subPaneController.getElementsAll(), subPaneController.getSelectedEncoding());
+            if (Playlists.SaveCurrent(resourceBundle, jsonStorage)) {
+                this.currentPlaylistLocation = Playlists.getPlaylistLocation();
+                this.statusLbl.setText(currentPlaylistLocation);    //TODO: update header of the application to include this?
+                addRecentlyOpened(currentPlaylistLocation);
+            }
+        }
+    }
+    @FXML
+    private void saveAsBtn() {
+        if (mkvPaneController.getElementsCount() == 0)
+            ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("ErrorUnableToSaveEmptyPlaylist"));
+        else {
+            JsonStorage jsonStorage = new JsonStorage(mkvPaneController.getElementsAll(), mkaPaneController.getElementsAll(), subPaneController.getElementsAll(), subPaneController.getSelectedEncoding());
+            if (Playlists.SaveAs(resourceBundle, jsonStorage)) {
+                this.currentPlaylistLocation = Playlists.getPlaylistLocation();
+                this.statusLbl.setText(currentPlaylistLocation);    //TODO: update header of the application to include this?
+                addRecentlyOpened(currentPlaylistLocation);
+            }
+        }
+    }
+    @FXML
+    private void cleanAllRecentlyOpened(){
+        recentlyOpenedMenu.getItems().remove(0,recentlyOpenedMenu.getItems().size() - 2);
+    }
+
+    private void addRecentlyOpened(String playlistPath){
+        ListIterator<MenuItem> iteratorItem = recentlyOpenedMenu.getItems().listIterator();
+        while (iteratorItem.hasNext()) {
+            MenuItem mi = iteratorItem.next();
+            if (mi.getUserData() != null && mi.getUserData().equals(playlistPath)) {
+                recentlyOpenedMenu.getItems().remove(mi);
+                recentlyOpenedMenu.getItems().add(0, mi);
+                return;
+            }
+        }
+
+        MenuItem menuItem = new MenuItem();
+        String fileNameOnly;
+        if (playlistPath.contains("/")) {       // Unix
+            fileNameOnly = playlistPath.substring(playlistPath.lastIndexOf("/") + 1, playlistPath.length());
+            menuItem.setText(fileNameOnly);
+        }
+        else if (playlistPath.contains("\\")) {  // Windows
+            fileNameOnly = playlistPath.substring(playlistPath.lastIndexOf("\\") + 1, playlistPath.length());
+            menuItem.setText(fileNameOnly);
+        }
+        else {                                // Other o_0
+            menuItem.setText(playlistPath);
+        }
+        menuItem.setUserData(playlistPath);
+        menuItem.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent actionEvent) {
+                JsonStorage jsonStorage = Playlists.ReadByPath(resourceBundle, new File(playlistPath));
+                if (jsonStorage != null) {
+                    mkvPaneController.setFilesFromList(jsonStorage.getVideo());
+                    mkaPaneController.setFilesFromList(jsonStorage.getAudio());
+                    subPaneController.setFilesFromList(jsonStorage.getSubs());
+                    subPaneController.selectEncodingValue(jsonStorage.getSubEncoding(), appPreferences);
+
+                    currentPlaylistLocation = Playlists.getPlaylistLocation();                 // TODO: Implement listener? mmm...
+                    statusLbl.setText(currentPlaylistLocation);
+                    addRecentlyOpened(currentPlaylistLocation);
+                }
+            }
+        });
+        // Limit list to 13 elements (2 in the end are separator and clear button)
+        if (recentlyOpenedMenu.getItems().size() >= 11)
+            recentlyOpenedMenu.getItems().remove(9, recentlyOpenedMenu.getItems().size() - 2);
+        recentlyOpenedMenu.getItems().add(0, menuItem);
+    }
 }
+

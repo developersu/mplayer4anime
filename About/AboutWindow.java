@@ -18,7 +18,7 @@ public class AboutWindow {
         Stage stageAbout = new Stage();
 
         stageAbout.setMinWidth(500);
-        stageAbout.setMinHeight(230);
+        stageAbout.setMinHeight(450);
 
         FXMLLoader loaderAbout = new FXMLLoader(getClass().getResource("AboutLayout.fxml"));
         ResourceBundle resourceBundle;
@@ -42,7 +42,7 @@ public class AboutWindow {
                     new Image(Main.class.getResourceAsStream("/mplayer4anime/res/app_icon64x64.png")),
                     new Image(Main.class.getResourceAsStream("/mplayer4anime/res/app_icon128x128.png"))
             ); // TODO: change to something reliable
-            stageAbout.setScene(new Scene(parentAbout, 500, 230));
+            stageAbout.setScene(new Scene(parentAbout, 500, 450));
 
             stageAbout.show();
 

@@ -147,7 +147,7 @@ public class SettingsController implements Initializable {
         subsExtListView.setItems(subsExtObservableList);
         //---------------------------------------------------------
         // Populate list of avaliable codepages
-        subsCodepageObservableList = FXCollections.observableArrayList(appPreferences.getSubsCodepageList());
+        subsCodepageObservableList = FXCollections.observableArrayList(appPreferences.getSubsEncodingList());
         subsCodepageListView.setItems(subsCodepageObservableList);
     }
 
@@ -191,7 +191,7 @@ public class SettingsController implements Initializable {
         appPreferences.setSubtilesFirst(subtitlesFirstCheckBox.isSelected());
         appPreferences.setLoadListsOnStart(listsLoadOnStartCheckBox.isSelected());
         appPreferences.setSubsExtensionsList(Arrays.copyOf(subsExtObservableList.toArray(), subsExtObservableList.toArray().length, String[].class));
-        appPreferences.setSubsCodepageList(Arrays.copyOf(subsCodepageObservableList.toArray(), subsCodepageObservableList.toArray().length, String[].class));
+        appPreferences.setSubsEncodingList(Arrays.copyOf(subsCodepageObservableList.toArray(), subsCodepageObservableList.toArray().length, String[].class));
 
         MediatorControl.getInstance().sentUpdates();    // TODO: implement list to track what should be updated
 

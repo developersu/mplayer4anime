@@ -22,7 +22,7 @@
                      </graphic>
                   </Button>
                   <ChoiceBox fx:id="subtExt" prefWidth="60.0" />
-                  <ChoiceBox fx:id="subtCodepage" prefWidth="100.0" />
+                  <ChoiceBox fx:id="subtEncoding" prefWidth="100.0" />
                   <Pane HBox.hgrow="ALWAYS" />
                   <Button mnemonicParsing="false" onAction="#Up">
                      <graphic>

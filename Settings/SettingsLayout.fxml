@@ -80,7 +80,7 @@
             <HBox spacing="5.0" VBox.vgrow="NEVER">
                <children>
                   <TextField fx:id="subsExtNewRecordText" HBox.hgrow="ALWAYS" />
-                  <Button fx:id="subsExtNewRecordBtn" mnemonicParsing="false" onAction="#subsExtAddNewRecord">
+                  <Button mnemonicParsing="false" onAction="#subsExtAddNewRecord">
                      <graphic>
                         <SVGPath content="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" fill="#007f08" />
                      </graphic>

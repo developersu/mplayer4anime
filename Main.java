@@ -1,12 +1,12 @@
 package mplayer4anime;
-/***********************************************
-* Name: mplayer4anime                          *
-* Author: Dmitry Isaenko                       *
-* License: GNU GPL v.3                         *
-* Version: 0.9                                 *
-* Site: https://developersu.blogspot.com/      *
-* 2018, Russia                                 *
-***********************************************/
+/**
+Name: mplayer4anime
+@author Dmitry Isaenko
+License: GNU GPL v.3
+@version 0.10
+@see https://developersu.blogspot.com/
+2018, Russia
+*/
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
