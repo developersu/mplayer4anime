@@ -1,6 +1,7 @@
 package mplayer4anime;
 
 import javafx.scene.control.Alert;
+import javafx.scene.layout.Region;
 
 public class ServiceWindow {
     /**
@@ -11,6 +12,7 @@ public class ServiceWindow {
         alertBox.setTitle(title);
         alertBox.setHeaderText(null);
         alertBox.setContentText(body);
+        alertBox.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);        // Java bug workaround for linux
         alertBox.show();
     }
 }

@@ -40,7 +40,7 @@ public class AboutController implements Initializable {
     @FXML
     private void bloggerUrl(){
         try {
-            hostServices.showDocument("https://developersu.blogspot.com/");
+            hostServices.showDocument("https://developersu.blogspot.com/search/label/mplayer4anime");
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -53,6 +53,16 @@ public class AboutController implements Initializable {
             e.printStackTrace();
         }
     }
+    @FXML
+    private void iconsMaterial(){
+        try {
+            hostServices.showDocument("https://materialdesignicons.com/");
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    //TODO note icons meaterial design
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

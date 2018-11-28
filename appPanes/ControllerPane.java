@@ -4,32 +4,62 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.DirectoryChooser;
+import javafx.stage.FileChooser;
 import javafx.util.Callback;
+import mplayer4anime.AppPreferences;
 
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.List;
 import java.util.ResourceBundle;
 
-public abstract class ControllerPane  implements Initializable {
+public class ControllerPane  implements Initializable {
 
     private ResourceBundle resourceBundle;
     // use folderToOpen same variable in all panes
     private static String folderToOpen;
 
+    private AppPreferences appPreferences;
+
     @FXML
     private ListView<File> paneListView;
     private ObservableList<File> paneFileList = FXCollections.observableArrayList();
+
+    @FXML
+    private Label paneLbl;
+    private String paneType;
+
 
     @Override
     public void initialize(URL url, ResourceBundle resBundle) {
         SetCellFactory(paneListView);
         resourceBundle = resBundle;
+        appPreferences = new AppPreferences();
+    }
+    public void setPaneType(String paneType){
+        this.paneType = paneType;
+
+        switch (paneType) {
+            case "Video":
+                paneLbl.setText(resourceBundle.getString("lbl_VideoPane"));
+                break;
+            case "Audio":
+                paneLbl.setText(resourceBundle.getString("lbl_AudioPane"));
+                break;
+            case "Subtitles":
+                paneLbl.setText(resourceBundle.getString("lbl_SubsPane"));
+                break;
+            default:
+                paneLbl.setText(resourceBundle.getString("?"));
+                break;
+        }
     }
 
     /** Get index of the selected in pane element */
@@ -94,7 +124,24 @@ public abstract class ControllerPane  implements Initializable {
     /**
      * Open file selector (Open folder button in UI).
      * */
-    void openFileChooser (String key){
+    @FXML
+    void openDirChooser(){
+        String[] filesExtension;
+        switch (paneType) {
+            case "Video":
+                filesExtension = appPreferences.getVideoExtensionsList();
+                break;
+            case "Audio":
+                filesExtension = appPreferences.getAudioExtensionsList();
+                break;
+            case "Subtitles":
+                filesExtension = appPreferences.getSubsExtensionsList();
+                break;
+            default:
+                filesExtension = new String[]{"*"};
+                break;
+        }
+
         File directoryReceived;      // Store files (folder) received from selector
         DirectoryChooser dirSelect;
 
@@ -109,30 +156,68 @@ public abstract class ControllerPane  implements Initializable {
 
         // GET LIST OF FILES from directory
         if (directoryReceived != null) {
-            setFilesFromFolder(directoryReceived, key);
+            File[] files;                // Store files mkv/mka
+
+            files = directoryReceived.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File file, String Name) {
+                    if (Name.lastIndexOf('.') > 0) {
+                        int lastindex = Name.lastIndexOf('.');
+                        String ext = Name.substring(lastindex);
+                        for (String key : filesExtension){
+                            if (ext.equals(key.substring(1)))
+                                return true;
+                        }
+                    } else
+                        return false;
+                    return false;
+                }
+            });
+
+            displayFiles(files);
         } else {
-            System.out.println("\tNo folder selected");
+            System.out.println("No folder selected");
         }
     }
+    /**
+     * Open file selector (Open files button in UI).
+     * */
+    @FXML
+    void openFilesChooser(){
+        String[] filesExtension;
+        switch (paneType) {
+            case "Video":
+                filesExtension = appPreferences.getVideoExtensionsList();
+                break;
+            case "Audio":
+                filesExtension = appPreferences.getAudioExtensionsList();
+                break;
+            case "Subtitles":
+                filesExtension = appPreferences.getSubsExtensionsList();
+                break;
+            default:
+                filesExtension = new String[]{"*"};
+                break;
+        }
 
-    private void setFilesFromFolder(File directoryReceived, String key) {
-        File[] files;                // Store files mkv/mka
+        List<File> filesRecievedList;
 
-        files = directoryReceived.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File file, String Name) {
-                if (Name.lastIndexOf('.') > 0) {
-                    int lastindex = Name.lastIndexOf('.');
-                    String ext = Name.substring(lastindex);
-                    if (ext.equals(key))
-                        return true;
-                } else
-                    return false;
-                return false;
-            }
-        });
+        FileChooser fc = new FileChooser();
+        fc.setTitle(resourceBundle.getString("SelectFile"));
+        if (folderToOpen == null)
+            fc.setInitialDirectory(new File(System.getProperty("user.home")));
+        else
+            fc.setInitialDirectory(new File(folderToOpen));
+        fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter(paneType, filesExtension));
 
-        displayFiles(files);
+        filesRecievedList = fc.showOpenMultipleDialog(paneListView.getScene().getWindow());
+        if (filesRecievedList != null){
+            File[] filesRecieved = new File[filesRecievedList.size()];
+            filesRecievedList.toArray(filesRecieved);
+            displayFiles(filesRecieved);
+        } else {
+            System.out.println("No files selected");
+        }
     }
     /**
      * Set files using lists. Used if playlist loaded
@@ -151,16 +236,10 @@ public abstract class ControllerPane  implements Initializable {
             // spiced java magic
             Arrays.sort(files);
 
-            /* DEBUG START
-            for (File eachFile : files)
-                System.out.println(eachFile.getAbsoluteFile());
-            DEBUG END */
-
             // Remember the folder used for MKV and reuse it when user opens MKA/subs folder (as new default path instead of user.home)
             folderToOpen = files[0].getParent();
             //System.out.println(folderToOpen);
 
-                paneListView.getItems().clear(); // wipe elements from ListView
                 paneFileList.addAll(files);
                 paneListView.setItems(paneFileList);
                 paneListView.getSelectionModel().select(0);
@@ -169,6 +248,11 @@ public abstract class ControllerPane  implements Initializable {
             System.out.println("\tNo files in this folder");
         }
     }
+    @FXML
+    public void cleanList(){
+        paneListView.getItems().clear(); // wipe elements from ListView
+         }
+
     @FXML
     private void Up(){
         int index;
@@ -197,7 +281,4 @@ public abstract class ControllerPane  implements Initializable {
         if (event.getCode().toString().equals("DELETE"))
             Del();
     }
-    // TO IMPLEMENT IN REAL CLASS
-    @FXML
-    protected abstract void openAction();
 }

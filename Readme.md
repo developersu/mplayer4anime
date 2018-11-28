@@ -6,6 +6,14 @@ mplayer4anime is mplayer launcher to play mkv file with mka audio and subtitles 
 
 Source code spreads under the GNU General Public License v.3. You can find it in LICENSE file or just visit www.gnu.org (it should be there for sure).
 
+Note: Since 0.10 application supports playlists management and implements own json-based format that (somehow) could be used in third-party application,
+it would be nice to leave it as is. At least, I would prefer to have .alpr file extension used for this. As for the format of playlist format, please
+refer to WFTPL license.
+
+## Used libraries
+GSON: https://github.com/google/gson
+Pay attention, that this lib uses Apache-2.0 license
+
 ## Requirements
 
 JRE and JavaFX should be installed on your PC.
@@ -17,9 +25,6 @@ Just start it as usual Java application:
 ```
 $ java -jar mplayer4anime.jar
 ```
-
-## Used libraries
-GSON: https://github.com/google/gson
 
 ## Run on windows
 Step 1.

@@ -13,8 +13,7 @@ import mplayer4anime.About.AboutWindow;
 import mplayer4anime.Playlists.JsonStorage;
 import mplayer4anime.Playlists.Playlists;
 import mplayer4anime.Settings.SettingsWindow;
-import mplayer4anime.appPanes.ControllerMKA;
-import mplayer4anime.appPanes.ControllerMKV;
+import mplayer4anime.appPanes.ControllerPane;
 import mplayer4anime.appPanes.ControllerSUB;
 
 import java.io.*;
@@ -24,11 +23,11 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
     @FXML
-    private ControllerMKV mkvPaneController;
+    private ControllerPane mkvPaneController;
+    @FXML
+    private ControllerPane mkaPaneController;
     @FXML
     private ControllerSUB subPaneController;
-    @FXML
-    private ControllerMKA mkaPaneController;
     @FXML
     private Label statusLbl;
     @FXML
@@ -53,13 +52,13 @@ public class Controller implements Initializable {
     private String currentPlaylistLocation = null;  //TODO: move to the constructor?
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        mkvPaneController.setPaneType("Video");
+        mkaPaneController.setPaneType("Audio");
+        subPaneController.setPaneType("Subtitles");
         // Register this controller in mediator
         MediatorControl.getInstance().registerMainController(this);
 
         resourceBundle = rb;
-
-        // Set default extension of the subtitles files:
-        subPaneController.setSubtExt(appPreferences.getSubsExtensionsList(), appPreferences.getLastTimeUsedSubsExt());// Receive list from storage & set selected value
 
         // Set default list of encodings of the subtitles files:
         subPaneController.setEncoding(appPreferences.getSubsEncodingList(), appPreferences.getLastTimeUsedSubsEncoding());
@@ -217,7 +216,6 @@ public class Controller implements Initializable {
     // Will be used to store lists previously opened.
     // Linkage established by ohHidden in Main.java class
     void shutdown(){
-        appPreferences.setLastTimeUsedSusExt(subPaneController.getSelectedExt());
         appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getSelectedEncoding());
         appPreferences.setFullScreenSelected(fullScreen.isSelected());
         appPreferences.setSubtitlesHideSelected(subsHide.isSelected());
@@ -240,12 +238,6 @@ public class Controller implements Initializable {
     // Get event that notify application in case some settings has been changed
     // This function called from MediatorControl after mediator receives request form SettingsController indicating that user updated some required fields.
     void updateAfterSettingsChanged(){
-        /* update list of extensions */
-        // Clear and update list
-        subPaneController.setSubtExt(appPreferences.getSubsExtensionsList(), null);
-        // In case of application failure should be better to save this immediately
-        appPreferences.setLastTimeUsedSusExt(subPaneController.getSelectedEncoding());
-
         /* update list of encoding */
         subPaneController.setEncoding(appPreferences.getSubsEncodingList(), null);
         // In case of application failure should be better to save this immediately
@@ -255,14 +247,20 @@ public class Controller implements Initializable {
     @FXML
     private void openBtn() {
         JsonStorage jsonStorage = Playlists.Read(resourceBundle);
+        setAllLists(jsonStorage);
+    }
+    private void setAllLists(JsonStorage jsonStorage){
         if (jsonStorage != null) {
+            mkvPaneController.cleanList();
+            mkaPaneController.cleanList();
+            subPaneController.cleanList();
             mkvPaneController.setFilesFromList(jsonStorage.getVideo());
             mkaPaneController.setFilesFromList(jsonStorage.getAudio());
             subPaneController.setFilesFromList(jsonStorage.getSubs());
             subPaneController.selectEncodingValue(jsonStorage.getSubEncoding(), appPreferences);
 
-            this.currentPlaylistLocation = Playlists.getPlaylistLocation();                 // TODO: Implement listener? mmm...
-            this.statusLbl.setText(currentPlaylistLocation);
+            currentPlaylistLocation = Playlists.getPlaylistLocation();                 // TODO: Implement listener? mmm...
+            statusLbl.setText(currentPlaylistLocation);
             addRecentlyOpened(currentPlaylistLocation);
         }
     }
@@ -326,16 +324,7 @@ public class Controller implements Initializable {
             @Override
             public void handle(ActionEvent actionEvent) {
                 JsonStorage jsonStorage = Playlists.ReadByPath(resourceBundle, new File(playlistPath));
-                if (jsonStorage != null) {
-                    mkvPaneController.setFilesFromList(jsonStorage.getVideo());
-                    mkaPaneController.setFilesFromList(jsonStorage.getAudio());
-                    subPaneController.setFilesFromList(jsonStorage.getSubs());
-                    subPaneController.selectEncodingValue(jsonStorage.getSubEncoding(), appPreferences);
-
-                    currentPlaylistLocation = Playlists.getPlaylistLocation();                 // TODO: Implement listener? mmm...
-                    statusLbl.setText(currentPlaylistLocation);
-                    addRecentlyOpened(currentPlaylistLocation);
-                }
+                setAllLists(jsonStorage);
             }
         });
         // Limit list to 13 elements (2 in the end are separator and clear button)

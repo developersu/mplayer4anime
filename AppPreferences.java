@@ -32,15 +32,6 @@ public class AppPreferences {
         preferences.putBoolean("SUBS_TAB_FIRST", set);
     }
 
-    // Set option, that tells that we have to save/restore lists on startup
-    public void setLoadListsOnStart(boolean set){
-        preferences.putBoolean("LOAD_LISTS_ON_START", set);
-    }
-    // Returns settings for the save/restore lists option
-    public boolean getLoadListsOnStart(){
-        return preferences.getBoolean("LOAD_LISTS_ON_START", false);   // Don't populate lists by-default
-    }
-
     /** Convert strings array to singls string.
      * Used in:
      * setSubsExtensionsList
@@ -50,23 +41,25 @@ public class AppPreferences {
         StringBuilder collect = new StringBuilder();
         for (String e : strArr) {
             collect.append(e);
-            collect.append("@@@");  // If there is some idiot who will use @@@ in file extension I'll find him.
+            collect.append(" ");
         }
         String strToStore = collect.toString();
         preferences.put(whichList, strToStore);
     }
+    /** Handle lists of the video files extensions */
+    public void setVideoExtensionsList(String[] videoExtensionsList){ storeSingleStringList("VIDEO_EXTENSIONS_LIST", videoExtensionsList); }
+    public String[] getVideoExtensionsList(){ return preferences.get("VIDEO_EXTENSIONS_LIST", "*.mkv *.avi *.mp4").split(" "); }
+    /** Handle lists of the audio files extensions */
+    public void setAudioExtensionsList(String[] audioExtensionsList){ storeSingleStringList("AUDIO_EXTENSIONS_LIST", audioExtensionsList); }
+    public String[] getAudioExtensionsList(){ return preferences.get("AUDIO_EXTENSIONS_LIST", "*.mka *.ac3").split(" "); }
 
      /** Handle lists of the subtitles extensions selector */
     public void setSubsExtensionsList(String[] subsList){ storeSingleStringList("SUBS_EXTENSIONS_LIST", subsList); }
-    public String[] getSubsExtensionsList(){ return preferences.get("SUBS_EXTENSIONS_LIST", ".ass@@@.crt@@@").split("@@@"); }
+    public String[] getSubsExtensionsList(){ return preferences.get("SUBS_EXTENSIONS_LIST", "*.ass *.crt ").split(" "); }
 
     /** Handle lists of the subtitles encodings selector */
     public void setSubsEncodingList(String[] subsEncodingList){ storeSingleStringList("SUBS_ENCODINGS_LIST", subsEncodingList); }
-    public String[] getSubsEncodingList(){ return preferences.get("SUBS_ENCODINGS_LIST", "default@@@utf8@@@cp1251@@@koi8-r").split("@@@"); }
-
-    /** Save & recover selected by user Subtitles format */
-    public void setLastTimeUsedSusExt(String selected){ preferences.put("SUBS_EXT_LAST_TIME_SELECTED", selected); }
-    public String  getLastTimeUsedSubsExt(){ return preferences.get("SUBS_EXT_LAST_TIME_SELECTED", ""); }
+    public String[] getSubsEncodingList(){ return preferences.get("SUBS_ENCODINGS_LIST", "default utf8 cp1251 koi8-r").split(" "); }
 
     /** Save & recover selected by user Subtitles encoding */
     public void setLastTimeUsedSubsEncoding(String selected){ preferences.put("SUBS_ENCODING_LAST_TIME_SELECTED", selected); }
@@ -100,7 +93,7 @@ public class AppPreferences {
                     preferences.put("RECENT_PLS_" + i, recentPlaylists[i]);
                 else
                     preferences.put("RECENT_PLS_" + i, "");
-            for (;i<10;i++)                                             // Not needed. Logic may handle recieved String to be less or greater then String[10], but it never happened.
+            for (;i<10;i++)                                             // Not needed. Logic may handle received String to be less or greater then String[10], but it never happened.
                 preferences.put("RECENT_PLS_" + i, "");
         }
     }

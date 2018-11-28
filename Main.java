@@ -3,8 +3,9 @@ package mplayer4anime;
 Name: mplayer4anime
 @author Dmitry Isaenko
 License: GNU GPL v.3
-@version 0.10
-@see https://developersu.blogspot.com/
+@version 0.11
+@see https://developersu.blogspot.com/search/label/mplayer4anime
+@see https://github.com/developersu/mplayer4anime
 2018, Russia
 */
 

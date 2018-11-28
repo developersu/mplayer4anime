@@ -52,6 +52,7 @@
       </HBox>
       <Hyperlink onAction="#libGSON" text="GSON" />
       <TextArea fx:id="GSONLicense" editable="false" prefHeight="200.0" />
+      <Hyperlink onAction="#iconsMaterial" text="Material Design Icons" />
             <HBox alignment="BOTTOM_LEFT" VBox.vgrow="ALWAYS">
                <children>
                   <Pane HBox.hgrow="ALWAYS" />
