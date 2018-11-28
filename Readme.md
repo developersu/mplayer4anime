@@ -1,6 +1,6 @@
 # mplayer4anime
 
-mplayer4anime is mplayer launcher to play mkv file with mka audio and subtitles (.ass and .crt) at once.
+mplayer4anime is mplayer launcher to play video file with audio layer and/or subtitles (.ass and .srt) at once.
 
 ## License
 
