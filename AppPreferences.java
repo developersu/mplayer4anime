@@ -55,7 +55,7 @@ public class AppPreferences {
 
      /** Handle lists of the subtitles extensions selector */
     public void setSubsExtensionsList(String[] subsList){ storeSingleStringList("SUBS_EXTENSIONS_LIST", subsList); }
-    public String[] getSubsExtensionsList(){ return preferences.get("SUBS_EXTENSIONS_LIST", "*.ass *.crt ").split(" "); }
+    public String[] getSubsExtensionsList(){ return preferences.get("SUBS_EXTENSIONS_LIST", "*.ass *.srt ").split(" "); }
 
     /** Handle lists of the subtitles encodings selector */
     public void setSubsEncodingList(String[] subsEncodingList){ storeSingleStringList("SUBS_ENCODINGS_LIST", subsEncodingList); }
