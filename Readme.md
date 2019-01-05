@@ -16,8 +16,7 @@ Pay attention, that this lib uses Apache-2.0 license
 
 ## Requirements
 
-JRE and JavaFX should be installed on your PC.
-For example, in Debian Stretch you should install 'openjfx' package.
+JRE 11 (v8 before v0.12 +JavaFX For example, in Debian Stretch you should install 'openjfx' package.) should be installed on your PC.
 
 ## Usage
 
@@ -28,7 +27,7 @@ $ java -jar mplayer4anime.jar
 
 ## Run on windows
 Step 1.
-Download and install JRE (8 or later):
+Download and install JRE (~~8~~ 11 or later):
 http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html
 
 Step 2.

@@ -5,7 +5,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import mplayer4anime.Main;
+import mplayer4anime.MainFX;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -36,10 +36,10 @@ public class SettingsWindow {
 
             stageAbout.setTitle(resourceBundle.getString("settings_SettingsName"));
             stageAbout.getIcons().addAll(
-                    new Image(Main.class.getResourceAsStream("/res/settings_icon32x32.png")),
-                    new Image(Main.class.getResourceAsStream("/res/settings_icon48x48.png")),
-                    new Image(Main.class.getResourceAsStream("/res/settings_icon64x64.png")),
-                    new Image(Main.class.getResourceAsStream("/res/settings_icon128x128.png"))
+                    new Image(MainFX.class.getResourceAsStream("/res/settings_icon32x32.png")),
+                    new Image(MainFX.class.getResourceAsStream("/res/settings_icon48x48.png")),
+                    new Image(MainFX.class.getResourceAsStream("/res/settings_icon64x64.png")),
+                    new Image(MainFX.class.getResourceAsStream("/res/settings_icon128x128.png"))
             );       // TODO: change to something reliable
             stageAbout.setScene(new Scene(parentAbout, 570, 500));
             stageAbout.show();

@@ -230,7 +230,7 @@ public class Controller implements Initializable {
     }
 
     // Will be used to store lists previously opened.
-    // Linkage established by ohHidden in Main.java class
+    // Linkage established by ohHidden in MainFX.java class
     void shutdown(){
         appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getSelectedEncoding());
         appPreferences.setFullScreenSelected(fullScreen.isSelected());
