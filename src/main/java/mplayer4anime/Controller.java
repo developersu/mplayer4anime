@@ -50,6 +50,13 @@ public class Controller implements Initializable {
     private CheckMenuItem subsHide;
 
     private String currentPlaylistLocation = null;  //TODO: move to the constructor?
+
+    // If application started with playlist passed as an argument, then we'll try to load it (if it's valid).
+    public void setPlaylistAsArgument(String playlist) {
+        JsonStorage jsonStorage = Playlists.ReadByPath(resourceBundle, new File(playlist));
+        setAllLists(jsonStorage);
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         mkvPaneController.setPaneType("Video");
@@ -77,7 +84,7 @@ public class Controller implements Initializable {
                 addRecentlyOpened(recentPlaylists[i]);
     }
 
-    public void setHostServices(HostServices hostServices) {
+    void setHostServices(HostServices hostServices) {
         this.hostServices = hostServices;
     }
 
@@ -139,10 +146,19 @@ public class Controller implements Initializable {
         }
         int index;
         index = mkvPaneController.getElementSelectedIndex();
+        // TODO: add 'link' button
         if (index+1 < mkvPaneController.getElementsCount() ) {
             mkvPaneController.setElementSelectedByIndex(index+1);
-            playBtn();
         }
+        index = mkaPaneController.getElementSelectedIndex();
+        if (index+1 < mkaPaneController.getElementsCount() ) {
+            mkaPaneController.setElementSelectedByIndex(index+1);
+        }
+        index = subPaneController.getElementSelectedIndex();
+        if (index+1 < subPaneController.getElementsCount() ) {
+            subPaneController.setElementSelectedByIndex(index+1);
+        }
+        playBtn();
     }
 
     private Process player;
@@ -225,7 +241,6 @@ public class Controller implements Initializable {
             storeRecentArr[i] = (String) recentlyOpenedMenu.getItems().get(i).getUserData();
         }
         appPreferences.setRecentPlaylists(storeRecentArr);
-
         Platform.exit();
     }
 
@@ -260,6 +275,7 @@ public class Controller implements Initializable {
             subPaneController.selectEncodingValue(jsonStorage.getSubEncoding(), appPreferences);
 
             currentPlaylistLocation = Playlists.getPlaylistLocation();                 // TODO: Implement listener? mmm...
+            //System.out.println(currentPlaylistLocation);
             statusLbl.setText(currentPlaylistLocation);
             addRecentlyOpened(currentPlaylistLocation);
         }
@@ -308,17 +324,10 @@ public class Controller implements Initializable {
 
         MenuItem menuItem = new MenuItem();
         String fileNameOnly;
-        if (playlistPath.contains("/")) {       // Unix
-            fileNameOnly = playlistPath.substring(playlistPath.lastIndexOf("/") + 1, playlistPath.length());
-            menuItem.setText(fileNameOnly);
-        }
-        else if (playlistPath.contains("\\")) {  // Windows
-            fileNameOnly = playlistPath.substring(playlistPath.lastIndexOf("\\") + 1, playlistPath.length());
-            menuItem.setText(fileNameOnly);
-        }
-        else {                                // Other o_0
-            menuItem.setText(playlistPath);
-        }
+
+        fileNameOnly = playlistPath.substring(playlistPath.lastIndexOf(File.separator) + 1);
+        menuItem.setText(fileNameOnly);
+
         menuItem.setUserData(playlistPath);
         menuItem.setOnAction(new EventHandler<ActionEvent>() {
             @Override

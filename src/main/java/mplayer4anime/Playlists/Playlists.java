@@ -5,6 +5,7 @@ import javafx.stage.FileChooser;
 import mplayer4anime.ServiceWindow;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ResourceBundle;
 
 public class Playlists {
@@ -45,7 +46,7 @@ public class Playlists {
             if (!playlistFile.getAbsolutePath().endsWith(".alpr")) {
                 playlistFile = new File(playlistFile.getAbsolutePath() + ".alpr");
             }
-            try (Writer writer = new OutputStreamWriter(new FileOutputStream(playlistFile.getAbsolutePath()),  "UTF-8"))
+            try (Writer writer = new OutputStreamWriter(new FileOutputStream(playlistFile.getAbsolutePath()), StandardCharsets.UTF_8))
             {
                 Gson jsonObject = new GsonBuilder().setPrettyPrinting().create();
                 jsonObject.toJson(jStorage, writer);
@@ -93,6 +94,7 @@ public class Playlists {
                 JsonStorage jStorage = new Gson().fromJson(reader, JsonStorage.class);
                 if (jStorage != null){
                     playlistLocation = playlistFile.getAbsolutePath();
+                    //System.out.println("FILE:|"+playlistLocation+"|");
                     return jStorage;
                 }
                 else

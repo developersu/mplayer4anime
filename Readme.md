@@ -1,13 +1,13 @@
 # mplayer4anime
 
-mplayer4anime is mplayer launcher to play video file with audio layer and/or subtitles (.ass and .srt) at once.
+mplayer4anime is mplayer launcher to play video file with audio layer and/or subtitles (.ass, .srt, etc,,,) at once.
 
 ## License
 
 Source code spreads under the GNU General Public License v.3. You can find it in LICENSE file or just visit www.gnu.org (it should be there for sure).
 
 Note: Since 0.10 application supports playlists management and implements own json-based format that (somehow) could be used in third-party application,
-it would be nice to leave it as is. At least, I would prefer to have .alpr file extension used for this. As for the format of playlist format, please
+it would be nice to leave it as is. At least, I would prefer to have .alpr file extension used for this. As for the format of playlist, please
 refer to WFTPL license.
 
 ## Used libraries

@@ -19,13 +19,13 @@ public class SettingsWindow {
         stageAbout.setMinWidth(570);
         stageAbout.setMinHeight(500);
 
-        FXMLLoader loaderSettings = new FXMLLoader(getClass().getResource("SettingsLayout.fxml"));
+        FXMLLoader loaderSettings = new FXMLLoader(getClass().getResource("/Settings/SettingsLayout.fxml"));
         ResourceBundle resourceBundle;
 
         if (Locale.getDefault().getISO3Language().equals("rus")) {
-            resourceBundle = ResourceBundle.getBundle("mplayer4anime.localization.locale", new Locale("ru"));
+            resourceBundle = ResourceBundle.getBundle("locale", new Locale("ru"));
         } else {
-            resourceBundle = ResourceBundle.getBundle("mplayer4anime.localization.locale", new Locale("en"));
+            resourceBundle = ResourceBundle.getBundle("locale", new Locale("en"));
         }
         loaderSettings.setResources(resourceBundle);
 
@@ -36,10 +36,10 @@ public class SettingsWindow {
 
             stageAbout.setTitle(resourceBundle.getString("settings_SettingsName"));
             stageAbout.getIcons().addAll(
-                    new Image(Main.class.getResourceAsStream("/mplayer4anime/res/settings_icon32x32.png")),
-                    new Image(Main.class.getResourceAsStream("/mplayer4anime/res/settings_icon48x48.png")),
-                    new Image(Main.class.getResourceAsStream("/mplayer4anime/res/settings_icon64x64.png")),
-                    new Image(Main.class.getResourceAsStream("/mplayer4anime/res/settings_icon128x128.png"))
+                    new Image(Main.class.getResourceAsStream("/res/settings_icon32x32.png")),
+                    new Image(Main.class.getResourceAsStream("/res/settings_icon48x48.png")),
+                    new Image(Main.class.getResourceAsStream("/res/settings_icon64x64.png")),
+                    new Image(Main.class.getResourceAsStream("/res/settings_icon128x128.png"))
             );       // TODO: change to something reliable
             stageAbout.setScene(new Scene(parentAbout, 570, 500));
             stageAbout.show();
