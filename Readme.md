@@ -16,7 +16,7 @@ Pay attention, that this lib uses Apache-2.0 license
 
 ## Requirements
 
-JRE 11 (v8 before v0.12 +JavaFX For example, in Debian Stretch you should install 'openjfx' package.) should be installed on your PC.
+JRE (v8 before v0.12 +JavaFX, in Debian Stretch you should install 'openjfx' package.) should be installed on your PC. In new versions it should be JRE 8+.
 
 ## Usage
 
