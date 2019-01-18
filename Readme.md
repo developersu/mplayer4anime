@@ -13,6 +13,8 @@ refer to WFTPL license.
 ## Used libraries
 GSON: https://github.com/google/gson
 Pay attention, that this lib uses Apache-2.0 license
+Material design icons: https://materialdesignicons.com/
+Since v0.12: OpenJFX https://wiki.openjdk.java.net/display/OpenJFX/Main
 
 ## Requirements
 
@@ -27,7 +29,7 @@ $ java -jar mplayer4anime.jar
 
 ## Run on windows
 Step 1.
-Download and install JRE (~~8~~ 11 or later):
+Download and install JRE 8 or later:
 http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html
 
 Step 2.
@@ -37,3 +39,9 @@ http://oss.netfarm.it/mplayer/
 
 Step 3.
 Download and run jar file.
+
+Step 4.
+If using v0.12 or higher:
+Somehow set file associations for this application to all *.alpr files. Allow netowork usage when start application (using socket 65042 for inter-process communication within localhost)
+OR
+Wait for native installer. 
