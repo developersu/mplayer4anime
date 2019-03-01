@@ -5,13 +5,52 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>loper</groupId>
+    <name>mplayer4anime</name>
+
     <artifactId>mplayer4anime</artifactId>
-    <version>0.12-SNAPSHOT</version>
+    <version>0.13-SNAPSHOT</version>
+
     <packaging>jar</packaging>
-    <name>InnaIrcBot</name>
+
+    <url>https://github.com/developersu/mplayer4anime</url>
+    <description>
+        mplayer front end to play content pairs, that mostly used for anime (mka+mkv, mp4+ac3, mkv+srt)
+    </description>
+    <inceptionYear>2018-2019</inceptionYear>
+    <organization>
+        <name>Dmitry Isaenko</name>
+        <url>https://developersu.blogspot.com/search/label/mplayer4anime</url>
+    </organization>
+
+    <licenses>
+        <license>
+            <name>GPLv3</name>
+            <url>LICENSE</url>
+            <distribution>manual</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>developer.su</id>
+            <name>Dmitry Isaenko</name>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+3</timezone>
+            <url>https://developersu.blogspot.com/</url>
+        </developer>
+    </developers>
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
+
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/developer_su/${project.artifactId}/issues</url>
+    </issueManagement>
+
     <dependencies>
         <dependency>
             <groupId>com.google.code.gson</groupId>
@@ -19,22 +58,91 @@
             <version>2.8.5</version>
             <scope>compile</scope>
         </dependency>
+    <!-- openJFX Linux -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
             <version>11</version>
+            <classifier>linux</classifier>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-media</artifactId>
             <version>11</version>
+            <classifier>linux</classifier>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
             <version>11</version>
+            <classifier>linux</classifier>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>11</version>
+            <classifier>linux</classifier>
+            <scope>compile</scope>
+        </dependency>
+        <!-- openJFX Windows -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>11</version>
+            <classifier>win</classifier>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>11</version>
+            <classifier>win</classifier>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>11</version>
+            <classifier>win</classifier>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>11</version>
+            <classifier>win</classifier>
+            <scope>compile</scope>
+        </dependency>
+        <!-- openJFX MAC -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>11</version>
+            <classifier>mac</classifier>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-media</artifactId>
+            <version>11</version>
+            <classifier>mac</classifier>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>11</version>
+            <classifier>mac</classifier>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-graphics</artifactId>
+            <version>11</version>
+            <classifier>mac</classifier>
             <scope>compile</scope>
         </dependency>
     </dependencies>

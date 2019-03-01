@@ -52,7 +52,6 @@ public class AppPreferences {
     /** Handle lists of the audio files extensions */
     public void setAudioExtensionsList(String[] audioExtensionsList){ storeSingleStringList("AUDIO_EXTENSIONS_LIST", audioExtensionsList); }
     public String[] getAudioExtensionsList(){ return preferences.get("AUDIO_EXTENSIONS_LIST", "*.mka *.ac3").split(" "); }
-
      /** Handle lists of the subtitles extensions selector */
     public void setSubsExtensionsList(String[] subsList){ storeSingleStringList("SUBS_EXTENSIONS_LIST", subsList); }
     public String[] getSubsExtensionsList(){ return preferences.get("SUBS_EXTENSIONS_LIST", "*.ass *.srt ").split(" "); }

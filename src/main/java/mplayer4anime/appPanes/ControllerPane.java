@@ -16,6 +16,7 @@ import mplayer4anime.AppPreferences;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -126,21 +127,28 @@ public class ControllerPane  implements Initializable {
      * */
     @FXML
     void openDirChooser(){
-        String[] filesExtension;
+        String[] filesExtensionTmp;
         switch (paneType) {
             case "Video":
-                filesExtension = appPreferences.getVideoExtensionsList();
+                filesExtensionTmp = appPreferences.getVideoExtensionsList();
                 break;
             case "Audio":
-                filesExtension = appPreferences.getAudioExtensionsList();
+                filesExtensionTmp = appPreferences.getAudioExtensionsList();
                 break;
             case "Subtitles":
-                filesExtension = appPreferences.getSubsExtensionsList();
+                filesExtensionTmp = appPreferences.getSubsExtensionsList();
                 break;
             default:
-                filesExtension = new String[]{"*"};
+                filesExtensionTmp = new String[]{"*"};
                 break;
         }
+
+        List<String> lowerAndUpperExts = new ArrayList<>();
+        for (String s: filesExtensionTmp) {
+            lowerAndUpperExts.add(s);
+            lowerAndUpperExts.add(s.toUpperCase());
+        }
+        String[] filesExtension = lowerAndUpperExts.toArray(new String[lowerAndUpperExts.size()]);
 
         File directoryReceived;      // Store files (folder) received from selector
         DirectoryChooser dirSelect;
@@ -164,7 +172,7 @@ public class ControllerPane  implements Initializable {
                     if (Name.lastIndexOf('.') > 0) {
                         int lastindex = Name.lastIndexOf('.');
                         String ext = Name.substring(lastindex);
-                        for (String key : filesExtension){
+                        for (String key : filesExtension){          // TODO: add toLowerCase and validate whatever registry extension noted
                             if (ext.equals(key.substring(1)))
                                 return true;
                         }
@@ -200,6 +208,13 @@ public class ControllerPane  implements Initializable {
                 break;
         }
 
+        List<String> lowerAndUpperExts = new ArrayList<>();
+        for (String s: filesExtension) {
+            lowerAndUpperExts.add(s);
+            lowerAndUpperExts.add(s.toUpperCase());
+        }
+        filesExtension = lowerAndUpperExts.toArray(new String[lowerAndUpperExts.size()]);
+
         List<File> filesRecievedList;
 
         FileChooser fc = new FileChooser();
@@ -211,7 +226,7 @@ public class ControllerPane  implements Initializable {
         fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter(paneType, filesExtension));
 
         filesRecievedList = fc.showOpenMultipleDialog(paneListView.getScene().getWindow());
-        if (filesRecievedList != null){
+        if (filesRecievedList != null){                                     // TODO: and !filesRecieved.isEmpty()
             File[] filesRecieved = new File[filesRecievedList.size()];
             filesRecievedList.toArray(filesRecieved);
             displayFiles(filesRecieved);

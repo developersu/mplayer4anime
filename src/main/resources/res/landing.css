@@ -91,3 +91,42 @@
        -fx-background-position: center;
        -fx-background-repeat: repeat;
 }
+
+/* -======================== TAB PANE =========================- */
+.tab-paneSettings .tab SVGPath{
+    -fx-fill: #000000;
+}
+.tab-paneSettings .tab:selected SVGPath{
+    -fx-fill: #267a9e;
+}
+.tab-paneSettings .tab{
+    -fx-background-color: #ffffff;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-border-radius: 0 0 0 0;
+    -fx-border-width: 0 0 5 0;
+    -fx-border-color: #ffffff;
+}
+
+.tab-paneSettings .tab:selected{
+    -fx-background-color: #ebffff;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+    -fx-border-radius: 0 0 0 0;
+    -fx-border-width: 0 0 5 0;
+    -fx-border-color: #8dbee4;
+}
+
+.tab-paneSettings > .tab-header-area {
+    -fx-background-insets: 0.0;
+    -fx-padding: 0;
+}
+
+.tab-paneSettings > .tab-header-area > .tab-header-background
+{
+   -fx-background-color: #ffffff;
+
+}
+.tab-paneSettings > .tab-header-area > .headers-region > .tab {
+    -fx-padding: 10;
+}

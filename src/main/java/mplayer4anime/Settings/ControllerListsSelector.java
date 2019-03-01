@@ -31,7 +31,7 @@ public class ControllerListsSelector implements Initializable {
      * Must be run on start
      * Set list content
     */
-     void setList(String[] listFromStorage, boolean isListOfExtensions){
+    void setList(String[] listFromStorage, boolean isListOfExtensions){
         observableList = FXCollections.observableArrayList(listFromStorage);
         listView.setItems(observableList);
         this.listOfExtensions = isListOfExtensions;
@@ -71,31 +71,40 @@ public class ControllerListsSelector implements Initializable {
     private void removeRecord(){ observableList.remove(listView.getSelectionModel().getSelectedItem()); }
     @FXML
     private void addNewRecord(){
-        String addingItem = newRecordText.getText().trim();
+        String addingItem = newRecordText.getText().trim().toLowerCase();
         if (!addingItem.isEmpty())                   // If this field is non-empty
             if (!addingItem.contains(" ") && !addingItem.contains("\t")) {
                 if (this.listOfExtensions) {
-                    if (addingItem.startsWith("*."))
+                    if (addingItem.startsWith("*.")) {
                         if (addingItem.substring(2).contains("*")) {
                             ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("settings_fieldContainUnacceptedChars"));
-                        } else {
-                            observableList.add(addingItem);
                         }
+                        else {
+                            validateAndAdd(addingItem);
+                        }
+                    }
                     else if (addingItem.contains("*")) {
                         ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("settings_fieldContainUnacceptedChars"));
-                    } else if (addingItem.startsWith(".")) {
-                        observableList.add("*" + addingItem);
-                    } else {
-                        observableList.add("*." + addingItem);
+                    }
+                    else if (addingItem.startsWith(".")) {
+                        validateAndAdd("*" + addingItem);
+                    }
+                    else {
+                        validateAndAdd("*." + addingItem);
                     }
                 }
                 else {
-                    observableList.add(addingItem);
+                    validateAndAdd(addingItem);
                 }
             }
             else{
                 ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("settings_fieldContainUnacceptedChars"));
             }
         newRecordText.clear();
+    }
+    private void validateAndAdd(String addingItem){
+        if (!observableList.contains(addingItem)) {
+            observableList.add(addingItem);
+        }
     }
 }

@@ -2,6 +2,8 @@
 
 mplayer4anime is mplayer launcher to play video file with audio layer and/or subtitles (.ass, .srt, etc,,,) at once.
 
+![Screenshot](https://farm8.staticflickr.com/7917/40285210053_fe9c781698_o.png)
+
 ## License
 
 Source code spreads under the GNU General Public License v.3. You can find it in LICENSE file or just visit www.gnu.org (it should be there for sure).
