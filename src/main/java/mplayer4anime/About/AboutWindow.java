@@ -23,11 +23,8 @@ public class AboutWindow {
         FXMLLoader loaderAbout = new FXMLLoader(getClass().getResource("/About/AboutLayout.fxml"));
         ResourceBundle resourceBundle;
 
-        if (Locale.getDefault().getISO3Language().equals("rus")) {
-            resourceBundle = ResourceBundle.getBundle("locale", new Locale("ru"));
-        } else {
-            resourceBundle = ResourceBundle.getBundle("locale", new Locale("en"));
-        }
+        Locale userLocale = new Locale(Locale.getDefault().getISO3Language());      // NOTE: user locale based on ISO3 Language codes
+        resourceBundle = ResourceBundle.getBundle("locale", userLocale);
         loaderAbout.setResources(resourceBundle);
 
         try {

@@ -32,11 +32,9 @@ public class MainFX extends Application {
     public void start(Stage primaryStage) throws Exception{
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/landingPage.fxml"));
 
-        if (Locale.getDefault().getISO3Language().equals("rus")) {
-            loader.setResources(ResourceBundle.getBundle("locale", new Locale("ru")));
-        } else {
-            loader.setResources(ResourceBundle.getBundle("locale", new Locale("en")));
-        }
+        Locale userLocale = new Locale(Locale.getDefault().getISO3Language());      // NOTE: user locale based on ISO3 Language codes
+        ResourceBundle rb = ResourceBundle.getBundle("locale", userLocale);
+        loader.setResources(rb);
 
         Parent root = loader.load();
 
