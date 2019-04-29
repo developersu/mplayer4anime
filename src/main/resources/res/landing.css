@@ -97,7 +97,7 @@
     -fx-fill: #000000;
 }
 .tab-paneSettings .tab:selected SVGPath{
-    -fx-fill: #267a9e;
+    -fx-fill: #f90000;
 }
 .tab-paneSettings .tab{
     -fx-background-color: #ffffff;
@@ -114,7 +114,7 @@
     -fx-faint-focus-color: transparent;
     -fx-border-radius: 0 0 0 0;
     -fx-border-width: 0 0 5 0;
-    -fx-border-color: #8dbee4;
+    -fx-border-color: #0067ab;
 }
 
 .tab-paneSettings > .tab-header-area {
