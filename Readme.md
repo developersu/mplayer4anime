@@ -4,7 +4,7 @@ mplayer4anime is mplayer launcher to play video file with audio layer and/or sub
 
 ![Screenshot](https://farm8.staticflickr.com/7917/40285210053_fe9c781698_o.png)
 
-## License
+### License
 
 Source code spreads under the GNU General Public License v.3. You can find it in LICENSE file or just visit www.gnu.org (it should be there for sure).
 
@@ -12,38 +12,45 @@ Note: Since 0.10 application supports playlists management and implements own js
 it would be nice to leave it as is. At least, I would prefer to have .alpr file extension used for this. As for the format of playlist, please
 refer to WFTPL license.
 
-## Used libraries
-GSON: https://github.com/google/gson
-Pay attention, that this lib uses Apache-2.0 license
-Material design icons: https://materialdesignicons.com/
-Since v0.12: OpenJFX https://wiki.openjdk.java.net/display/OpenJFX/Main
+### Used libraries
+* [GSON](https://github.com/google/gson) (library distributes under Apache-2.0 license)
+* [Material design icons](https://materialdesignicons.com/)
+* Since v0.12: [OpenJFX](https://wiki.openjdk.java.net/display/OpenJFX/Main)
 
-## Requirements
+### Requirements
 
-JRE (v8 before v0.12 +JavaFX, in Debian Stretch you should install 'openjfx' package.) should be installed on your PC. In new versions it should be JRE 8+.
+For latest versions of this app use JRE or JDK 8 or higher.
 
-## Usage
+For older versions (prior to v0.12) please use JRE/JDK 8 (and JavaFX if you're NOT using Windows. For example: in Debian Stretch you should install 'openjfx' package).
+
+### Running on Linux
 
 Just start it as usual Java application:
 ```
 $ java -jar mplayer4anime.jar
 ```
 
-## Run on windows
+### Running on Windows
 Step 1.
+
 Download and install JRE 8 or later:
 http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html
 
 Step 2.
+
 Download and install (unpack) mplayer:
 http://oss.netfarm.it/mplayer/
 (see 'Build selection table', for example click 'generic')
 
 Step 3.
+
 Download and run jar file.
 
 Step 4.
+
 If using v0.12 or higher:
 Somehow set file associations for this application to all *.alpr files. Allow netowork usage when start application (using socket 65042 for inter-process communication within localhost)
+
 OR
-Wait for native installer. 
+
+Wait for native installer. No ETA. 
