@@ -56,7 +56,7 @@
                   </VBox>
                </content>
                <graphic>
-                  <VBox alignment="CENTER">
+                  <VBox alignment="CENTER" spacing="5.0">
                      <children>
                         <SVGPath content="M 33.727273,12.181818 H 4.2727273 V -7.4545455 H 33.727273 m 0,-3.2727275 H 4.2727273 C 2.4563636,-10.727273 1,-9.2709091 1,-7.4545455 V 12.181818 a 3.2727273,3.2727273 0 0 0 3.2727273,3.272727 H 15.727273 v 3.272728 H 12.454545 V 22 h 13.09091 V 18.727273 H 22.272727 V 15.454545 H 33.727273 A 3.2727273,3.2727273 0 0 0 37,12.181818 V -7.4545455 c 0,-1.8163636 -1.472727,-3.2727275 -3.272727,-3.2727275 z" />
                         <Label text="%settings_Tab_General" />
@@ -66,7 +66,7 @@
             </Tab>
             <Tab closable="false">
                <graphic>
-                  <VBox alignment="CENTER">
+                  <VBox alignment="CENTER" spacing="5.0">
                      <children>
                         <SVGPath content="m 32,-3 h -4 v -4 h 4 M 32,5 H 28 V 1 h 4 m 0,12 H 28 V 9 h 4 M 12,-3 H 8 v -4 h 4 M 12,5 H 8 V 1 h 4 m 0,12 H 8 V 9 h 4 m 20,-24 v 4 h -4 v -4 H 12 v 4 H 8 v -4 H 4 v 36 h 4 v -4 h 4 v 4 h 16 v -4 h 4 v 4 h 4 v -36 z" />
                         <Label text="%settings_Tab_Video" />
@@ -87,7 +87,7 @@
             </Tab>
             <Tab closable="false">
                <graphic>
-                  <VBox alignment="CENTER">
+                  <VBox alignment="CENTER" spacing="5.0">
                      <children>
                         <SVGPath content="m 25,-14.31 v 4.12 c 5.78,1.72 10,7.08 10,13.42 0,6.34 -4.22,11.68 -10,13.4 v 4.14 C 33,18.95 39,11.79 39,3.23 39,-5.33 33,-12.49 25,-14.31 m 5,17.54 c 0,-3.54 -2,-6.58 -5,-8.06 v 16.06 c 3,-1.42 5,-4.48 5,-8 m -27,-6 v 12 h 8 l 10,10 v -32 l -10,10 z" />
                         <Label text="%settings_Tab_Audio" />
@@ -108,7 +108,7 @@
             </Tab>
             <Tab closable="false">
                <graphic>
-                  <VBox alignment="CENTER">
+                  <VBox alignment="CENTER" spacing="5.0">
                      <children>
                         <SVGPath content="M 34.4,-8.8 H 5.6 A 3.6,3.6 0 0 0 2,-5.2 V 16.4 A 3.6,3.6 0 0 0 5.6,20 H 34.4 A 3.6,3.6 0 0 0 38,16.4 V -5.2 A 3.6,3.6 0 0 0 34.4,-8.8 M 5.6,5.6 h 7.2 V 9.2 H 5.6 V 5.6 m 18,10.8 h -18 v -3.6 h 18 v 3.6 m 10.8,0 h -7.2 v -3.6 h 7.2 v 3.6 m 0,-7.2 h -18 V 5.6 h 18 z" />
                         <Label text="%settings_Tab_Subtitles" />
