@@ -44,9 +44,7 @@
                         </Label>
                         <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
                            <children>
-                              <Label text="%settings_SubtitlesTabFirst" />
-                              <Pane HBox.hgrow="ALWAYS" />
-                              <CheckBox fx:id="subtitlesFirstCheckBox" mnemonicParsing="false" />
+                              <CheckBox fx:id="subtitlesFirstCheckBox" mnemonicParsing="false" text="%settings_SubtitlesTabFirst" />
                            </children>
                         </HBox>
                      </children>
@@ -132,8 +130,19 @@
       <HBox prefWidth="200.0" spacing="5.0" VBox.vgrow="NEVER">
          <children>
             <Pane HBox.hgrow="ALWAYS" />
-            <Button cancelButton="true" mnemonicParsing="false" onAction="#Cancel" text="%CancelBtn" />
-            <Button mnemonicParsing="false" onAction="#Save" text="%SaveBtn" />
+            <Button mnemonicParsing="false" onAction="#Ok" text="%OkBtn">
+               <graphic>
+                  <SVGPath content="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+               </graphic></Button>
+            <Button mnemonicParsing="false" onAction="#Apply" text="%ApplyBtn">
+               <graphic>
+                  <SVGPath content="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" />
+               </graphic>
+            </Button>
+            <Button cancelButton="true" mnemonicParsing="false" onAction="#Cancel" text="%CancelBtn">
+               <graphic>
+                  <SVGPath content="M 8.705,8.59 A 6.705,6.705 0 0 1 15.41,15.295 6.705,6.705 0 0 1 8.705,22 6.705,6.705 0 0 1 2,15.295 6.705,6.705 0 0 1 8.705,8.59 m 0,1.341 a 5.364,5.364 0 0 0 -5.364,5.364 c 0,1.240425 0.422415,2.380275 1.12644,3.292155 L 11.997155,11.05744 C 11.085275,10.353415 9.945425,9.931 8.705,9.931 m 0,10.728 a 5.364,5.364 0 0 0 5.364,-5.364 c 0,-1.240425 -0.422415,-2.380275 -1.12644,-3.292155 L 5.412845,19.53256 C 6.324725,20.236585 7.464575,20.659 8.705,20.659 Z" />
+               </graphic></Button>
          </children>
          <padding>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

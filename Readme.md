@@ -25,7 +25,7 @@ For older versions (prior to v0.12) please use JRE/JDK 8 (and JavaFX if you're N
 
 ### Running on Linux
 
-Just start it as usual Java application:
+Just start it as regular Java application:
 ```
 $ java -jar mplayer4anime.jar
 ```

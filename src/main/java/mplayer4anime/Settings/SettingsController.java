@@ -77,8 +77,13 @@ public class SettingsController implements Initializable {
     }
 
     @FXML
-    private void Save(){
+    private void Ok(){
+        this.Apply();
         Stage thisStage = (Stage) pathToMplayerLbl.getScene().getWindow();  // TODO: consider refactoring. Non-urgent.
+        thisStage.close();
+    }
+    @FXML
+    private void Apply(){
         appPreferences.setPath(pathToMplayerLbl.getText());
         appPreferences.setSubtilesFirst(subtitlesFirstCheckBox.isSelected());
         appPreferences.setSubsExtensionsList(subExtensionListController.getList());
@@ -87,7 +92,5 @@ public class SettingsController implements Initializable {
         appPreferences.setAudioExtensionsList(audioExtensionListController.getList());
 
         MediatorControl.getInstance().sentUpdates();    // TODO: implement list to track what should be updated
-
-        thisStage.close();
     }
 }
