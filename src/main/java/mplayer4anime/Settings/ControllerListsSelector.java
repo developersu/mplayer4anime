@@ -6,8 +6,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.input.KeyEvent;
-import mplayer4anime.ServiceWindow;
 
 import java.net.URL;
 import java.util.Arrays;
@@ -21,7 +21,7 @@ public class ControllerListsSelector implements Initializable {
     private ObservableList<String> observableList;
     private ResourceBundle resourceBundle;
 
-    private boolean listOfExtensions;       // Handle validation of the format importing items
+    private boolean isListOfExtensions;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -32,9 +32,25 @@ public class ControllerListsSelector implements Initializable {
      * Set list content
     */
     void setList(String[] listFromStorage, boolean isListOfExtensions){
+        this.isListOfExtensions = isListOfExtensions;
         observableList = FXCollections.observableArrayList(listFromStorage);
         listView.setItems(observableList);
-        this.listOfExtensions = isListOfExtensions;
+        if (isListOfExtensions) {
+            newRecordText.setText("*.");
+            newRecordText.setTextFormatter(new TextFormatter<Object>(change -> {
+                if (change.getControlNewText().matches("(^\\*\\.[A-Za-z0-9]$)|(^\\*\\.[A-Za-z0-9][A-Za-z0-9\\.]+?$)|(^\\*\\.$)"))
+                    return change;
+                return null;
+            }));
+        }
+        else {
+            newRecordText.setTextFormatter(new TextFormatter<Object>(change -> {
+                if (change.getControlNewText().matches("(^[A-Za-z0-9\\-]+?$)|(^$)"))
+                    return change;
+                return null;
+            }));
+        }
+
     }
     /**
      * Return list content
@@ -71,40 +87,14 @@ public class ControllerListsSelector implements Initializable {
     private void removeRecord(){ observableList.remove(listView.getSelectionModel().getSelectedItem()); }
     @FXML
     private void addNewRecord(){
-        String addingItem = newRecordText.getText().trim().toLowerCase();
-        if (!addingItem.isEmpty())                   // If this field is non-empty
-            if (!addingItem.contains(" ") && !addingItem.contains("\t")) {
-                if (this.listOfExtensions) {
-                    if (addingItem.startsWith("*.")) {
-                        if (addingItem.substring(2).contains("*")) {
-                            ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("settings_fieldContainUnacceptedChars"));
-                        }
-                        else {
-                            validateAndAdd(addingItem);
-                        }
-                    }
-                    else if (addingItem.contains("*")) {
-                        ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("settings_fieldContainUnacceptedChars"));
-                    }
-                    else if (addingItem.startsWith(".")) {
-                        validateAndAdd("*" + addingItem);
-                    }
-                    else {
-                        validateAndAdd("*." + addingItem);
-                    }
-                }
-                else {
-                    validateAndAdd(addingItem);
-                }
-            }
-            else{
-                ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("settings_fieldContainUnacceptedChars"));
-            }
-        newRecordText.clear();
-    }
-    private void validateAndAdd(String addingItem){
-        if (!observableList.contains(addingItem)) {
-            observableList.add(addingItem);
+        String addingItem = newRecordText.getText().toLowerCase();
+        if (!addingItem.isEmpty()) {                   // If this field is non-empty
+            if (!observableList.contains(addingItem))
+                observableList.add(addingItem);
         }
+        if (isListOfExtensions)
+            newRecordText.setText("*.");
+        else
+            newRecordText.clear();
     }
 }
