@@ -33,33 +33,25 @@ public class AboutController implements Initializable {
     private void gitHubUrl(){
         try {
             hostServices.showDocument("https://github.com/developersu/mplayer4anime");
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        } catch (Exception ignored){ }
     }
     @FXML
     private void bloggerUrl(){
         try {
             hostServices.showDocument("https://developersu.blogspot.com/search/label/mplayer4anime");
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        } catch (Exception ignored){ }
     }
     @FXML
     private void libGSON(){
         try {
             hostServices.showDocument("https://github.com/google/gson");
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        } catch (Exception ignored){ }
     }
     @FXML
     private void iconsMaterial(){
         try {
             hostServices.showDocument("https://materialdesignicons.com/");
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        } catch (Exception ignored){ }
     }
 
     //TODO note icons meaterial design

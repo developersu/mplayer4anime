@@ -329,12 +329,9 @@ public class Controller implements Initializable {
         menuItem.setText(fileNameOnly);
 
         menuItem.setUserData(playlistPath);
-        menuItem.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent actionEvent) {
-                JsonStorage jsonStorage = Playlists.ReadByPath(resourceBundle, new File(playlistPath));
-                setAllLists(jsonStorage);
-            }
+        menuItem.setOnAction(actionEvent -> {
+            JsonStorage jsonStorage = Playlists.ReadByPath(resourceBundle, new File(playlistPath));
+            setAllLists(jsonStorage);
         });
         // Limit list to 13 elements (2 in the end are separator and clear button)
         if (recentlyOpenedMenu.getItems().size() >= 11)
