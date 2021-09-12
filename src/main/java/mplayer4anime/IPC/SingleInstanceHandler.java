@@ -7,6 +7,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+// TODO: Rewrite and remove. Or just remove.
 public class SingleInstanceHandler implements Runnable{
 
     private ServerSocket servSock;
@@ -41,15 +42,9 @@ public class SingleInstanceHandler implements Runnable{
 
     @Override
     public void run() {
-        while (true) {
-            if ( Thread.currentThread().isInterrupted() ){
-                try {
-                    servSock.close();
-                } catch (IOException e) {
-                    System.out.println("Internal issue: unable to create client socket.");
-                }
-                break;
-            }
-        }
+        while (! Thread.currentThread().isInterrupted());
+        try {
+            servSock.close();
+        } catch (IOException ignore) {}
     }
 }

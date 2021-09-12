@@ -16,7 +16,10 @@
     You should have received a copy of the GNU General Public License
     along with mplayer4anime.  If not, see <https://www.gnu.org/licenses/>.
  */
-package mplayer4anime;
+package mplayer4anime.mplayer;
+
+import mplayer4anime.ISlaveModeAppOrchestration;
+import mplayer4anime.ServiceWindow;
 
 import java.io.*;
 import java.util.ResourceBundle;
@@ -42,7 +45,7 @@ public class MplayerSlave implements ISlaveModeAppOrchestration {
         }
         return false;
     }
-
+    @Override
     public void subtitlesSwitch(){
         if (! playerSingleCommand("get_sub_visibility"))
             return;
@@ -66,15 +69,15 @@ public class MplayerSlave implements ISlaveModeAppOrchestration {
             System.out.println("Can't determine whether subtitles enabled or disabled");
         }
     }
-
+    @Override
     public void fullscreenSwitch(){
         playerSingleCommand("vo_fullscreen");
     }
-
+    @Override
     public void mute(){
         playerSingleCommand("mute");
     }
-
+    @Override
     public void forcePlay(String mplayerPath,
                           String VideoFile,
                           String AudioFile,
@@ -94,7 +97,7 @@ public class MplayerSlave implements ISlaveModeAppOrchestration {
             e.printStackTrace();
         }
     }
-
+    @Override
     public boolean pause(){
         if (player == null || !player.isAlive())
             return false;
@@ -103,7 +106,7 @@ public class MplayerSlave implements ISlaveModeAppOrchestration {
         playerIn.flush();
         return true;
     }
-
+    @Override
     public void playPause(String mplayerPath,
                           String VideoFile,
                           String AudioFile,
@@ -155,15 +158,15 @@ public class MplayerSlave implements ISlaveModeAppOrchestration {
             ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("ErrorUnableToStartMplayer"));
         }
     }
-
+    @Override
     public void stop(){
         playerSingleCommand("stop");
     }
-
+    @Override
     public void volumeUp(){
         playerSingleCommand("volume +1 0");
     }
-
+    @Override
     public void volumeDown(){
         playerSingleCommand("volume -1 0");
     }

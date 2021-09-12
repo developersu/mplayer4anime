@@ -20,6 +20,7 @@ package mplayer4anime;
 
 import javafx.scene.control.Alert;
 import javafx.scene.layout.Region;
+import javafx.stage.Stage;
 
 /**
  * Creates window with notification
@@ -30,7 +31,13 @@ public class ServiceWindow {
         alertBox.setTitle(title);
         alertBox.setHeaderText(null);
         alertBox.setContentText(body);
-        alertBox.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);        // Java bug workaround for linux
+        alertBox.getDialogPane().setMinWidth(Region.USE_PREF_SIZE);
+        alertBox.getDialogPane().setMinHeight(Region.USE_PREF_SIZE);
+        alertBox.setResizable(true);
         alertBox.show();
+
+        Stage dialogStage = (Stage) alertBox.getDialogPane().getScene().getWindow();
+        dialogStage.setAlwaysOnTop(true);
+        dialogStage.toFront();
     }
 }

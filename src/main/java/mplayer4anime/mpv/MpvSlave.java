@@ -16,28 +16,81 @@
     You should have received a copy of the GNU General Public License
     along with mplayer4anime.  If not, see <https://www.gnu.org/licenses/>.
  */
-package mplayer4anime;
+package mplayer4anime.mpv;
 
-public interface ISlaveModeAppOrchestration {
-    void subtitlesSwitch();
-    void fullscreenSwitch();
-    void mute();
-    void forcePlay(String mplayerPath,
+import mplayer4anime.ISlaveModeAppOrchestration;
+import mplayer4anime.ServiceWindow;
+
+import java.util.ResourceBundle;
+
+public class MpvSlave implements ISlaveModeAppOrchestration {
+    static {
+        if (! MpvJniLibraryLoader.load()){
+            ServiceWindow.getErrorNotification("Error",
+                    "Unable to load mpv back end library. Please use mplayer instead"); // TODO: use bundle & translate
+        }
+    }
+
+    native void play();
+
+    public MpvSlave(ResourceBundle resourceBundle){
+
+    }
+
+    @Override
+    public void subtitlesSwitch() {
+
+    }
+
+    @Override
+    public void fullscreenSwitch() {
+
+    }
+
+    @Override
+    public void mute() {
+
+    }
+
+    @Override
+    public void forcePlay(String mplayerPath,
                           String VideoFile,
                           String AudioFile,
                           String SubtitlesFile,
                           String subtitlesEncoding,
                           boolean subtitlesHidden,
-                          boolean isFullscreen);
-    boolean pause();
-    void playPause(String mplayerPath,
+                          boolean isFullscreen) {
+
+    }
+
+    @Override
+    public boolean pause() {
+        return false;
+    }
+
+    @Override
+    public void playPause(String mplayerPath,
                           String VideoFile,
                           String AudioFile,
                           String SubtitlesFile,
                           String subtitlesEncoding,
                           boolean subtitlesHidden,
-                          boolean isFullscreen);
-    void stop();
-    void volumeUp();
-    void volumeDown();
+                          boolean isFullscreen) {
+
+    }
+
+    @Override
+    public void stop() {
+
+    }
+
+    @Override
+    public void volumeUp() {
+
+    }
+
+    @Override
+    public void volumeDown() {
+
+    }
 }

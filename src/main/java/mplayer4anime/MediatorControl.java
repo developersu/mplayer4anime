@@ -1,14 +1,12 @@
 package mplayer4anime;
 
-public class MediatorControl implements IMediatorContol{
+public class MediatorControl{
     private Controller mainController;
 
-    @Override
     public void registerMainController(Controller mc) {
         mainController = mc;
     }
 
-    @Override
     public void sentUpdates() {
         mainController.updateAfterSettingsChanged();
     }

@@ -122,4 +122,7 @@ public class AppPreferences {
 
     public double getSceneHeight(){ return preferences.getDouble("window_height", 800.0); }
     public void setSceneHeight(double value){ preferences.putDouble("window_height", value); }
+
+    public int getBackendEngineIndexId(){ return preferences.getInt("backend_player", 0); }
+    public void setBackendEngineIndexId(int value){ preferences.putInt("backend_player", value); }
 }

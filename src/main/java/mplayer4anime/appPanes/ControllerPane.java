@@ -238,6 +238,7 @@ public class ControllerPane implements Initializable {
      * Set files using lists. Used if playlist loaded
      * */
     public void setFilesFromList(String[] fileLocations){
+        cleanList();
         if (fileLocations != null && fileLocations.length != 0) {
             File[] files = new File[fileLocations.length];
             for (int i=0; i < fileLocations.length; i++)

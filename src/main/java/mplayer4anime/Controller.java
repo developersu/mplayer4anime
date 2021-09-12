@@ -32,6 +32,8 @@ import mplayer4anime.Playlists.Playlists;
 import mplayer4anime.Settings.SettingsWindow;
 import mplayer4anime.appPanes.ControllerPane;
 import mplayer4anime.appPanes.ControllerSUB;
+import mplayer4anime.mplayer.MplayerSlave;
+import mplayer4anime.mpv.MpvSlave;
 
 import java.io.*;
 import java.net.URL;
@@ -56,12 +58,10 @@ public class Controller implements Initializable {
     private final AppPreferences appPreferences = AppPreferences.getINSTANCE();
 
     private ResourceBundle resourceBundle;
-    // Get host services for opening URLs etc.
     private HostServices hostServices;
-
     private String currentPlaylistLocation;
-
-    private MplayerSlave mplayer;
+    private String backend;
+    private ISlaveModeAppOrchestration player;
 
     // If application started with playlist passed as an argument, then we'll try to load it (if it's valid).
     public void setPlaylistAsArgument(String playlist) {
@@ -96,8 +96,14 @@ public class Controller implements Initializable {
                 continue;
             addRecentlyOpened(recentPlaylists[i]);
         }
-
-        mplayer = new MplayerSlave(resourceBundle);
+        if (appPreferences.getBackendEngineIndexId() == 0) {
+            backend = "mplayer";
+            player = new MplayerSlave(resourceBundle);
+        }
+        else {
+            backend = "mpv";
+            player = new MpvSlave(resourceBundle);
+        }
     }
 
     void setHostServices(HostServices hostServices) {
@@ -126,11 +132,15 @@ public class Controller implements Initializable {
     }
 
     @FXML
-    private void infoBtn(){ new AboutWindow(this.hostServices); } // TODO: fix this shit with hostSerivces that doesn't work @ linux
+    private void infoBtn(){
+        new AboutWindow(this.hostServices);
+    } // TODO: fix this shit with hostSerivces that doesn't work @ linux
 
     /**             SETTINGS HANDLE          */
     @FXML
-    private void settingsBtn(){ new SettingsWindow(); }
+    private void settingsBtn(){
+        new SettingsWindow();
+    }
     // Get event that notify application in case some settings has been changed
     // This function called from MediatorControl after mediator receives request form SettingsController indicating that user updated some required fields.
     void updateAfterSettingsChanged(){
@@ -138,6 +148,18 @@ public class Controller implements Initializable {
         subPaneController.setEncoding(appPreferences.getSubsEncodingList(), null);
         // In case of application failure should be better to save this immediately
         appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getSelectedEncoding());
+        switchBackend(appPreferences.getBackendEngineIndexId());
+    }
+    private void switchBackend(int newBackEndId){
+        if (newBackEndId == 0 && backend.equals("mpv")){
+            backend = "mplayer";
+            player = new MplayerSlave(resourceBundle);
+            return;
+        }
+        if (newBackEndId == 1 && backend.equals("mplayer")){
+            backend = "mpv";
+            player = new MpvSlave(resourceBundle);
+        }
     }
 
     @FXML
@@ -147,44 +169,51 @@ public class Controller implements Initializable {
     }
     private void setAllLists(JsonStorage jsonStorage){
         if (jsonStorage != null) {
-            mkvPaneController.cleanList();
-            mkaPaneController.cleanList();
-            subPaneController.cleanList();
             mkvPaneController.setFilesFromList(jsonStorage.getVideo());
             mkaPaneController.setFilesFromList(jsonStorage.getAudio());
             subPaneController.setFilesFromList(jsonStorage.getSubs());
             subPaneController.selectEncodingValue(jsonStorage.getSubEncoding(), appPreferences);
 
-            currentPlaylistLocation = Playlists.getPlaylistLocation();                 // TODO: Implement listener? mmm...
-            //System.out.println(currentPlaylistLocation);
+            currentPlaylistLocation = Playlists.getPlaylistLocation();              // TODO: Implement listener? mmm...
             statusLbl.setText(currentPlaylistLocation);
             addRecentlyOpened(currentPlaylistLocation);
         }
     }
     @FXML
     private void saveBtn() {
-        if (mkvPaneController.getElementsCount() == 0)
-            ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("ErrorUnableToSaveEmptyPlaylist"));
-        else {
-            JsonStorage jsonStorage = new JsonStorage(mkvPaneController.getElementsAll(), mkaPaneController.getElementsAll(), subPaneController.getElementsAll(), subPaneController.getSelectedEncoding());
-            if (Playlists.SaveCurrent(resourceBundle, jsonStorage)) {
-                this.currentPlaylistLocation = Playlists.getPlaylistLocation();
-                this.statusLbl.setText(currentPlaylistLocation);    //TODO: update header of the application to include this?
-                addRecentlyOpened(currentPlaylistLocation);
-            }
+        if (mkvPaneController.getElementsCount() == 0) {
+            ServiceWindow.getErrorNotification(resourceBundle.getString("Error"),
+                    resourceBundle.getString("ErrorUnableToSaveEmptyPlaylist"));
+            return;
+        }
+        JsonStorage jsonStorage = new JsonStorage(
+                mkvPaneController.getElementsAll(),
+                mkaPaneController.getElementsAll(),
+                subPaneController.getElementsAll(),
+                subPaneController.getSelectedEncoding());
+        if (Playlists.SaveCurrent(resourceBundle, jsonStorage)) {
+            this.currentPlaylistLocation = Playlists.getPlaylistLocation();
+            this.statusLbl.setText(currentPlaylistLocation);    //TODO: update header of the application to include this?
+            addRecentlyOpened(currentPlaylistLocation);
         }
     }
     @FXML
     private void saveAsBtn() {
-        if (mkvPaneController.getElementsCount() == 0)
-            ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("ErrorUnableToSaveEmptyPlaylist"));
-        else {
-            JsonStorage jsonStorage = new JsonStorage(mkvPaneController.getElementsAll(), mkaPaneController.getElementsAll(), subPaneController.getElementsAll(), subPaneController.getSelectedEncoding());
-            if (Playlists.SaveAs(resourceBundle, jsonStorage)) {
-                this.currentPlaylistLocation = Playlists.getPlaylistLocation();
-                this.statusLbl.setText(currentPlaylistLocation);    //TODO: update header of the application to include this?
-                addRecentlyOpened(currentPlaylistLocation);
-            }
+        if (mkvPaneController.getElementsCount() == 0) {
+            ServiceWindow.getErrorNotification(resourceBundle.getString("Error"),
+                    resourceBundle.getString("ErrorUnableToSaveEmptyPlaylist"));
+            return;
+        }
+
+        JsonStorage jsonStorage = new JsonStorage(
+                mkvPaneController.getElementsAll(),
+                mkaPaneController.getElementsAll(),
+                subPaneController.getElementsAll(),
+                subPaneController.getSelectedEncoding());
+        if (Playlists.SaveAs(resourceBundle, jsonStorage)) {
+            this.currentPlaylistLocation = Playlists.getPlaylistLocation();
+            this.statusLbl.setText(currentPlaylistLocation);    //TODO: update header of the application to include this?
+            addRecentlyOpened(currentPlaylistLocation);
         }
     }
     @FXML
@@ -223,15 +252,15 @@ public class Controller implements Initializable {
     /* PLAYER */
     @FXML
     private void subsTriggerBtn(){
-        mplayer.subtitlesSwitch();
+        player.subtitlesSwitch();
     }
     @FXML
     private void fullscreenBtn(){
-        mplayer.fullscreenSwitch();
+        player.fullscreenSwitch();
     }
     @FXML
     private void muteBtn(){
-        mplayer.mute();
+        player.mute();
     }
     @FXML
     private void playPrevTrackBtn(){
@@ -240,7 +269,7 @@ public class Controller implements Initializable {
             return;
 
         mkvPaneController.setElementSelectedByIndex(index-1);
-        mplayer.forcePlay(appPreferences.getPath(),
+        player.forcePlay(appPreferences.getPath(),
                 mkvPaneController.getElementSelected(),
                 mkaPaneController.getElementSelected(),
                 subPaneController.getElementSelected(),
@@ -265,7 +294,7 @@ public class Controller implements Initializable {
             subPaneController.setElementSelectedByIndex(index + 1);
         }
 
-        mplayer.forcePlay(appPreferences.getPath(),
+        player.forcePlay(appPreferences.getPath(),
                 mkvPaneController.getElementSelected(),
                 mkaPaneController.getElementSelected(),
                 subPaneController.getElementSelected(),
@@ -279,7 +308,7 @@ public class Controller implements Initializable {
         if (mkvPaneController.getElementSelected() == null)
             return;
 
-        mplayer.playPause(appPreferences.getPath(),
+        player.playPause(appPreferences.getPath(),
                 mkvPaneController.getElementSelected(),
                 mkaPaneController.getElementSelected(),
                 subPaneController.getElementSelected(),
@@ -290,15 +319,15 @@ public class Controller implements Initializable {
     }
     @FXML
     private void stopBtn(){
-        mplayer.stop();
+        player.stop();
     }
     @FXML
     private void volumeUpBtn(){
-        mplayer.volumeUp();
+        player.volumeUp();
     }
     @FXML
     private void volumeDownBtn(){
-        mplayer.volumeDown();
+        player.volumeDown();
     }
 }
 

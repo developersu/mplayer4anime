@@ -42,6 +42,8 @@ public class SettingsController implements Initializable {
     private Label pathToMplayerLbl;
     @FXML
     private CheckBox subtitlesFirstCheckBox;
+    @FXML
+    private ChoiceBox<String> backEndEngineChoiceBox;
 
     @Override
     public void initialize(URL url, ResourceBundle resBundle) {
@@ -55,6 +57,8 @@ public class SettingsController implements Initializable {
         subEncodingListController.setList(appPreferences.getSubsEncodingList(), false);
         videoExtensionListController.setList(appPreferences.getVideoExtensionsList(), true);
         audioExtensionListController.setList(appPreferences.getAudioExtensionsList(), true);
+        backEndEngineChoiceBox.getItems().addAll("mplayer", "mpv");
+        backEndEngineChoiceBox.getSelectionModel().select(appPreferences.getBackendEngineIndexId());
     }
 
     @FXML
@@ -103,6 +107,7 @@ public class SettingsController implements Initializable {
         appPreferences.setSubsEncodingList(subEncodingListController.getList());
         appPreferences.setVideoExtensionsList(videoExtensionListController.getList());
         appPreferences.setAudioExtensionsList(audioExtensionListController.getList());
+        appPreferences.setBackendEngineIndexId(backEndEngineChoiceBox.getSelectionModel().getSelectedIndex());
 
         MediatorControl.getInstance().sentUpdates();    // TODO: implement list to track what should be updated
     }
