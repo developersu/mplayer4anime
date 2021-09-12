@@ -1,12 +1,14 @@
 # mplayer4anime
 
-mplayer4anime is mplayer launcher to play video file with audio layer and/or subtitles (.ass, .srt, etc,,,) at once.
+![License](https://img.shields.io/badge/License-GPLv3-blue.svg) ![Releases](https://img.shields.io/github/downloads/developersu/mplayer4anime/total.svg) ![CI](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fredrise.ru%2Fjen%2Fjob%2Fmplayer4anime%2Fjob%2Fmaster%2F)
 
-![Screenshot](https://farm8.staticflickr.com/7917/40285210053_fe9c781698_o.png)
+mplayer4anime is mplayer launcher to play video file with audio layer and/or subtitles (.ass, .srt, etc.) at once.
+
+![Application screenshot 1](screenshots/1.png)
 
 ### License
 
-Source code spreads under the GNU General Public License v.3. You can find it in LICENSE file or just visit www.gnu.org (it should be there for sure).
+Source code spreads under the GNU General Public License v.3. You can find it in LICENSE file.
 
 Note: Since 0.10 application supports playlists management and implements own json-based format that (somehow) could be used in third-party application,
 it would be nice to leave it as is. At least, I would prefer to have .alpr file extension used for this. As for the format of playlist, please
