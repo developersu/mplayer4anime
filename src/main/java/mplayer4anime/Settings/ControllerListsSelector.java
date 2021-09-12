@@ -1,32 +1,42 @@
+/*
+    Copyright 2018-2021 Dmitry Isaenko
+
+    This file is part of mplayer4anime.
+
+    mplayer4anime is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    mplayer4anime is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with mplayer4anime.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package mplayer4anime.Settings;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.input.KeyEvent;
 
-import java.net.URL;
 import java.util.Arrays;
-import java.util.ResourceBundle;
 
-public class ControllerListsSelector implements Initializable {
+public class ControllerListsSelector{
     @FXML
     private ListView<String> listView;
     @FXML
     private TextField newRecordText;
     private ObservableList<String> observableList;
-    private ResourceBundle resourceBundle;
 
     private boolean isListOfExtensions;
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        resourceBundle = rb;
-    }
     /**
      * Must be run on start
      * Set list content

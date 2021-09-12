@@ -1,3 +1,21 @@
+/*
+    Copyright 2018-2021 Dmitry Isaenko
+
+    This file is part of mplayer4anime.
+
+    mplayer4anime is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    mplayer4anime is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with mplayer4anime.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package mplayer4anime.appPanes;
 
 import javafx.collections.FXCollections;
@@ -10,28 +28,23 @@ import javafx.scene.control.ListView;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
-import javafx.util.Callback;
 import mplayer4anime.AppPreferences;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
-public class ControllerPane  implements Initializable {
-
+public class ControllerPane implements Initializable {
     private ResourceBundle resourceBundle;
-    // use folderToOpen same variable in all panes
     private static String folderToOpen;
-
     private AppPreferences appPreferences;
 
     @FXML
     private ListView<File> paneListView;
-    private ObservableList<File> paneFileList = FXCollections.observableArrayList();
+    private final ObservableList<File> paneFileList = FXCollections.observableArrayList();
 
     @FXML
     private Label paneLbl;
@@ -42,8 +55,9 @@ public class ControllerPane  implements Initializable {
     public void initialize(URL url, ResourceBundle resBundle) {
         SetCellFactory(paneListView);
         resourceBundle = resBundle;
-        appPreferences = new AppPreferences();
+        appPreferences = AppPreferences.getINSTANCE();
     }
+
     public void setPaneType(String paneType){
         this.paneType = paneType;
 
@@ -69,12 +83,11 @@ public class ControllerPane  implements Initializable {
     }
     /** Select element name (full path) using index recieved */
     public String getElementSelected(){
-        if (this.paneListView.getSelectionModel().getSelectedItem() != null) {
-            return this.paneFileList.get(this.getElementSelectedIndex()).toPath().toString();
+        File item = paneListView.getSelectionModel().getSelectedItem();
+        if (item != null) {
+            return item.getAbsolutePath();
         }
-        else {
-            return null;
-        }
+        return null;
     }
     /** Select element in pane using index recieved */
     public void setElementSelectedByIndex(int index){
@@ -98,33 +111,23 @@ public class ControllerPane  implements Initializable {
         return  elementsArray;
     }
 
-    private void SetCellFactory(ListView<File> lv) {
-        lv.setCellFactory(new Callback<ListView<File>, ListCell<File>>() {
-            @Override
-            public ListCell<File> call(ListView<File> fileListView) {
-                return new ListCell<File>(){
+    private void SetCellFactory(ListView<File> listView) {
+        listView.setCellFactory(cb -> new ListCell<File>() {
                     @Override
-                    public void updateItem(File item, boolean empty){
+                    public void updateItem(File item, boolean empty) {
                         // have to call super here
                         super.updateItem(item, empty);
 
-                        String trimmedName;
-
-                        if (item == null || empty){
+                        if (item == null || empty) {
                             setText(null);
+                            return;
                         }
-                        else {
-                            trimmedName = item.getName();
-                            setText(trimmedName);
-                        }
+                        setText(item.getName());
                     }
-                };
-            }
-        });
+                });
     }
-    /**
-     * Open file selector (Open folder button in UI).
-     * */
+
+    /** Open file selector (Open folder button in UI) */
     @FXML
     void openDirChooser(){
         String[] filesExtensionTmp;
@@ -166,30 +169,25 @@ public class ControllerPane  implements Initializable {
         if (directoryReceived != null) {
             File[] files;                // Store files mkv/mka
 
-            files = directoryReceived.listFiles(new FilenameFilter() {
-                @Override
-                public boolean accept(File file, String Name) {
-                    if (Name.lastIndexOf('.') > 0) {
-                        int lastindex = Name.lastIndexOf('.');
-                        String ext = Name.substring(lastindex);
-                        for (String key : filesExtension){          // TODO: add toLowerCase and validate whatever registry extension noted
-                            if (ext.equals(key.substring(1)))
-                                return true;
-                        }
-                    } else
-                        return false;
-                    return false;
+            files = directoryReceived.listFiles((file, Name) -> {
+                int lastIndexOfDot = Name.lastIndexOf('.');
+                if (lastIndexOfDot > 0) {
+                    String ext = Name.substring(lastIndexOfDot);
+                    for (String key : filesExtension){          // TODO: add toLowerCase and validate whatever registry extension noted
+                        if (ext.equals(key.substring(1)))
+                            return true;
+                    }
                 }
+                return false;
             });
 
             displayFiles(files);
-        } else {
+        }
+        else {
             System.out.println("No folder selected");
         }
     }
-    /**
-     * Open file selector (Open files button in UI).
-     * */
+    /** Open file selector (Open files button in UI) */
     @FXML
     void openFilesChooser(){
         String[] filesExtension;
@@ -213,9 +211,8 @@ public class ControllerPane  implements Initializable {
             lowerAndUpperExts.add(s);
             lowerAndUpperExts.add(s.toUpperCase());
         }
-        filesExtension = lowerAndUpperExts.toArray(new String[lowerAndUpperExts.size()]);
 
-        List<File> filesRecievedList;
+        List<File> filesReceivedList;
 
         FileChooser fc = new FileChooser();
         fc.setTitle(resourceBundle.getString("SelectFile"));
@@ -223,16 +220,19 @@ public class ControllerPane  implements Initializable {
             fc.setInitialDirectory(new File(System.getProperty("user.home")));
         else
             fc.setInitialDirectory(new File(folderToOpen));
-        fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter(paneType, filesExtension));
 
-        filesRecievedList = fc.showOpenMultipleDialog(paneListView.getScene().getWindow());
-        if (filesRecievedList != null){                                     // TODO: and !filesRecieved.isEmpty()
-            File[] filesRecieved = new File[filesRecievedList.size()];
-            filesRecievedList.toArray(filesRecieved);
-            displayFiles(filesRecieved);
-        } else {
+        fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter(paneType,
+                lowerAndUpperExts.toArray(new String[0])));
+
+        filesReceivedList = fc.showOpenMultipleDialog(paneListView.getScene().getWindow());
+        if (filesReceivedList == null) {
             System.out.println("No files selected");
+            return;
         }
+
+        File[] filesReceived = new File[filesReceivedList.size()];
+        filesReceivedList.toArray(filesReceived);
+        displayFiles(filesReceived);
     }
     /**
      * Set files using lists. Used if playlist loaded
@@ -250,7 +250,6 @@ public class ControllerPane  implements Initializable {
         if (files != null && files.length > 0) {
             // spiced java magic
             Arrays.sort(files);
-
             // Remember the folder used for MKV and reuse it when user opens MKA/subs folder (as new default path instead of user.home)
             folderToOpen = files[0].getParent();
             //System.out.println(folderToOpen);

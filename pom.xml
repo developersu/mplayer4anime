@@ -8,7 +8,7 @@
     <name>mplayer4anime</name>
 
     <artifactId>mplayer4anime</artifactId>
-    <version>0.14.1-SNAPSHOT</version>
+    <version>0.15-SNAPSHOT</version>
 
     <packaging>jar</packaging>
 
@@ -16,7 +16,7 @@
     <description>
         mplayer front end to play content pairs that are mostly used for anime (mka+mkv, mp4+ac3, mkv+srt)
     </description>
-    <inceptionYear>2018-2019</inceptionYear>
+    <inceptionYear>2018</inceptionYear>
     <organization>
         <name>Dmitry Isaenko</name>
         <url>https://developersu.blogspot.com/search/label/mplayer4anime</url>

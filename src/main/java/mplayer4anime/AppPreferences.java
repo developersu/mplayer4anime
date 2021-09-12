@@ -1,14 +1,34 @@
+/*
+    Copyright 2018-2021 Dmitry Isaenko
+
+    This file is part of mplayer4anime.
+
+    mplayer4anime is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    mplayer4anime is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with mplayer4anime.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package mplayer4anime;
 
 import java.util.prefs.Preferences;
 
 // Rule application settings
 public class AppPreferences {
+    private static AppPreferences INSTANCE = new AppPreferences();
+    private Preferences preferences = Preferences.userRoot().node("mplayer4anime");
 
-    private Preferences preferences;
+    private AppPreferences(){}
 
-    public AppPreferences(){
-        preferences = Preferences.userRoot().node("mplayer4anime");
+    public static AppPreferences getINSTANCE() {
+        return INSTANCE;
     }
 
     public void setPath(String path){
@@ -96,5 +116,10 @@ public class AppPreferences {
                 preferences.put("RECENT_PLS_" + i, "");
         }
     }
+    // Window size
+    public double getSceneWidth(){ return preferences.getDouble("window_width", 1200.0); }
+    public void setSceneWidth(double value){ preferences.putDouble("window_width", value); }
 
+    public double getSceneHeight(){ return preferences.getDouble("window_height", 800.0); }
+    public void setSceneHeight(double value){ preferences.putDouble("window_height", value); }
 }
