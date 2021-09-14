@@ -19,19 +19,10 @@
 package mplayer4anime.mpv;
 
 import mplayer4anime.ISlaveModeAppOrchestration;
-import mplayer4anime.ServiceWindow;
 
 import java.util.ResourceBundle;
 
 public class MpvSlave implements ISlaveModeAppOrchestration {
-    static {
-        if (! MpvJniLibraryLoader.load()){
-            ServiceWindow.getErrorNotification("Error",
-                    "Unable to load mpv back end library. Please use mplayer instead"); // TODO: use bundle & translate
-        }
-    }
-
-    native void play();
 
     public MpvSlave(ResourceBundle resourceBundle){
 
@@ -76,7 +67,9 @@ public class MpvSlave implements ISlaveModeAppOrchestration {
                           String subtitlesEncoding,
                           boolean subtitlesHidden,
                           boolean isFullscreen) {
-
+        //TODO: fix
+        Thread thread = new Thread(new MpvProcess(VideoFile));
+        thread.start();
     }
 
     @Override
