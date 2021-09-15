@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with mplayer4anime.  If not, see <https://www.gnu.org/licenses/>.
  */
-package mplayer4anime;
+package mplayer4anime.ui.landing;
 
 import javafx.application.HostServices;
 import javafx.application.Platform;
@@ -26,12 +26,16 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
 import javafx.stage.Stage;
-import mplayer4anime.About.AboutWindow;
-import mplayer4anime.Playlists.JsonStorage;
-import mplayer4anime.Playlists.Playlists;
-import mplayer4anime.Settings.SettingsWindow;
-import mplayer4anime.appPanes.ControllerPane;
-import mplayer4anime.appPanes.ControllerSUB;
+import mplayer4anime.ui.about.AboutWindow;
+import mplayer4anime.AppPreferences;
+import mplayer4anime.ISlaveModeAppOrchestration;
+import mplayer4anime.MediatorControl;
+import mplayer4anime.playlists.JsonStorage;
+import mplayer4anime.playlists.Playlists;
+import mplayer4anime.ui.ServiceWindow;
+import mplayer4anime.ui.settings.SettingsWindow;
+import mplayer4anime.ui.landing.panes.ControllerPane;
+import mplayer4anime.ui.landing.panes.ControllerPaneSubtitles;
 import mplayer4anime.mplayer.MplayerSlave;
 import mplayer4anime.mpv.MpvSlave;
 
@@ -39,21 +43,20 @@ import java.io.*;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class Controller implements Initializable {
+public class LandingController implements Initializable {
     @FXML
-    private ControllerPane mkvPaneController, mkaPaneController;
+    ControllerPane mkvPaneController, mkaPaneController;
     @FXML
-    private ControllerSUB subPaneController;
+    ControllerPaneSubtitles subPaneController;
+    @FXML
+    private PlayerToolbarController playerToolbarController;
     @FXML
     private Label statusLbl;
     @FXML
     private Menu recentlyOpenedMenu;
-    @FXML
-    private CheckMenuItem fullScreen;
+
     @FXML
     private TabPane tabPane;
-    @FXML
-    private CheckMenuItem subsHide;
 
     private final AppPreferences appPreferences = AppPreferences.getINSTANCE();
 
@@ -61,7 +64,8 @@ public class Controller implements Initializable {
     private HostServices hostServices;
     private String currentPlaylistLocation;
     private String backend;
-    private ISlaveModeAppOrchestration player;
+
+    ISlaveModeAppOrchestration player;
 
     // If application started with playlist passed as an argument, then we'll try to load it (if it's valid).
     public void setPlaylistAsArgument(String playlist) {
@@ -71,11 +75,12 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        // Register this controller in mediator
+        MediatorControl.getInstance().registerMainController(this);
+
         mkvPaneController.setPaneType("Video");
         mkaPaneController.setPaneType("Audio");
         subPaneController.setPaneType("Subtitles");
-        // Register this controller in mediator
-        MediatorControl.getInstance().registerMainController(this);
 
         resourceBundle = rb;
 
@@ -86,9 +91,6 @@ public class Controller implements Initializable {
         if (appPreferences.getSubtilesFirst()){
             tabPane.getSelectionModel().select(1);  // 0 is mka 1 is subs
         }
-
-        fullScreen.setSelected(appPreferences.getFullScreenSelected());
-        subsHide.setSelected(appPreferences.getSubtitlesHideSelected());
 
         String[] recentPlaylists = appPreferences.getRecentPlaylists();
         for (int i = recentPlaylists.length-1; i >= 0; i--) {
@@ -104,9 +106,11 @@ public class Controller implements Initializable {
             backend = "mpv";
             player = new MpvSlave(resourceBundle);
         }
+
+        playerToolbarController.initializeMainUiController(this);
     }
 
-    void setHostServices(HostServices hostServices) {
+    public void setHostServices(HostServices hostServices) {
         this.hostServices = hostServices;
     }
 
@@ -118,11 +122,10 @@ public class Controller implements Initializable {
 
     // Will be used to store lists previously opened.
     // Linkage established by ohHidden in MainFX.java class
-    void shutdown(){
+    public void shutdown(){
         appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getSelectedEncoding());
-        appPreferences.setFullScreenSelected(fullScreen.isSelected());
-        appPreferences.setSubtitlesHideSelected(subsHide.isSelected());
-
+        playerToolbarController.shutdown();
+        // TODO: remove from here; too sophisticated
         String[] storeRecentArr = new String[10];
         for (int i =0; i < recentlyOpenedMenu.getItems().size() - 2 && !(i > 9); i++) {       // Don't take separator and Clean button
             storeRecentArr[i] = (String) recentlyOpenedMenu.getItems().get(i).getUserData();
@@ -143,7 +146,7 @@ public class Controller implements Initializable {
     }
     // Get event that notify application in case some settings has been changed
     // This function called from MediatorControl after mediator receives request form SettingsController indicating that user updated some required fields.
-    void updateAfterSettingsChanged(){
+    public void updateAfterSettingsChanged(){
         /* update list of encoding */
         subPaneController.setEncoding(appPreferences.getSubsEncodingList(), null);
         // In case of application failure should be better to save this immediately
@@ -247,87 +250,6 @@ public class Controller implements Initializable {
         if (items.size() >= 11)
             items.remove(9, recentlyOpenedMenu.getItems().size() - 2);
         items.add(0, menuItem);
-    }
-
-    /* PLAYER */
-    @FXML
-    private void subsTriggerBtn(){
-        player.subtitlesSwitch();
-    }
-    @FXML
-    private void fullscreenBtn(){
-        player.fullscreenSwitch();
-    }
-    @FXML
-    private void muteBtn(){
-        player.mute();
-    }
-    @FXML
-    private void playPrevTrackBtn(){
-        int index = mkvPaneController.getElementSelectedIndex();
-        if (index <= 0)
-            return;
-
-        mkvPaneController.setElementSelectedByIndex(index-1);
-        player.forcePlay(appPreferences.getPath(),
-                mkvPaneController.getElementSelected(),
-                mkaPaneController.getElementSelected(),
-                subPaneController.getElementSelected(),
-                subPaneController.getSelectedEncoding(),
-                subsHide.isSelected(),
-                fullScreen.isSelected()
-        );
-    }
-    @FXML
-    private void playNextTrackBtn(){
-        int index = mkvPaneController.getElementSelectedIndex();
-
-        if (index + 1 < mkvPaneController.getElementsCount()) {
-            mkvPaneController.setElementSelectedByIndex(index + 1);
-        }
-        index = mkaPaneController.getElementSelectedIndex();
-        if (index + 1 < mkaPaneController.getElementsCount()) {
-            mkaPaneController.setElementSelectedByIndex(index + 1);
-        }
-        index = subPaneController.getElementSelectedIndex();
-        if (index + 1 < subPaneController.getElementsCount()) {
-            subPaneController.setElementSelectedByIndex(index + 1);
-        }
-
-        player.forcePlay(appPreferences.getPath(),
-                mkvPaneController.getElementSelected(),
-                mkaPaneController.getElementSelected(),
-                subPaneController.getElementSelected(),
-                subPaneController.getSelectedEncoding(),
-                subsHide.isSelected(),
-                fullScreen.isSelected()
-        );
-    }
-    @FXML
-    private void playBtn(){
-        if (mkvPaneController.getElementSelected() == null)
-            return;
-
-        player.playPause(appPreferences.getPath(),
-                mkvPaneController.getElementSelected(),
-                mkaPaneController.getElementSelected(),
-                subPaneController.getElementSelected(),
-                subPaneController.getSelectedEncoding(),
-                subsHide.isSelected(),
-                fullScreen.isSelected()
-                );
-    }
-    @FXML
-    private void stopBtn(){
-        player.stop();
-    }
-    @FXML
-    private void volumeUpBtn(){
-        player.volumeUp();
-    }
-    @FXML
-    private void volumeDownBtn(){
-        player.volumeDown();
     }
 }
 

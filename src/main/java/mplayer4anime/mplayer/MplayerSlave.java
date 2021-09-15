@@ -19,7 +19,7 @@
 package mplayer4anime.mplayer;
 
 import mplayer4anime.ISlaveModeAppOrchestration;
-import mplayer4anime.ServiceWindow;
+import mplayer4anime.ui.ServiceWindow;
 
 import java.io.*;
 import java.util.ResourceBundle;

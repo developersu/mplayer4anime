@@ -1,4 +1,4 @@
-package mplayer4anime.Playlists;
+package mplayer4anime.playlists;
 
 public class JsonStorage {
     private final String Ver;

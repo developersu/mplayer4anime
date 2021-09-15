@@ -19,7 +19,7 @@
 package mplayer4anime.mpv;
 
 import com.sun.jna.ptr.IntByReference;
-import mplayer4anime.ServiceWindow;
+import mplayer4anime.ui.ServiceWindow;
 
 public class MpvProcess implements Runnable{
     private String videoFilename;

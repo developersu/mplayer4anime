@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with mplayer4anime.  If not, see <https://www.gnu.org/licenses/>.
  */
-package mplayer4anime.Settings;
+package mplayer4anime.ui.settings;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -109,7 +109,7 @@ public class SettingsController implements Initializable {
         appPreferences.setAudioExtensionsList(audioExtensionListController.getList());
         appPreferences.setBackendEngineIndexId(backEndEngineChoiceBox.getSelectionModel().getSelectedIndex());
 
-        MediatorControl.getInstance().sentUpdates();    // TODO: implement list to track what should be updated
+        MediatorControl.getInstance().updateAfterSettingsChanged();    // TODO: implement list to track what should be updated
     }
 
     private void close(){

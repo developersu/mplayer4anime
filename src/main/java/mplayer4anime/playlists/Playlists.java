@@ -16,11 +16,11 @@
     You should have received a copy of the GNU General Public License
     along with mplayer4anime.  If not, see <https://www.gnu.org/licenses/>.
  */
-package mplayer4anime.Playlists;
+package mplayer4anime.playlists;
 
 import com.google.gson.*;
 import javafx.stage.FileChooser;
-import mplayer4anime.ServiceWindow;
+import mplayer4anime.ui.ServiceWindow;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;

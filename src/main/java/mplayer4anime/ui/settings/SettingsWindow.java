@@ -16,7 +16,7 @@
     You should have received a copy of the GNU General Public License
     along with mplayer4anime.  If not, see <https://www.gnu.org/licenses/>.
  */
-package mplayer4anime.Settings;
+package mplayer4anime.ui.settings;
 
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;

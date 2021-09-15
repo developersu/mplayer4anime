@@ -24,7 +24,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import mplayer4anime.IPC.SingleInstanceHandler;
+import mplayer4anime.ipc.SingleInstanceHandler;
+import mplayer4anime.ui.landing.LandingController;
 
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -39,7 +40,7 @@ public class MainFX extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/landingPage.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/LandingPage.fxml"));
 
         Locale userLocale = new Locale(Locale.getDefault().getISO3Language());      // NOTE: user locale based on ISO3 Language codes
         ResourceBundle rb = ResourceBundle.getBundle("locale", userLocale);
@@ -47,21 +48,14 @@ public class MainFX extends Application {
 
         Parent root = loader.load();
 
-        // tmp?
-        Controller controller = loader.getController();
-        controller.setHostServices(getHostServices());
-        SingleInstanceHandler sih;
+        LandingController landingController = loader.getController();
+        landingController.setHostServices(getHostServices());
+        SingleInstanceHandler singleInstanceHandler;
 
-        if (!getParameters().getUnnamed().isEmpty())
-            sih = new SingleInstanceHandler(controller, getParameters().getUnnamed().get(0));
+        if (getParameters().getUnnamed().isEmpty())
+            singleInstanceHandler = new SingleInstanceHandler(landingController, null);
         else
-            sih = new SingleInstanceHandler(controller, null);
-        // end
-        Thread tsih = new Thread(sih);
-        tsih.start();
-
-        // TODO: refactor needed?
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> tsih.interrupt()));
+            singleInstanceHandler = new SingleInstanceHandler(landingController, getParameters().getUnnamed().get(0));
 
         primaryStage.getIcons().addAll(
                 new Image(getClass().getResourceAsStream("/res/app_icon32x32.png")),
@@ -80,10 +74,10 @@ public class MainFX extends Application {
         primaryStage.setOnHidden(e -> {
             AppPreferences.getINSTANCE().setSceneHeight(scene.getHeight());
             AppPreferences.getINSTANCE().setSceneWidth(scene.getWidth());
-            tsih.interrupt();
-            controller.shutdown();
+            singleInstanceHandler.finishWork();
+            landingController.shutdown();
         });
-
+        //Runtime.getRuntime().addShutdownHook(new Thread(sihThread::interrupt));
         primaryStage.show();
     }
 }

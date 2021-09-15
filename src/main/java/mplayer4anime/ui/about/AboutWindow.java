@@ -1,4 +1,4 @@
-package mplayer4anime.About;
+package mplayer4anime.ui.about;
 
 import javafx.application.HostServices;
 import javafx.fxml.FXMLLoader;

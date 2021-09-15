@@ -16,10 +16,10 @@
     You should have received a copy of the GNU General Public License
     along with mplayer4anime.  If not, see <https://www.gnu.org/licenses/>.
  */
-package mplayer4anime.IPC;
+package mplayer4anime.ipc;
 
 import javafx.application.Platform;
-import mplayer4anime.Controller;
+import mplayer4anime.ui.landing.LandingController;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -30,38 +30,29 @@ import java.net.Socket;
 class ServerSocketProvider implements Runnable{
 
     private final ServerSocket serverSocket;
-    private final Controller controller;
+    private final LandingController landingController;
 
-    ServerSocketProvider(Controller mainCntrl, ServerSocket srvSock){
+    ServerSocketProvider(LandingController mainLandingController, ServerSocket srvSock){
         this.serverSocket = srvSock;
-        this.controller = mainCntrl;
+        this.landingController = mainLandingController;
     }
 
     @Override
     public void run() {
-        Socket servSockClient;
         try{
+            Socket servSockClient;
             while (!serverSocket.isClosed()){
                 servSockClient = serverSocket.accept();
                 BufferedReader servInpRdr = new BufferedReader(
-                        new InputStreamReader(servSockClient.getInputStream())
-                        );
+                        new InputStreamReader(servSockClient.getInputStream()));
 
                 String line = servInpRdr.readLine();
                 // Avoid 'Not on FX application thread' error.
-                Platform.runLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        controller.setPlaylistAsArgument(line);
-                    }
-                });
+                Platform.runLater(() -> landingController.setPlaylistAsArgument(line));
 
                 servSockClient.close();
             }
         }
-        catch (IOException ex){
-            ex.printStackTrace();
-            System.out.println("Socket has been closed.");
-        }
+        catch (IOException ignore){}
     }
 }

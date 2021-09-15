@@ -1,4 +1,4 @@
-package mplayer4anime.appPanes;
+package mplayer4anime.ui.landing.panes;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,7 +10,7 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 
-public class ControllerSUB extends ControllerPane {
+public class ControllerPaneSubtitles extends ControllerPane {
     @FXML
     private ChoiceBox<String> subtEncoding;
     private ObservableList<String> subEncodingList;
