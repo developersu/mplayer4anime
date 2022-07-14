@@ -108,6 +108,9 @@ public class LandingController implements Initializable {
         }
 
         playerToolbarController.initializeMainUiController(this);
+        /*
+        Playlists.ReadByPath(resourceBundle, playListFile);
+        * */
     }
 
     public void setHostServices(HostServices hostServices) {
@@ -167,7 +170,7 @@ public class LandingController implements Initializable {
 
     @FXML
     private void openBtn() {
-        JsonStorage jsonStorage = Playlists.Read(resourceBundle);
+        JsonStorage jsonStorage = Playlists.OpenPlaylistFileChooser(resourceBundle);
         setAllLists(jsonStorage);
     }
     private void setAllLists(JsonStorage jsonStorage){

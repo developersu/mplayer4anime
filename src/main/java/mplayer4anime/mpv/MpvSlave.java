@@ -68,7 +68,7 @@ public class MpvSlave implements ISlaveModeAppOrchestration {
                           boolean subtitlesHidden,
                           boolean isFullscreen) {
         //TODO: fix
-        Thread thread = new Thread(new MpvProcess(VideoFile));
+        Thread thread = new Thread(new MpvProcess(VideoFile, AudioFile, SubtitlesFile));
         thread.start();
     }
 

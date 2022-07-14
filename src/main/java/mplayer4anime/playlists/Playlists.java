@@ -90,8 +90,8 @@ public class Playlists {
     }
     /**
      * Interface for Opening playlists via FileChooser
-     * */
-    public static JsonStorage Read(ResourceBundle resourceBundle){
+     **/
+    public static JsonStorage OpenPlaylistFileChooser(ResourceBundle resourceBundle){
         File playlistFile;
         FileChooser fileChooser = new FileChooser();
 

@@ -20,54 +20,21 @@ package mplayer4anime.mpv;
 
 import com.sun.jna.ptr.IntByReference;
 import mplayer4anime.ui.ServiceWindow;
+import static mplayer4anime.mpv.Mpv_Events.*;
+import static mplayer4anime.mpv.Mpv_Format.*;
 
 public class MpvProcess implements Runnable{
-    private String videoFilename;
+    private final String videoFilename;
+    private final String audioFilename;
+    private final String subsFilename;
+
     private final LibC libC = LibC.INSTANCE;
     private final LibMpv libMpv = LibMpv.INSTANCE;
 
-    /** MPV_FORMAT*/
-    private final int MPV_FORMAT_NONE        = 0;
-    private final int MPV_FORMAT_STRING      = 1;
-    private final int MPV_FORMAT_OSD_STRING  = 2;
-    private final int MPV_FORMAT_FLAG        = 3;
-    private final int MPV_FORMAT_INT64       = 4;
-    private final int MPV_FORMAT_DOUBLE      = 5;
-    private final int MPV_FORMAT_NODE        = 6;
-    private final int MPV_FORMAT_NODE_ARRAY  = 7;
-    private final int MPV_FORMAT_NODE_MAP    = 8;
-    private final int MPV_FORMAT_BYTE_ARRAY  = 9;
-
-    /** mpv_event_id */
-    private final int MPV_EVENT_NONE              = 0;
-    private final int MPV_EVENT_SHUTDOWN          = 1;
-    private final int MPV_EVENT_LOG_MESSAGE       = 2;
-    private final int MPV_EVENT_GET_PROPERTY_REPLY = 3;
-    private final int MPV_EVENT_SET_PROPERTY_REPLY = 4;
-    private final int MPV_EVENT_COMMAND_REPLY     = 5;
-    private final int MPV_EVENT_START_FILE        = 6;
-    private final int MPV_EVENT_END_FILE          = 7;
-    private final int MPV_EVENT_FILE_LOADED       = 8;
-    private final int MPV_EVENT_TRACKS_CHANGED    = 9;//DEPRECATED
-    private final int MPV_EVENT_TRACK_SWITCHED    = 10;//DEPRECATED
-    private final int MPV_EVENT_IDLE              = 11;//DEPRECATED
-    private final int MPV_EVENT_PAUSE             = 12;//DEPRECATED
-    private final int MPV_EVENT_UNPAUSE           = 13;//DEPRECATED
-    private final int MPV_EVENT_TICK              = 14;//DEPRECATED
-    private final int MPV_EVENT_SCRIPT_INPUT_DISPATCH = 15;//DEPRECATED
-    private final int MPV_EVENT_CLIENT_MESSAGE    = 16;
-    private final int MPV_EVENT_VIDEO_RECONFIG    = 17;
-    private final int MPV_EVENT_AUDIO_RECONFIG    = 18;
-    private final int MPV_EVENT_METADATA_UPDATE   = 19;//DEPRECATED
-    private final int MPV_EVENT_SEEK              = 20;
-    private final int MPV_EVENT_PLAYBACK_RESTART  = 21;
-    private final int MPV_EVENT_PROPERTY_CHANGE   = 22;
-    private final int MPV_EVENT_CHAPTER_CHANGE    = 23;//DEPRECATED
-    private final int MPV_EVENT_QUEUE_OVERFLOW    = 24;
-    private final int MPV_EVENT_HOOK              = 25;
-
-    MpvProcess(String filename){
-        this.videoFilename = filename;
+    MpvProcess(String videoFilename, String audioFilename, String subsFilename){
+        this.videoFilename = videoFilename;
+        this.audioFilename = audioFilename;
+        this.subsFilename = subsFilename;
         libC.setlocale(LibC.LC_NUMERIC, "C");  //Somehow it's important
     }
 
@@ -81,14 +48,20 @@ public class MpvProcess implements Runnable{
         libMpv.mpv_set_option_string(ctx, "input-default-bindings", "yes");
         libMpv.mpv_set_option_string(ctx, "input-vo-keyboard", "yes");
         IntByReference value = new IntByReference(1);
-        libMpv.mpv_set_option(ctx, "osc", MPV_FORMAT_FLAG, value);
+        libMpv.mpv_set_option(ctx, "osc", MPV_FORMAT_FLAG.ordinal(), value);
         libMpv.mpv_initialize(ctx);
-        libMpv.mpv_command(ctx, new String[]{"loadfile", videoFilename, null});
+
+        libMpv.mpv_command(ctx, new String[]{"loadfile", videoFilename});
+        //libMpv.mpv_command(ctx, new String[]{"audio-add", audioFilename});
+        //libMpv.mpv_command(ctx, new String[]{"subs-add", subsFilename});
         while (true){
             mpv_event event = libMpv.mpv_wait_event(ctx, 10000);
-            if (event.event_id == MPV_EVENT_SHUTDOWN)
+            if (event.event_id == MPV_EVENT_SHUTDOWN.ordinal())
                 break;
-            System.out.println(event.event_id);
+            System.out.println(Mpv_Events.values()[event.event_id].name());
+
+            if (event.event_id == MPV_EVENT_START_FILE.ordinal())
+                libMpv.mpv_command(ctx, new String[]{"audio-add", audioFilename});
         }
         libMpv.mpv_terminate_destroy(ctx);
     }

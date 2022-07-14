@@ -151,7 +151,7 @@ public class ControllerPane implements Initializable {
             lowerAndUpperExts.add(s);
             lowerAndUpperExts.add(s.toUpperCase());
         }
-        String[] filesExtension = lowerAndUpperExts.toArray(new String[lowerAndUpperExts.size()]);
+        String[] filesExtension = lowerAndUpperExts.toArray(new String[0]);
 
         File directoryReceived;      // Store files (folder) received from selector
         DirectoryChooser dirSelect;

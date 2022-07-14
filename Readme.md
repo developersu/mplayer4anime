@@ -1,6 +1,6 @@
 # mplayer4anime
 
-![License](https://img.shields.io/badge/License-GPLv3-blue.svg) ![Releases](https://img.shields.io/github/downloads/developersu/mplayer4anime/total.svg) ![CI](https://img.shields.io/jenkins/build?jobUrl=https%3A%2F%2Fredrise.ru%2Fjen%2Fjob%2Fmplayer4anime%2Fjob%2Fmaster%2F)
+![License](https://img.shields.io/badge/License-GPLv3-blue.svg) ![Releases](https://img.shields.io/github/downloads/developersu/mplayer4anime/total.svg) [![Build Status](https://ci.redrise.ru/api/badges/desu/mplayer4anime/status.svg)](https://ci.redrise.ru/desu/mplayer4anime)
 
 mplayer4anime is mplayer launcher to play video file with audio layer and/or subtitles (.ass, .srt, etc.) at once.
 
