@@ -12,7 +12,20 @@ steps:
       - name: m2
         path: /root/.m2
 
+  - name: archive-artifact
+    image: alpine:latest
+    commands:
+      - mkdir -p /web/mplayer4anime
+      - echo Download location - https://redrise.ru/builds/`ls mplayer*`
+      - cp mplayer4anime-.*jar /ArtifactsLocalStorage/mplayer4anime
+    volumes:
+      - name: ArtifactsLocalStorage
+        path: /ArtifactsLocalStorage
+
 volumes:
   - name: m2
     host:
       path: /m2
+  - name: ArtifactsLocalStorage
+    host:
+      path: /builds
