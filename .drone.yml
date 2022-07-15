@@ -15,7 +15,6 @@ steps:
   - name: archive-artifact
     image: alpine:latest
     commands:
-      - sleep 60
       - mkdir -p /builds/mplayer4anime
       - cp target/mplayer4anime-*jar /builds/mplayer4anime/
     volumes:
@@ -25,7 +24,7 @@ steps:
 volumes:
   - name: m2
     host:
-      path: /m2
+      path: /home/docker/drone/files/m2
   - name: builds
     host:
-      path: /builds
+      path: /home/www/builds
