@@ -15,8 +15,9 @@ steps:
   - name: archive-artifact
     image: alpine:latest
     commands:
+      - sleep 60
       - mkdir -p /builds/mplayer4anime
-      - cp target/mplayer4anime-*jar /builds/mplayer4anime
+      - cp target/mplayer4anime-*jar /builds/mplayer4anime/
     volumes:
       - name: builds
         path: /builds
