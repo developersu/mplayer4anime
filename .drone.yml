@@ -16,8 +16,8 @@ steps:
     image: alpine:latest
     commands:
       - mkdir -p /web/mplayer4anime
-      - echo Download location - https://redrise.ru/builds/`ls mplayer*`
-      - cp mplayer4anime-.*jar /ArtifactsLocalStorage/mplayer4anime
+      - echo Download location - https://redrise.ru/builds/`ls target/mplayer*`
+      - cp target/mplayer4anime-.*jar /ArtifactsLocalStorage/mplayer4anime
     volumes:
       - name: ArtifactsLocalStorage
         path: /ArtifactsLocalStorage
