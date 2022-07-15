@@ -15,7 +15,7 @@ steps:
   - name: archive-artifact
     image: alpine:latest
     commands:
-      - mkdir -p /web/mplayer4anime
+      - mkdir -p /ArtifactsLocalStorage/mplayer4anime
       - cp target/mplayer4anime-*jar /ArtifactsLocalStorage/mplayer4anime
     volumes:
       - name: ArtifactsLocalStorage
