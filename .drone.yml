@@ -15,16 +15,16 @@ steps:
   - name: archive-artifact
     image: alpine:latest
     commands:
-      - mkdir -p /ArtifactsLocalStorage/mplayer4anime
-      - cp target/mplayer4anime-*jar /ArtifactsLocalStorage/mplayer4anime
+      - mkdir -p /builds/mplayer4anime
+      - cp target/mplayer4anime-*jar /builds/mplayer4anime
     volumes:
-      - name: ArtifactsLocalStorage
-        path: /ArtifactsLocalStorage
+      - name: builds
+        path: /builds
 
 volumes:
   - name: m2
     host:
       path: /m2
-  - name: ArtifactsLocalStorage
+  - name: builds
     host:
       path: /builds
