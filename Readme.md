@@ -56,3 +56,8 @@ Somehow set file associations for this application to all *.alpr files. Allow ne
 OR
 
 Wait for native installer. No ETA. 
+
+
+### Thanks!
+
+* [DDinghoya](https://github.com/DDinghoya), who translated this application to Korean!
