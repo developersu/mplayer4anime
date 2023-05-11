@@ -37,17 +37,17 @@
                   <Pane HBox.hgrow="ALWAYS" />
                   <Label fx:id="paneLbl" text="%lbl_SubsPane" />
                   <Pane HBox.hgrow="ALWAYS" />
-                  <Button minHeight="28.0" mnemonicParsing="false" onAction="#Up">
+                  <Button minHeight="28.0" mnemonicParsing="false" onAction="#up">
                      <graphic>
                         <SVGPath content="M7.41,15.41L12,10.83L16.59,15.41L18,14L12,8L6,14L7.41,15.41Z" fill="#1a1a1a" />
                      </graphic>
                   </Button>
-                  <Button minHeight="28.0" mnemonicParsing="false" onAction="#Down">
+                  <Button minHeight="28.0" mnemonicParsing="false" onAction="#down">
                      <graphic>
                         <SVGPath content="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" fill="#1a1a1a" />
                      </graphic>
                   </Button>
-                  <Button minHeight="28.0" mnemonicParsing="false" onAction="#Del">
+                  <Button minHeight="28.0" mnemonicParsing="false" onAction="#delete">
                      <graphic>
                         <SVGPath content="M19,6.41L17.59,5L12,10.59L6.41,5L5,6.41L10.59,12L5,17.59L6.41,19L12,13.41L17.59,19L19,17.59L13.41,12L19,6.41Z" fill="#b90505" />
                      </graphic>
@@ -57,7 +57,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </VBox.margin>
             </HBox>
-            <ListView fx:id="paneListView" onKeyPressed="#KeyPressed" styleClass="landing" stylesheets="@../res/landing.css" VBox.vgrow="ALWAYS" />
+            <ListView fx:id="paneListView" onKeyPressed="#keyPressed" styleClass="landing" stylesheets="@../res/landing.css" VBox.vgrow="ALWAYS" />
          </children>
       </VBox>
    </children>

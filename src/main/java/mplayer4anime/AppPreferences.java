@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2023 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -22,8 +22,8 @@ import java.util.prefs.Preferences;
 
 // Rule application settings
 public class AppPreferences {
-    private static AppPreferences INSTANCE = new AppPreferences();
-    private Preferences preferences = Preferences.userRoot().node("mplayer4anime");
+    private static final AppPreferences INSTANCE = new AppPreferences();
+    private final Preferences preferences = Preferences.userRoot().node("mplayer4anime");
 
     private AppPreferences(){}
 
@@ -99,7 +99,7 @@ public class AppPreferences {
     /** Return recently opened elements */
     public String[] getRecentPlaylists(){
         String[] recentPlaylists = new String[10];
-        for (int i=0; i<10; i++)
+        for (int i = 0; i < 10; i++)
             recentPlaylists[i] = preferences.get("RECENT_PLS_" + i, "");
         return recentPlaylists;
     }
@@ -112,7 +112,7 @@ public class AppPreferences {
                     preferences.put("RECENT_PLS_" + i, recentPlaylists[i]);
                 else
                     preferences.put("RECENT_PLS_" + i, "");
-            for (;i<10;i++)                                             // Not needed. Logic may handle received String to be less or greater then String[10], but it never happened.
+            for (;i < 10; i++)                                             // Not needed. Logic may handle received String to be less or greater then String[10], but it never happened.
                 preferences.put("RECENT_PLS_" + i, "");
         }
     }
@@ -125,4 +125,23 @@ public class AppPreferences {
 
     public int getBackendEngineIndexId(){ return preferences.getInt("backend_player", 0); }
     public void setBackendEngineIndexId(int value){ preferences.putInt("backend_player", value); }
+
+    public String getRecentPlaylist(){
+        return preferences.get("RECENT_PLS_0", "");
+    }
+    public boolean getOpenLatestPlaylistOnStart(){ return preferences.getBoolean("open_latest_playlist", true); }
+    public void setOpenLatestPlaylistOnStart(boolean value){ preferences.putBoolean("open_latest_playlist" , value); }
+
+    public int getLatestPositionVideo(){ return preferences.getInt("latest_video_pos", 1); }
+    public void setLatestPositionVideo(int value){
+        preferences.putInt("latest_video_pos", Math.max(value, 0));
+    }
+    public int getLatestPositionAudio(){ return preferences.getInt("latest_audio_pos", 1); }
+    public void setLatestPositionAudio(int value){
+        preferences.putInt("latest_audio_pos", Math.max(value, 0));
+    }
+    public int getLatestPositionSubs(){ return preferences.getInt("latest_subs_pos", 1); }
+    public void setLatestPositionSubs(int value){
+        preferences.putInt("latest_subs_pos", Math.max(value, 0));
+    }
 }

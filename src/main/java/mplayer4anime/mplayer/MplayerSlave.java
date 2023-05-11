@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2023 Dmitry Isaenko
      
     This file is part of mplayer4anime.
 
@@ -18,14 +18,14 @@
  */
 package mplayer4anime.mplayer;
 
-import mplayer4anime.ISlaveModeAppOrchestration;
+import mplayer4anime.IPlayer;
 import mplayer4anime.ui.ServiceWindow;
 
 import java.io.*;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
-public class MplayerSlave implements ISlaveModeAppOrchestration {
+public class MplayerSlave implements IPlayer {
     private Process player;
     private PrintStream playerIn;
     private BufferedReader playerOutErr;
@@ -37,13 +37,13 @@ public class MplayerSlave implements ISlaveModeAppOrchestration {
     }
 
     private boolean playerSingleCommand(String command){
-        if (player != null && player.isAlive()) {
-            playerIn.print(command);
-            playerIn.print("\n");
-            playerIn.flush();
-            return true;
-        }
-        return false;
+        if (player == null || ! player.isAlive())
+            return false;
+
+        playerIn.print(command);
+        playerIn.print("\n");
+        playerIn.flush();
+        return true;
     }
     @Override
     public void subtitlesSwitch(){

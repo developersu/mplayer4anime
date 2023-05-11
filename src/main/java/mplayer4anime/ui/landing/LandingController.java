@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2023 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -28,7 +28,7 @@ import javafx.scene.control.*;
 import javafx.stage.Stage;
 import mplayer4anime.ui.about.AboutWindow;
 import mplayer4anime.AppPreferences;
-import mplayer4anime.ISlaveModeAppOrchestration;
+import mplayer4anime.IPlayer;
 import mplayer4anime.MediatorControl;
 import mplayer4anime.playlists.JsonStorage;
 import mplayer4anime.playlists.Playlists;
@@ -45,9 +45,9 @@ import java.util.ResourceBundle;
 
 public class LandingController implements Initializable {
     @FXML
-    ControllerPane mkvPaneController, mkaPaneController;
+    private ControllerPane mkvPaneController, mkaPaneController;
     @FXML
-    ControllerPaneSubtitles subPaneController;
+    private ControllerPaneSubtitles subPaneController;
     @FXML
     private PlayerToolbarController playerToolbarController;
     @FXML
@@ -65,24 +65,23 @@ public class LandingController implements Initializable {
     private String currentPlaylistLocation;
     private String backend;
 
-    ISlaveModeAppOrchestration player;
+    private IPlayer player;
 
     // If application started with playlist passed as an argument, then we'll try to load it (if it's valid).
     public void setPlaylistAsArgument(String playlist) {
-        JsonStorage jsonStorage = Playlists.ReadByPath(resourceBundle, new File(playlist));
+        JsonStorage jsonStorage = Playlists.readByPath(resourceBundle, new File(playlist));
         setAllLists(jsonStorage);
     }
 
     @Override
-    public void initialize(URL url, ResourceBundle rb) {
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        this.resourceBundle = resourceBundle;
         // Register this controller in mediator
         MediatorControl.getInstance().registerMainController(this);
 
         mkvPaneController.setPaneType("Video");
         mkaPaneController.setPaneType("Audio");
         subPaneController.setPaneType("Subtitles");
-
-        resourceBundle = rb;
 
         // Set default list of encodings of the subtitles files:
         subPaneController.setEncoding(appPreferences.getSubsEncodingList(), appPreferences.getLastTimeUsedSubsEncoding());
@@ -107,13 +106,27 @@ public class LandingController implements Initializable {
             player = new MpvSlave(resourceBundle);
         }
 
-        playerToolbarController.initializeMainUiController(this);
-        /*
-        Playlists.ReadByPath(resourceBundle, playListFile);
-        * */
+        playerToolbarController.initializeMainUiController(player, mkvPaneController, mkaPaneController, subPaneController);
+
+        if (appPreferences.getOpenLatestPlaylistOnStart())
+            loadLatestPlaylist();
+    }
+    private void loadLatestPlaylist(){
+        try {
+            String recentPlaylist = appPreferences.getRecentPlaylist();
+            if ("".equals(recentPlaylist))
+                return;
+            // TODO: IF video set, if playlist has been opened before
+            JsonStorage jsonStorage = Playlists.readByPathSilent(new File(recentPlaylist));
+            setAllLists(jsonStorage);
+            mkvPaneController.setElementSelectedByIndex(appPreferences.getLatestPositionVideo());
+            mkaPaneController.setElementSelectedByIndex(appPreferences.getLatestPositionAudio());
+            subPaneController.setElementSelectedByIndex(appPreferences.getLatestPositionSubs());
+        }
+        catch (Exception ignore){}
     }
 
-    public void setHostServices(HostServices hostServices) {
+    public void setHostServices(HostServices hostServices){
         this.hostServices = hostServices;
     }
 
@@ -130,16 +143,21 @@ public class LandingController implements Initializable {
         playerToolbarController.shutdown();
         // TODO: remove from here; too sophisticated
         String[] storeRecentArr = new String[10];
-        for (int i =0; i < recentlyOpenedMenu.getItems().size() - 2 && !(i > 9); i++) {       // Don't take separator and Clean button
+        for (int i = 0; i < recentlyOpenedMenu.getItems().size() - 2 && !(i > 9); i++) {       // Don't take separator and Clean button
             storeRecentArr[i] = (String) recentlyOpenedMenu.getItems().get(i).getUserData();
         }
         appPreferences.setRecentPlaylists(storeRecentArr);
+
+        appPreferences.setLatestPositionVideo(mkvPaneController.getElementSelectedIndex());
+        appPreferences.setLatestPositionAudio(mkaPaneController.getElementSelectedIndex());
+        appPreferences.setLatestPositionSubs(subPaneController.getElementSelectedIndex());
+
         Platform.exit();
     }
 
     @FXML
     private void infoBtn(){
-        new AboutWindow(this.hostServices);
+        new AboutWindow(hostServices);
     } // TODO: fix this shit with hostSerivces that doesn't work @ linux
 
     /**             SETTINGS HANDLE          */
@@ -170,7 +188,7 @@ public class LandingController implements Initializable {
 
     @FXML
     private void openBtn() {
-        JsonStorage jsonStorage = Playlists.OpenPlaylistFileChooser(resourceBundle);
+        JsonStorage jsonStorage = Playlists.openPlaylistFileChooser(resourceBundle);
         setAllLists(jsonStorage);
     }
     private void setAllLists(JsonStorage jsonStorage){
@@ -197,7 +215,7 @@ public class LandingController implements Initializable {
                 mkaPaneController.getElementsAll(),
                 subPaneController.getElementsAll(),
                 subPaneController.getSelectedEncoding());
-        if (Playlists.SaveCurrent(resourceBundle, jsonStorage)) {
+        if (Playlists.saveCurrent(resourceBundle, jsonStorage)) {
             this.currentPlaylistLocation = Playlists.getPlaylistLocation();
             this.statusLbl.setText(currentPlaylistLocation);    //TODO: update header of the application to include this?
             addRecentlyOpened(currentPlaylistLocation);
@@ -216,7 +234,7 @@ public class LandingController implements Initializable {
                 mkaPaneController.getElementsAll(),
                 subPaneController.getElementsAll(),
                 subPaneController.getSelectedEncoding());
-        if (Playlists.SaveAs(resourceBundle, jsonStorage)) {
+        if (Playlists.saveAs(resourceBundle, jsonStorage)) {
             this.currentPlaylistLocation = Playlists.getPlaylistLocation();
             this.statusLbl.setText(currentPlaylistLocation);    //TODO: update header of the application to include this?
             addRecentlyOpened(currentPlaylistLocation);
@@ -246,7 +264,7 @@ public class LandingController implements Initializable {
 
         menuItem.setUserData(playlistPath);
         menuItem.setOnAction(actionEvent -> {
-            JsonStorage jsonStorage = Playlists.ReadByPath(resourceBundle, new File(playlistPath));
+            JsonStorage jsonStorage = Playlists.readByPath(resourceBundle, new File(playlistPath));
             setAllLists(jsonStorage);
         });
         // Limit list to 13 elements (2 in the end are separator and clear button)

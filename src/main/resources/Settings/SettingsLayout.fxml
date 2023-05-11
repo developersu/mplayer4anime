@@ -13,7 +13,7 @@
 <?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.text.Font?>
 
-<VBox xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mplayer4anime.ui.settings.SettingsController">
+<VBox xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mplayer4anime.ui.settings.SettingsController">
    <children>
       <TabPane side="LEFT" styleClass="tab-paneSettings" stylesheets="@../res/landing.css" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="100.0" tabMaxWidth="500.0" tabMinHeight="100.0" tabMinWidth="80.0" VBox.vgrow="ALWAYS">
          <tabs>
@@ -49,11 +49,8 @@
                               <ChoiceBox fx:id="backEndEngineChoiceBox" prefWidth="150.0" />
                            </children>
                         </HBox>
-                        <HBox alignment="CENTER_LEFT" VBox.vgrow="NEVER">
-                           <children>
-                              <CheckBox fx:id="subtitlesFirstCheckBox" mnemonicParsing="false" text="%settings_SubtitlesTabFirst" />
-                           </children>
-                        </HBox>
+                        <CheckBox fx:id="subtitlesFirstCheckBox" mnemonicParsing="false" text="%settings_SubtitlesTabFirst" />
+                        <CheckBox fx:id="openLatestPlaylistCheckBox" mnemonicParsing="false" text="%settings_OpenLatestOnStart" />
                      </children>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

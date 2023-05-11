@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2023 Dmitry Isaenko
      
     This file is part of mplayer4anime.
 
@@ -18,11 +18,11 @@
  */
 package mplayer4anime.mpv;
 
-import mplayer4anime.ISlaveModeAppOrchestration;
+import mplayer4anime.IPlayer;
 
 import java.util.ResourceBundle;
 
-public class MpvSlave implements ISlaveModeAppOrchestration {
+public class MpvSlave implements IPlayer {
 
     public MpvSlave(ResourceBundle resourceBundle){
 

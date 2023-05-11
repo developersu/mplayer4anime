@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2023 Dmitry Isaenko
      
     This file is part of mplayer4anime.
 
@@ -18,7 +18,7 @@
  */
 package mplayer4anime;
 
-public interface ISlaveModeAppOrchestration {
+public interface IPlayer {
     void subtitlesSwitch();
     void fullscreenSwitch();
     void mute();

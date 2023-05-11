@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2023 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -41,7 +41,7 @@ public class SettingsController implements Initializable {
     @FXML
     private Label pathToMplayerLbl;
     @FXML
-    private CheckBox subtitlesFirstCheckBox;
+    private CheckBox subtitlesFirstCheckBox, openLatestPlaylistCheckBox;
     @FXML
     private ChoiceBox<String> backEndEngineChoiceBox;
 
@@ -59,6 +59,7 @@ public class SettingsController implements Initializable {
         audioExtensionListController.setList(appPreferences.getAudioExtensionsList(), true);
         backEndEngineChoiceBox.getItems().addAll("mplayer", "mpv");
         backEndEngineChoiceBox.getSelectionModel().select(appPreferences.getBackendEngineIndexId());
+        openLatestPlaylistCheckBox.setSelected(appPreferences.getOpenLatestPlaylistOnStart());
     }
 
     @FXML
@@ -67,17 +68,13 @@ public class SettingsController implements Initializable {
         fileChooser.setTitle("mplayer");
 
         // In case we use Windows, limit selectable file to .exe
-        if (System.getProperty("os.name").contains("Windows")) {
-            fileChooser.getExtensionFilters().setAll(
-                    new FileChooser.ExtensionFilter("mplayer", "*.exe")
-            );
-        }
+        if (System.getProperty("os.name").contains("Windows"))
+            fileChooser.getExtensionFilters().setAll(new FileChooser.ExtensionFilter("mplayer", "*.exe"));
 
         File mplayerExecutableFile = fileChooser.showOpenDialog(null);
 
-        if (mplayerExecutableFile != null) {
+        if (mplayerExecutableFile != null)
             pathToMplayerLbl.setText(mplayerExecutableFile.toString());
-        }
     }
 
     @FXML
@@ -108,6 +105,7 @@ public class SettingsController implements Initializable {
         appPreferences.setVideoExtensionsList(videoExtensionListController.getList());
         appPreferences.setAudioExtensionsList(audioExtensionListController.getList());
         appPreferences.setBackendEngineIndexId(backEndEngineChoiceBox.getSelectionModel().getSelectedIndex());
+        appPreferences.setOpenLatestPlaylistOnStart(openLatestPlaylistCheckBox.isSelected());
 
         MediatorControl.getInstance().updateAfterSettingsChanged();    // TODO: implement list to track what should be updated
     }

@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2023 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -24,6 +24,7 @@ import mplayer4anime.ui.ServiceWindow;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ResourceBundle;
 
 public class Playlists {
@@ -31,23 +32,22 @@ public class Playlists {
 
     //TODO: Show popUp if unable to write! Or nothing to write! Or overwrite!
     //TODO: Disable 'Save' button if no files added
-    public static boolean SaveAs(ResourceBundle resourceBundle, JsonStorage jStorage){
-        File playlistFile;
+    public static boolean saveAs(ResourceBundle resourceBundle, JsonStorage jStorage){
         FileChooser fileChooser = new FileChooser();
 
         fileChooser.setTitle(resourceBundle.getString("SelectFile"));
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         fileChooser.setInitialFileName("MyPlaylist.alpr");
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Playlists (*.alpr)", "*.alpr"));
-        playlistFile = fileChooser.showSaveDialog(null);
+        File playlistFile = fileChooser.showSaveDialog(null);
 
         return writeFile(resourceBundle, playlistFile, jStorage);
     }
 
-    public static boolean SaveCurrent(ResourceBundle resourceBundle, JsonStorage jStorage) {
-        if (playlistLocation == null || playlistLocation.equals("")){
-            return Playlists.SaveAs(resourceBundle, jStorage);
-        }
+    public static boolean saveCurrent(ResourceBundle resourceBundle, JsonStorage jStorage) {
+        if (playlistLocation == null || playlistLocation.equals(""))
+            return Playlists.saveAs(resourceBundle, jStorage);
+
         return writeFile(resourceBundle, new File(playlistLocation), jStorage);
     }
 
@@ -91,7 +91,7 @@ public class Playlists {
     /**
      * Interface for Opening playlists via FileChooser
      **/
-    public static JsonStorage OpenPlaylistFileChooser(ResourceBundle resourceBundle){
+    public static JsonStorage openPlaylistFileChooser(ResourceBundle resourceBundle){
         File playlistFile;
         FileChooser fileChooser = new FileChooser();
 
@@ -101,12 +101,12 @@ public class Playlists {
         fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Playlists (*.alpr)", "*.alpr"));
         playlistFile = fileChooser.showOpenDialog(null);
 
-        return ReadByPath(resourceBundle, playlistFile);
+        return readByPath(resourceBundle, playlistFile);
     }
     /**
      * Interface for Opening playlists using file itself
      * */
-    public static JsonStorage ReadByPath(ResourceBundle resourceBundle, File playlistFile){
+    public static JsonStorage readByPath(ResourceBundle resourceBundle, File playlistFile){
         if (playlistFile == null) {
             ServiceWindow.getErrorNotification(resourceBundle.getString("Error"),
                     "Playlist file not selected");// TODO: translate
@@ -129,6 +129,17 @@ public class Playlists {
             ServiceWindow.getErrorNotification(resourceBundle.getString("Error"),
                     resourceBundle.getString("ErrorOnOpenIOProblem"));
         }
+        return null;
+    }
+
+    public static JsonStorage readByPathSilent(File playlistFile){
+        try (Reader reader = new InputStreamReader(Files.newInputStream(playlistFile.toPath()))) {
+            JsonStorage jStorage = new Gson().fromJson(reader, JsonStorage.class);
+            if (jStorage != null){
+                playlistLocation = playlistFile.getAbsolutePath();
+                return jStorage;
+            }
+        } catch (Exception ignore){}
         return null;
     }
 

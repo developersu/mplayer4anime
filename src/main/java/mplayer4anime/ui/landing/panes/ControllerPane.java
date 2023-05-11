@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2023 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -18,6 +18,7 @@
  */
 package mplayer4anime.ui.landing.panes;
 
+import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -50,7 +51,6 @@ public class ControllerPane implements Initializable {
     private Label paneLbl;
     private String paneType;
 
-
     @Override
     public void initialize(URL url, ResourceBundle resBundle) {
         SetCellFactory(paneListView);
@@ -58,10 +58,14 @@ public class ControllerPane implements Initializable {
         appPreferences = AppPreferences.getINSTANCE();
     }
 
+    public ObservableList<File> getPaneFileList() {
+        return paneFileList;
+    }
+
     public void setPaneType(String paneType){
         this.paneType = paneType;
 
-        switch (paneType) {
+        switch (paneType){
             case "Video":
                 paneLbl.setText(resourceBundle.getString("lbl_VideoPane"));
                 break;
@@ -73,7 +77,6 @@ public class ControllerPane implements Initializable {
                 break;
             default:
                 paneLbl.setText(resourceBundle.getString("?"));
-                break;
         }
     }
 
@@ -91,23 +94,20 @@ public class ControllerPane implements Initializable {
     }
     /** Select element in pane using index recieved */
     public void setElementSelectedByIndex(int index){
-        this.paneListView.getSelectionModel().select(index);
+        paneListView.getSelectionModel().select(index);
     }
     /** Get number of elements loaded into the pane */
     public int getElementsCount(){
-        return this.paneFileList.size();
-    }
-    /** Check if there are any elements loaded */
-    public boolean isElementsListEmpty(){
-        return paneFileList.isEmpty();
+        return paneFileList.size();
     }
     /** Get all elements
      * Used in Json playlist writer only */
     public String[] getElementsAll(){
         String[] elementsArray = new String[this.getElementsCount()];
-        for (int i = 0; i < elementsArray.length; i++){
+
+        for (int i = 0; i < elementsArray.length; i++)
             elementsArray[i] = paneFileList.get(i).toString();
-        }
+
         return  elementsArray;
     }
 
@@ -239,61 +239,63 @@ public class ControllerPane implements Initializable {
      * */
     public void setFilesFromList(String[] fileLocations){
         cleanList();
-        if (fileLocations != null && fileLocations.length != 0) {
-            File[] files = new File[fileLocations.length];
-            for (int i=0; i < fileLocations.length; i++)
-                files[i] = new File(fileLocations[i]);
-            displayFiles(files);
-        }
+
+        if (fileLocations == null || fileLocations.length == 0)
+            return;
+
+        File[] files = new File[fileLocations.length];
+        for (int i = 0; i < fileLocations.length; i++)
+            files[i] = new File(fileLocations[i]);
+        displayFiles(files);
     }
 
     private void displayFiles(File[] files){
-        if (files != null && files.length > 0) {
-            // spiced java magic
-            Arrays.sort(files);
-            // Remember the folder used for MKV and reuse it when user opens MKA/subs folder (as new default path instead of user.home)
-            folderToOpen = files[0].getParent();
-            //System.out.println(folderToOpen);
+        if (files == null || files.length == 0)
+            return;
 
-                paneFileList.addAll(files);
-                paneListView.setItems(paneFileList);
-                paneListView.getSelectionModel().select(0);
+        Arrays.sort(files);
+        // Remember the folder used for MKV and reuse it when user opens MKA/subs folder (as new default path instead of user.home)
+        folderToOpen = files[0].getParent();
 
-        } else {
-            System.out.println("\tNo files in this folder");
-        }
+        paneFileList.addAll(files);
+        paneListView.setItems(paneFileList);
+        paneListView.getSelectionModel().select(0);
     }
     @FXML
     public void cleanList(){
-        paneListView.getItems().clear(); // wipe elements from ListView
-         }
+        paneListView.getItems().clear();
+    }
 
     @FXML
-    private void Up(){
-        int index;
-        index = paneListView.getSelectionModel().getSelectedIndex();
-        if (index >0){
-            paneFileList.add(index-1, paneListView.getSelectionModel().getSelectedItem());
-            paneFileList.remove(index+1);
-            paneListView.getSelectionModel().select(index-1);
+    private void up(){
+        int index = paneListView.getSelectionModel().getSelectedIndex();
+        if (index > 0){
+            paneFileList.add(index - 1, paneListView.getSelectionModel().getSelectedItem());
+            paneFileList.remove(index + 1);
+            paneListView.getSelectionModel().select(index - 1);
         }
     }
     @FXML
-    private void Down(){
-        int index;
-        index = paneListView.getSelectionModel().getSelectedIndex();
-        if (index+1 < paneFileList.size() ){
-            paneFileList.add(index+2, paneListView.getSelectionModel().getSelectedItem());
+    private void down(){
+        int index = paneListView.getSelectionModel().getSelectedIndex();
+        if (index + 1 < paneFileList.size() ){
+            paneFileList.add(index + 2, paneListView.getSelectionModel().getSelectedItem());
             paneFileList.remove(index);
-            paneListView.getSelectionModel().select(index+1);
+            paneListView.getSelectionModel().select(index + 1);
         }
     }
     @FXML
-    private void Del(){ paneFileList.remove(paneListView.getSelectionModel().getSelectedItem()); }
+    private void delete(){
+        paneFileList.remove(paneListView.getSelectionModel().getSelectedItem());
+    }
 
     @FXML
-    private void KeyPressed(KeyEvent event){
+    private void keyPressed(KeyEvent event){
         if (event.getCode().toString().equals("DELETE"))
-            Del();
+            delete();
+    }
+
+    public ReadOnlyIntegerProperty getSelectedIndexProperty(){
+        return paneListView.getSelectionModel().selectedIndexProperty();
     }
 }
