@@ -8,11 +8,11 @@
     <name>mplayer4anime</name>
 
     <artifactId>mplayer4anime</artifactId>
-    <version>0.15-SNAPSHOT</version>
+    <version>0.15</version>
 
     <packaging>jar</packaging>
 
-    <url>https://github.com/developersu/mplayer4anime</url>
+    <url>https://git.redrise.ru/desu/mplayer4anime</url>
     <description>
         mplayer front end to play content pairs that are mostly used for anime (mka+mkv, mp4+ac3, mkv+srt)
     </description>
@@ -45,6 +45,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.build.timestamp.format>yyyyMMdd.HHmmss</maven.build.timestamp.format>
+        <javafx.version>19.0.2.1</javafx.version>
     </properties>
 
     <issueManagement>
@@ -64,97 +65,85 @@
             <version>2.9.0</version>
             <scope>compile</scope>
         </dependency>
-    <!-- openJFX Linux -->
+        <!-- openJFX Linux -->
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>16</version>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
             <classifier>linux</classifier>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
-            <version>16</version>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
             <classifier>linux</classifier>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>16</version>
-            <classifier>linux</classifier>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>16</version>
+            <version>${javafx.version}</version>
             <classifier>linux</classifier>
             <scope>compile</scope>
         </dependency>
         <!-- openJFX Windows -->
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>16</version>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
             <classifier>win</classifier>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
-            <version>16</version>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
             <classifier>win</classifier>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>16</version>
-            <classifier>win</classifier>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>16</version>
+            <version>${javafx.version}</version>
             <classifier>win</classifier>
             <scope>compile</scope>
         </dependency>
         <!-- openJFX MAC -->
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>16</version>
+            <artifactId>javafx-graphics</artifactId>
+            <version>${javafx.version}</version>
             <classifier>mac</classifier>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-media</artifactId>
-            <version>16</version>
+            <artifactId>javafx-controls</artifactId>
+            <version>${javafx.version}</version>
             <classifier>mac</classifier>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-fxml</artifactId>
-            <version>16</version>
-            <classifier>mac</classifier>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>16</version>
+            <version>${javafx.version}</version>
             <classifier>mac</classifier>
             <scope>compile</scope>
         </dependency>
     </dependencies>
     <build>
         <finalName>${project.artifactId}-${project.version}-${maven.build.timestamp}</finalName>
-
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+            <resource>
+                <directory>src/main/resources-filtered</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -203,12 +192,6 @@
                 </executions>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>true</filtering>
-            </resource>
-        </resources>
     </build>
 
 </project>

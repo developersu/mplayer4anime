@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
 
-<VBox spacing="5.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mplayer4anime.ui.about.AboutController">
+<VBox spacing="5.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mplayer4anime.ui.about.AboutController">
          <children>
             <HBox>
                <children>
@@ -27,7 +27,7 @@
                   <VBox spacing="5.0">
                      <children>
                         <Label text="%about_line1" wrapText="true" />
-                        <Label text="%about_line2" wrapText="true" />
+                        <Label fx:id="versionLbl" wrapText="true" />
                         <Label text="%about_line3" wrapText="true" />
                      </children>
                   </VBox>
