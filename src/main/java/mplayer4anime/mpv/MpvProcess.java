@@ -69,7 +69,7 @@ public class MpvProcess implements Runnable{
     private boolean nonSupportedOs(){
         if (! System.getProperty("os.name").toLowerCase().contains("linux")) {
             ServiceWindow.getErrorNotification("Error",
-                    "Non-Linux OS are not supported. Yet. Please yse mplayer backend for now.");
+                    "Non-Linux OS are not supported. Yet. Please use mplayer backend for now.");
             return true;
         }
         return false;

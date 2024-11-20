@@ -37,12 +37,10 @@ public class SettingsWindow {
         stageAbout.setMinHeight(500);
 
         FXMLLoader loaderSettings = new FXMLLoader(getClass().getResource("/Settings/SettingsLayout.fxml"));
-        ResourceBundle resourceBundle;
 
         Locale userLocale = new Locale(Locale.getDefault().getISO3Language());      // NOTE: user locale based on ISO3 Language codes
-        resourceBundle = ResourceBundle.getBundle("locale", userLocale);
+        ResourceBundle resourceBundle = ResourceBundle.getBundle("locale", userLocale);
         loaderSettings.setResources(resourceBundle);
-
 
         try {
             Parent parentAbout = loaderSettings.load();
