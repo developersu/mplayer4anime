@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2023 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -47,11 +47,11 @@ public class SettingsController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resBundle) {
-        appPreferences = AppPreferences.getINSTANCE();
+        appPreferences = AppPreferences.get();
         pathToMplayerLbl.setText(appPreferences.getPath());
 
         // Subtitles should be shown first? If TRUE, then set checkbox.
-        subtitlesFirstCheckBox.setSelected(appPreferences.getSubtilesFirst());
+        subtitlesFirstCheckBox.setSelected(appPreferences.getSubtitlesFirst());
         // Fill lists of extensions and encodings
         subExtensionListController.setList(appPreferences.getSubsExtensionsList(), true);
         subEncodingListController.setList(appPreferences.getSubsEncodingList(), false);
@@ -99,7 +99,7 @@ public class SettingsController implements Initializable {
     @FXML
     private void Apply(){
         appPreferences.setPath(pathToMplayerLbl.getText());
-        appPreferences.setSubtilesFirst(subtitlesFirstCheckBox.isSelected());
+        appPreferences.setSubtitlesFirst(subtitlesFirstCheckBox.isSelected());
         appPreferences.setSubsExtensionsList(subExtensionListController.getList());
         appPreferences.setSubsEncodingList(subEncodingListController.getList());
         appPreferences.setVideoExtensionsList(videoExtensionListController.getList());

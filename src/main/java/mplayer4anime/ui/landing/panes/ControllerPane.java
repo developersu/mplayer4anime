@@ -55,7 +55,7 @@ public class ControllerPane implements Initializable {
     public void initialize(URL url, ResourceBundle resBundle) {
         SetCellFactory(paneListView);
         resourceBundle = resBundle;
-        appPreferences = AppPreferences.getINSTANCE();
+        appPreferences = AppPreferences.get();
     }
 
     public ObservableList<File> getPaneFileList() {

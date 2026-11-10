@@ -21,9 +21,9 @@ refer to WFTPL license.
 
 ### Requirements
 
-For latest versions of this app use JRE or JDK 8 or higher.
+For latest versions of this app use JRE or JDK 25 or higher.
 
-For older versions (prior to v0.12) please use JRE/JDK 8 (and JavaFX if you're NOT using Windows. For example: in Debian Stretch you should install 'openjfx' package).
+For older versions (prior to v0.12) please use JRE/JDK 25 (and JavaFX if you're NOT using Windows. For example: in Debian Stretch you should install 'openjfx' package).
 
 ### Running on Linux
 
@@ -35,8 +35,7 @@ $ java -jar mplayer4anime.jar
 ### Running on Windows
 Step 1.
 
-Download and install JRE 8 or later:
-http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html
+Download and install JRE 25 or later
 
 Step 2.
 

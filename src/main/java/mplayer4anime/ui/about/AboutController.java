@@ -1,3 +1,22 @@
+/*
+    Copyright 2018-2026 Dmitry Isaenko
+
+    This file is part of mplayer4anime.
+
+    mplayer4anime is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    mplayer4anime is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with mplayer4anime.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package mplayer4anime.ui.about;
 
 import javafx.application.HostServices;
@@ -5,7 +24,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
 import javafx.stage.Stage;
 
 import java.net.URL;
@@ -16,63 +34,33 @@ public class AboutController implements Initializable {
 
     private HostServices hostServices;
 
-    void setHostServices(HostServices hs){
+    void setHostServices(HostServices hs) {
         this.hostServices = hs;
     }
 
     @FXML
     private Button buttonOk;
     @FXML
-    private TextArea GSONLicense;
-    @FXML
     private Label versionLbl;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         versionLbl.setText(ResourceBundle.getBundle("app").getString("_version"));
-
-        GSONLicense.setText("Copyright 2008 Google Inc.\n" +
-                "\n" +
-                "Licensed under the Apache License, Version 2.0 (the \"License\");\n" +
-                "you may not use this file except in compliance with the License.\n" +
-                "You may obtain a copy of the License at\n" +
-                "\n" +
-                "    http://www.apache.org/licenses/LICENSE-2.0\n" +
-                "\n" +
-                "Unless required by applicable law or agreed to in writing, software\n" +
-                "distributed under the License is distributed on an \"AS IS\" BASIS,\n" +
-                "WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n" +
-                "See the License for the specific language governing permissions and\n" +
-                "limitations under the License.");
     }
 
     @FXML
-    private void buttonClickOk(){
+    private void buttonClickOk() {
         Stage thisStage = (Stage) buttonOk.getScene().getWindow();
         thisStage.close();
     }
+
     @FXML
-    private void gitHubUrl(){
-        try {
-            hostServices.showDocument("https://github.com/developersu/mplayer4anime");
-        } catch (Exception ignored){ }
+    private void gitHubUrl() {
+        hostServices.showDocument("https://github.com/developersu/mplayer4anime");
     }
+
     @FXML
-    private void bloggerUrl(){
-        try {
-            hostServices.showDocument("https://developersu.blogspot.com/search/label/mplayer4anime");
-        } catch (Exception ignored){ }
-    }
-    @FXML
-    private void libGSON(){
-        try {
-            hostServices.showDocument("https://github.com/google/gson");
-        } catch (Exception ignored){ }
-    }
-    @FXML
-    private void iconsMaterial(){
-        try {
-            hostServices.showDocument("https://materialdesignicons.com/");
-        } catch (Exception ignored){ }
+    private void bloggerUrl() {
+        hostServices.showDocument("https://developersu.blogspot.com/search/label/mplayer4anime");
     }
 }

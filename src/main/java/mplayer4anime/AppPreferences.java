@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2023 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -18,16 +18,21 @@
  */
 package mplayer4anime;
 
+import java.util.Locale;
 import java.util.prefs.Preferences;
 
 // Rule application settings
 public class AppPreferences {
     private static final AppPreferences INSTANCE = new AppPreferences();
     private final Preferences preferences = Preferences.userRoot().node("mplayer4anime");
+    private final Locale locale;
 
-    private AppPreferences(){}
+    private AppPreferences(){
+        var localeCode = preferences.get("locale", Locale.getDefault().toString());
+        this.locale = Locale.of(localeCode.substring(0, 2), localeCode.substring(3));
+    }
 
-    public static AppPreferences getINSTANCE() {
+    public static AppPreferences get() {
         return INSTANCE;
     }
 
@@ -44,11 +49,11 @@ public class AppPreferences {
      * TRUE - Subtitles tab opens first
      * FALSE - Subtitles tab opens as usual
     */
-    public boolean getSubtilesFirst(){
+    public boolean getSubtitlesFirst(){
         return preferences.getBoolean("SUBS_TAB_FIRST", false);
     }
 
-    public void setSubtilesFirst(boolean set){
+    public void setSubtitlesFirst(boolean set){
         preferences.putBoolean("SUBS_TAB_FIRST", set);
     }
 
@@ -144,4 +149,7 @@ public class AppPreferences {
     public void setLatestPositionSubs(int value){
         preferences.putInt("latest_subs_pos", Math.max(value, 0));
     }
+    // FIXME: Implement manual selection of the locale
+    public Locale getLocale(){ return this.locale; }
+    public void setLocale(String langStr){ preferences.put("locale", langStr); }
 }

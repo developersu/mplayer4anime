@@ -23,40 +23,32 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+import mplayer4anime.AppPreferences;
 
-import java.io.IOException;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 public class SettingsWindow {
 
-    public SettingsWindow(){
-        Stage stageAbout = new Stage();
-
+    public SettingsWindow() throws Exception {
+        var stageAbout = new Stage();
         stageAbout.setMinWidth(570);
         stageAbout.setMinHeight(500);
 
-        FXMLLoader loaderSettings = new FXMLLoader(getClass().getResource("/Settings/SettingsLayout.fxml"));
+        var loaderSettings = new FXMLLoader(getClass().getResource("/Settings/SettingsLayout.fxml"));
 
-        Locale userLocale = new Locale(Locale.getDefault().getISO3Language());      // NOTE: user locale based on ISO3 Language codes
-        ResourceBundle resourceBundle = ResourceBundle.getBundle("locale", userLocale);
+        var resourceBundle = ResourceBundle.getBundle("locale", AppPreferences.get().getLocale());
         loaderSettings.setResources(resourceBundle);
 
-        try {
-            Parent parentAbout = loaderSettings.load();
+        Parent parentAbout = loaderSettings.load();
 
-            stageAbout.setTitle(resourceBundle.getString("settings_SettingsName"));
-            stageAbout.getIcons().addAll(
-                    new Image("/res/settings_icon32x32.png"),
-                    new Image("/res/settings_icon32x32.png"),
-                    new Image("/res/settings_icon48x48.png"),
-                    new Image("/res/settings_icon64x64.png"),
-                    new Image("/res/settings_icon128x128.png"));
-            stageAbout.setScene(new Scene(parentAbout, 570, 500));
-            stageAbout.show();
-
-        } catch (IOException e){
-            e.printStackTrace();
-        }
+        stageAbout.setTitle(resourceBundle.getString("settings_SettingsName"));
+        stageAbout.getIcons().addAll(
+                new Image("/res/settings_icon32x32.png"),
+                new Image("/res/settings_icon32x32.png"),
+                new Image("/res/settings_icon48x48.png"),
+                new Image("/res/settings_icon64x64.png"),
+                new Image("/res/settings_icon128x128.png"));
+        stageAbout.setScene(new Scene(parentAbout, 570, 500));
+        stageAbout.show();
     }
 }

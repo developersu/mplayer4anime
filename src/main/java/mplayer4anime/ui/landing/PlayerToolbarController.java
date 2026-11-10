@@ -50,7 +50,7 @@ public class PlayerToolbarController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        this.appPreferences = AppPreferences.getINSTANCE();
+        this.appPreferences = AppPreferences.get();
 
         fullScreen.setSelected(appPreferences.getFullScreenSelected());
         subsHide.setSelected(appPreferences.getSubtitlesHideSelected());

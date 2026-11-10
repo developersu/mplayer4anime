@@ -1,0 +1,27 @@
+mplayer4anime
+Copyright (C) 2018 Dmitry Isaenko
+
+mplayer4anime is licensed under the GNU General Public License,
+Version 3 (GPLv3). See the LICENSE file for the full license text.
+
+This product bundles the following third-party components:
+
+  Gson 2.9.0
+    URL: https://github.com/google/gson
+    License: Apache License, Version 2.0
+    Full license text: LICENSE-APACHE-2.0.txt
+    Copyright 2008 Google Inc.
+
+  Java Native Access (JNA) 5.6.0
+    URL: https://github.com/java-native-access/jna
+    License: GNU Lesser General Public License, Version 2.5
+
+  OpenJFX 25.0.5
+    URL: https://openjfx.io/
+    License: GNU General Public License, Version 2, with the
+    "Classpath" exception
+
+The complete corresponding source of this product, including the
+source code of all bundled components, is available from:
+
+    https://github.com/developersu/mplayer4anime

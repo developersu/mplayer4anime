@@ -58,7 +58,7 @@ public class LandingController implements Initializable {
     @FXML
     private TabPane tabPane;
 
-    private final AppPreferences appPreferences = AppPreferences.getINSTANCE();
+    private final AppPreferences appPreferences = AppPreferences.get();
 
     private ResourceBundle resourceBundle;
     private HostServices hostServices;
@@ -87,12 +87,12 @@ public class LandingController implements Initializable {
         subPaneController.setEncoding(appPreferences.getSubsEncodingList(), appPreferences.getLastTimeUsedSubsEncoding());
 
         // If subtitles should be opened first, per user's settings let's show it first
-        if (appPreferences.getSubtilesFirst()){
+        if (appPreferences.getSubtitlesFirst()) {
             tabPane.getSelectionModel().select(1);  // 0 is mka 1 is subs
         }
 
         String[] recentPlaylists = appPreferences.getRecentPlaylists();
-        for (int i = recentPlaylists.length-1; i >= 0; i--) {
+        for (int i = recentPlaylists.length - 1; i >= 0; i--) {
             if (recentPlaylists[i].isEmpty())
                 continue;
             addRecentlyOpened(recentPlaylists[i]);
@@ -111,7 +111,8 @@ public class LandingController implements Initializable {
         if (appPreferences.getOpenLatestPlaylistOnStart())
             loadLatestPlaylist();
     }
-    private void loadLatestPlaylist(){
+
+    private void loadLatestPlaylist() {
         try {
             String recentPlaylist = appPreferences.getRecentPlaylist();
             if ("".equals(recentPlaylist))
@@ -123,10 +124,11 @@ public class LandingController implements Initializable {
             mkaPaneController.setElementSelectedByIndex(appPreferences.getLatestPositionAudio());
             subPaneController.setElementSelectedByIndex(appPreferences.getLatestPositionSubs());
         }
-        catch (Exception ignore){}
+        catch (Exception ignore) {
+        }
     }
 
-    public void setHostServices(HostServices hostServices){
+    public void setHostServices(HostServices hostServices) {
         this.hostServices = hostServices;
     }
 
@@ -138,7 +140,7 @@ public class LandingController implements Initializable {
 
     // Will be used to store lists previously opened.
     // Linkage established by ohHidden in MainFX.java class
-    public void shutdown(){
+    public void shutdown() {
         appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getSelectedEncoding());
         playerToolbarController.shutdown();
         // TODO: remove from here; too sophisticated
@@ -156,31 +158,35 @@ public class LandingController implements Initializable {
     }
 
     @FXML
-    private void infoBtn(){
+    private void infoBtn() throws Exception {
         new AboutWindow(hostServices);
     } // TODO: fix this shit with hostSerivces that doesn't work @ linux
 
-    /**             SETTINGS HANDLE          */
+    /**
+     * SETTINGS HANDLE
+     */
     @FXML
-    private void settingsBtn(){
+    private void settingsBtn() throws Exception {
         new SettingsWindow();
     }
+
     // Get event that notify application in case some settings has been changed
     // This function called from MediatorControl after mediator receives request form SettingsController indicating that user updated some required fields.
-    public void updateAfterSettingsChanged(){
+    public void updateAfterSettingsChanged() {
         /* update list of encoding */
         subPaneController.setEncoding(appPreferences.getSubsEncodingList(), null);
         // In case of application failure should be better to save this immediately
         appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getSelectedEncoding());
         switchBackend(appPreferences.getBackendEngineIndexId());
     }
-    private void switchBackend(int newBackEndId){
-        if (newBackEndId == 0 && backend.equals("mpv")){
+
+    private void switchBackend(int newBackEndId) {
+        if (newBackEndId == 0 && backend.equals("mpv")) {
             backend = "mplayer";
             player = new MplayerSlave(resourceBundle);
             return;
         }
-        if (newBackEndId == 1 && backend.equals("mplayer")){
+        if (newBackEndId == 1 && backend.equals("mplayer")) {
             backend = "mpv";
             player = new MpvSlave(resourceBundle);
         }
@@ -191,7 +197,8 @@ public class LandingController implements Initializable {
         JsonStorage jsonStorage = Playlists.openPlaylistFileChooser(resourceBundle);
         setAllLists(jsonStorage);
     }
-    private void setAllLists(JsonStorage jsonStorage){
+
+    private void setAllLists(JsonStorage jsonStorage) {
         if (jsonStorage != null) {
             mkvPaneController.setFilesFromList(jsonStorage.getVideo());
             mkaPaneController.setFilesFromList(jsonStorage.getAudio());
@@ -203,6 +210,7 @@ public class LandingController implements Initializable {
             addRecentlyOpened(currentPlaylistLocation);
         }
     }
+
     @FXML
     private void saveBtn() {
         if (mkvPaneController.getElementsCount() == 0) {
@@ -221,6 +229,7 @@ public class LandingController implements Initializable {
             addRecentlyOpened(currentPlaylistLocation);
         }
     }
+
     @FXML
     private void saveAsBtn() {
         if (mkvPaneController.getElementsCount() == 0) {
@@ -240,12 +249,13 @@ public class LandingController implements Initializable {
             addRecentlyOpened(currentPlaylistLocation);
         }
     }
+
     @FXML
-    private void cleanAllRecentlyOpened(){
-        recentlyOpenedMenu.getItems().remove(0,recentlyOpenedMenu.getItems().size() - 2);
+    private void cleanAllRecentlyOpened() {
+        recentlyOpenedMenu.getItems().remove(0, recentlyOpenedMenu.getItems().size() - 2);
     }
 
-    private void addRecentlyOpened(String playlistPath){
+    private void addRecentlyOpened(String playlistPath) {
         ObservableList<MenuItem> items = recentlyOpenedMenu.getItems();
         for (MenuItem item : items) {
             if (item.getUserData() != null && item.getUserData().equals(playlistPath)) {

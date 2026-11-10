@@ -4,7 +4,6 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
@@ -12,7 +11,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
 
-<VBox spacing="5.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mplayer4anime.ui.about.AboutController">
+<VBox spacing="5.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mplayer4anime.ui.about.AboutController">
          <children>
             <HBox>
                <children>
@@ -46,13 +45,9 @@
       <HBox>
          <children>
             <Pane HBox.hgrow="ALWAYS" />
-            <Label text="%AboutUsedLibraries" />
             <Pane HBox.hgrow="ALWAYS" />
          </children>
       </HBox>
-      <Hyperlink onAction="#libGSON" text="GSON" />
-      <TextArea fx:id="GSONLicense" editable="false" prefHeight="200.0" />
-      <Hyperlink onAction="#iconsMaterial" text="Material Design Icons" />
             <HBox alignment="BOTTOM_LEFT" VBox.vgrow="ALWAYS">
                <children>
                   <Pane HBox.hgrow="ALWAYS" />

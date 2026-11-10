@@ -27,8 +27,9 @@ import javafx.stage.Stage;
 import mplayer4anime.ipc.SingleInstanceHandler;
 import mplayer4anime.ui.landing.LandingController;
 
-import java.util.Locale;
 import java.util.ResourceBundle;
+
+import static java.util.Objects.requireNonNull;
 
 //TODO: Use one copy of AppPreferences object widely
 //TODO: Drag-n-drop playlist/files/audio
@@ -36,15 +37,19 @@ import java.util.ResourceBundle;
 //TODO: remember position
 public class MainFX extends Application {
 
-    public static void main(String[] args) { launch(args);  }
+    public static void main(String[] args) {
+        launch(args);
+    }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/LandingPage.fxml"));
+    public void start(Stage primaryStage) throws Exception {
+        var loader = new FXMLLoader(getClass().getResource("/LandingPage.fxml"));
 
-        Locale userLocale = new Locale(Locale.getDefault().getISO3Language());      // NOTE: user locale based on ISO3 Language codes
-        ResourceBundle rb = ResourceBundle.getBundle("locale", userLocale);
-        loader.setResources(rb);
+        var preferences = AppPreferences.get();
+
+        var userLocale = preferences.getLocale();
+        var resourceBundle = ResourceBundle.getBundle("locale", userLocale);
+        loader.setResources(resourceBundle);
 
         Parent root = loader.load();
 
@@ -55,25 +60,24 @@ public class MainFX extends Application {
         if (getParameters().getUnnamed().isEmpty())
             singleInstanceHandler = new SingleInstanceHandler(landingController, null);
         else
-            singleInstanceHandler = new SingleInstanceHandler(landingController, getParameters().getUnnamed().get(0));
+            singleInstanceHandler = new SingleInstanceHandler(landingController, getParameters().getUnnamed().getFirst());
 
         primaryStage.getIcons().addAll(
-                new Image(getClass().getResourceAsStream("/res/app_icon32x32.png")),
-                new Image(getClass().getResourceAsStream("/res/app_icon48x48.png")),
-                new Image(getClass().getResourceAsStream("/res/app_icon64x64.png")),
-                new Image(getClass().getResourceAsStream("/res/app_icon128x128.png"))
-        );
+                new Image("/res/app_icon32x32.png"),
+                new Image("/res/app_icon48x48.png"),
+                new Image("/res/app_icon64x64.png"),
+                new Image("/res/app_icon128x128.png"));
         primaryStage.setTitle("mplayer4anime");
         primaryStage.setMinWidth(500);
         primaryStage.setMinHeight(375);
-        Scene scene = new Scene(root,
-                AppPreferences.getINSTANCE().getSceneWidth(),
-                AppPreferences.getINSTANCE().getSceneHeight());
+        var scene = new Scene(root,
+                preferences.getSceneWidth(),
+                preferences.getSceneHeight());
         primaryStage.setScene(scene);
         // Make linkage to controller method to handle exit() event in there.
         primaryStage.setOnHidden(e -> {
-            AppPreferences.getINSTANCE().setSceneHeight(scene.getHeight());
-            AppPreferences.getINSTANCE().setSceneWidth(scene.getWidth());
+            preferences.setSceneHeight(scene.getHeight());
+            preferences.setSceneWidth(scene.getWidth());
             singleInstanceHandler.finishWork();
             landingController.shutdown();
         });
