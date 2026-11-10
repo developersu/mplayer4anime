@@ -2,7 +2,7 @@ steps:
   - name: test
     when:
       event: [tag, push]
-    image: maven:3-jdk-11
+    image: maven:3-amazoncorretto-25-debian
     commands:
       - mvn -B -DskipTests clean package
       - mvn test -B
