@@ -26,8 +26,17 @@ import javafx.stage.Stage;
  * Creates window with notification
  * */
 public class ServiceWindow {
+
     public static void getErrorNotification(String title, String body){
-        Alert alertBox = new Alert(Alert.AlertType.ERROR);
+        getNotification(title, body, Alert.AlertType.ERROR);
+    }
+
+    public static void getInfoNotification(String title, String body){
+        getNotification(title, body, Alert.AlertType.INFORMATION);
+    }
+
+    private static void getNotification(String title, String body, Alert.AlertType type){
+        Alert alertBox = new Alert(type);
         alertBox.setTitle(title);
         alertBox.setHeaderText(null);
         alertBox.setContentText(body);

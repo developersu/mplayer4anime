@@ -24,15 +24,21 @@ import javafx.scene.control.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import mplayer4anime.AppPreferences;
+import mplayer4anime.ui.LocaleHolder;
+import mplayer4anime.ui.ServiceWindow;
+import mplayer4anime.ui.SettingsLanguagesSetup;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 import mplayer4anime.MediatorControl;
 
 public class SettingsController implements Initializable {
     private AppPreferences appPreferences;
+    private LocaleHolder recentLanguage;
+
     @FXML
     private ControllerListsSelector subExtensionListController,
             subEncodingListController,
@@ -44,6 +50,8 @@ public class SettingsController implements Initializable {
     private CheckBox subtitlesFirstCheckBox, openLatestPlaylistCheckBox;
     @FXML
     private ChoiceBox<String> backEndEngineChoiceBox;
+    @FXML
+    private ChoiceBox<LocaleHolder> languageChoiceBox;
 
     @Override
     public void initialize(URL url, ResourceBundle resBundle) {
@@ -60,6 +68,12 @@ public class SettingsController implements Initializable {
         backEndEngineChoiceBox.getItems().addAll("mplayer", "mpv");
         backEndEngineChoiceBox.getSelectionModel().select(appPreferences.getBackendEngineIndexId());
         openLatestPlaylistCheckBox.setSelected(appPreferences.getOpenLatestPlaylistOnStart());
+
+        // Fill the language selector with the locales available in the application
+        var settingsLanguagesSetup = new SettingsLanguagesSetup();
+        recentLanguage = settingsLanguagesSetup.getRecentLanguage();
+        languageChoiceBox.setItems(settingsLanguagesSetup.getLanguages());
+        languageChoiceBox.getSelectionModel().select(recentLanguage);
     }
 
     @FXML
@@ -108,6 +122,16 @@ public class SettingsController implements Initializable {
         appPreferences.setOpenLatestPlaylistOnStart(openLatestPlaylistCheckBox.isSelected());
 
         MediatorControl.getInstance().updateAfterSettingsChanged();    // TODO: implement list to track what should be updated
+
+        var localeHolder = languageChoiceBox.getSelectionModel().getSelectedItem();
+        if (Objects.equals(recentLanguage, localeHolder))
+            return;
+        // In case user willing to change it several times
+        recentLanguage = localeHolder;
+        appPreferences.setLocale(localeHolder.getLocaleCode());
+        ServiceWindow.getInfoNotification("",
+                ResourceBundle.getBundle("locale", localeHolder.getLocale())
+                        .getString("windowBodyRestartToApplyLang"));
     }
 
     private void close(){

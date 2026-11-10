@@ -29,7 +29,10 @@ public class AppPreferences {
 
     private AppPreferences(){
         var localeCode = preferences.get("locale", Locale.getDefault().toString());
-        this.locale = Locale.of(localeCode.substring(0, 2), localeCode.substring(3));
+        if (localeCode.length() < 5)
+            this.locale = Locale.of("en", "US");
+        else
+            this.locale = Locale.of(localeCode.substring(0, 2), localeCode.substring(3));
     }
 
     public static AppPreferences get() {
@@ -149,7 +152,6 @@ public class AppPreferences {
     public void setLatestPositionSubs(int value){
         preferences.putInt("latest_subs_pos", Math.max(value, 0));
     }
-    // FIXME: Implement manual selection of the locale
     public Locale getLocale(){ return this.locale; }
     public void setLocale(String langStr){ preferences.put("locale", langStr); }
 }

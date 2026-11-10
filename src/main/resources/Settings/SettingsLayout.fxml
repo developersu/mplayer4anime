@@ -49,6 +49,12 @@
                               <ChoiceBox fx:id="backEndEngineChoiceBox" prefWidth="150.0" />
                            </children>
                         </HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="5.0">
+                           <children>
+                              <Label text="%settings_languageSelect" />
+                              <ChoiceBox fx:id="languageChoiceBox" prefWidth="240.0" />
+                           </children>
+                        </HBox>
                         <CheckBox fx:id="subtitlesFirstCheckBox" mnemonicParsing="false" text="%settings_SubtitlesTabFirst" />
                         <CheckBox fx:id="openLatestPlaylistCheckBox" mnemonicParsing="false" text="%settings_OpenLatestOnStart" />
                      </children>
