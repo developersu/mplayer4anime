@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2023 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -30,15 +30,18 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import mplayer4anime.AppPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.ResourceBundle;
 
 public class ControllerPane implements Initializable {
+    private static final Logger log = LoggerFactory.getLogger(ControllerPane.class);
+
     private ResourceBundle resourceBundle;
     private static String folderToOpen;
     private AppPreferences appPreferences;
@@ -62,10 +65,10 @@ public class ControllerPane implements Initializable {
         return paneFileList;
     }
 
-    public void setPaneType(String paneType){
+    public void setPaneType(String paneType) {
         this.paneType = paneType;
 
-        switch (paneType){
+        switch (paneType) {
             case "Video":
                 paneLbl.setText(resourceBundle.getString("lbl_VideoPane"));
                 break;
@@ -80,100 +83,101 @@ public class ControllerPane implements Initializable {
         }
     }
 
-    /** Get index of the selected in pane element */
-    public int getElementSelectedIndex(){
+    /**
+     * Get index of the selected in pane element
+     */
+    public int getElementSelectedIndex() {
         return this.paneListView.getSelectionModel().getSelectedIndex();
     }
-    /** Select element name (full path) using index recieved */
-    public String getElementSelected(){
-        File item = paneListView.getSelectionModel().getSelectedItem();
-        if (item != null) {
-            return item.getAbsolutePath();
-        }
-        return null;
+
+    /**
+     * Select element name (full path) using index received
+     */
+    public String getElementSelected() {
+        var item = paneListView.getSelectionModel().getSelectedItem();
+        return item == null ?
+                null :
+                item.getAbsolutePath();
     }
-    /** Select element in pane using index recieved */
-    public void setElementSelectedByIndex(int index){
+
+    /**
+     * Select element in pane using index recieved
+     */
+    public void setElementSelectedByIndex(int index) {
         paneListView.getSelectionModel().select(index);
     }
-    /** Get number of elements loaded into the pane */
-    public int getElementsCount(){
+
+    /**
+     * Get number of elements loaded into the pane
+     */
+    public int getElementsCount() {
         return paneFileList.size();
     }
-    /** Get all elements
-     * Used in Json playlist writer only */
-    public String[] getElementsAll(){
-        String[] elementsArray = new String[this.getElementsCount()];
+
+    /**
+     * Get all elements
+     * Used in Json playlist writer only
+     */
+    public String[] getElementsAll() {
+        var elementsArray = new String[this.getElementsCount()];
 
         for (int i = 0; i < elementsArray.length; i++)
             elementsArray[i] = paneFileList.get(i).toString();
 
-        return  elementsArray;
+        return elementsArray;
     }
 
     private void SetCellFactory(ListView<File> listView) {
-        listView.setCellFactory(cb -> new ListCell<File>() {
-                    @Override
-                    public void updateItem(File item, boolean empty) {
-                        // have to call super here
-                        super.updateItem(item, empty);
+        listView.setCellFactory(_ -> new ListCell<>() {
+            @Override
+            public void updateItem(File item, boolean empty) {
+                // have to call super here
+                super.updateItem(item, empty);
 
-                        if (item == null || empty) {
-                            setText(null);
-                            return;
-                        }
-                        setText(item.getName());
-                    }
-                });
+                if (item == null || empty) {
+                    setText(null);
+                    return;
+                }
+                setText(item.getName());
+            }
+        });
     }
 
-    /** Open file selector (Open folder button in UI) */
+    /**
+     * Open file selector (Open folder button in UI)
+     */
     @FXML
-    void openDirChooser(){
-        String[] filesExtensionTmp;
-        switch (paneType) {
-            case "Video":
-                filesExtensionTmp = appPreferences.getVideoExtensionsList();
-                break;
-            case "Audio":
-                filesExtensionTmp = appPreferences.getAudioExtensionsList();
-                break;
-            case "Subtitles":
-                filesExtensionTmp = appPreferences.getSubsExtensionsList();
-                break;
-            default:
-                filesExtensionTmp = new String[]{"*"};
-                break;
-        }
+    void openDirChooser() {
+        var filesExtensionTmp = switch (paneType) {
+            case "Video" -> appPreferences.getVideoExtensionsList();
+            case "Audio" -> appPreferences.getAudioExtensionsList();
+            case "Subtitles" -> appPreferences.getSubsExtensionsList();
+            default -> new String[]{"*"};
+        };
 
-        List<String> lowerAndUpperExts = new ArrayList<>();
-        for (String s: filesExtensionTmp) {
+        var lowerAndUpperExts = new ArrayList<String>();
+        for (var s : filesExtensionTmp) {
             lowerAndUpperExts.add(s);
             lowerAndUpperExts.add(s.toUpperCase());
         }
-        String[] filesExtension = lowerAndUpperExts.toArray(new String[0]);
-
-        File directoryReceived;      // Store files (folder) received from selector
-        DirectoryChooser dirSelect;
+        var filesExtension = lowerAndUpperExts.toArray(new String[0]);
 
         // Show directory selector
-        dirSelect = new DirectoryChooser();
+        var dirSelect = new DirectoryChooser();
         dirSelect.setTitle(resourceBundle.getString("SelectDirectoryTitle"));
         if (folderToOpen == null)
             dirSelect.setInitialDirectory(new File(System.getProperty("user.home")));
         else
             dirSelect.setInitialDirectory(new File(folderToOpen));
-        directoryReceived = dirSelect.showDialog(paneListView.getScene().getWindow());
+        var directoryReceived = dirSelect.showDialog(paneListView.getScene().getWindow());
 
         // GET LIST OF FILES from directory
         if (directoryReceived != null) {
-            File[] files;                // Store files mkv/mka
-
-            files = directoryReceived.listFiles((file, Name) -> {
-                int lastIndexOfDot = Name.lastIndexOf('.');
+            var files = directoryReceived.listFiles((_, Name) -> {     // Store files mkv/mka
+                var lastIndexOfDot = Name.lastIndexOf('.');
                 if (lastIndexOfDot > 0) {
-                    String ext = Name.substring(lastIndexOfDot);
-                    for (String key : filesExtension){          // TODO: add toLowerCase and validate whatever registry extension noted
+                    var ext = Name.substring(lastIndexOfDot);
+                    for (var key : filesExtension) {          // TODO: add toLowerCase and validate whatever registry extension noted
                         if (ext.equals(key.substring(1)))
                             return true;
                     }
@@ -184,72 +188,66 @@ public class ControllerPane implements Initializable {
             displayFiles(files);
         }
         else {
-            System.out.println("No folder selected");
+            log.debug("No folder selected");
         }
     }
-    /** Open file selector (Open files button in UI) */
-    @FXML
-    void openFilesChooser(){
-        String[] filesExtension;
-        switch (paneType) {
-            case "Video":
-                filesExtension = appPreferences.getVideoExtensionsList();
-                break;
-            case "Audio":
-                filesExtension = appPreferences.getAudioExtensionsList();
-                break;
-            case "Subtitles":
-                filesExtension = appPreferences.getSubsExtensionsList();
-                break;
-            default:
-                filesExtension = new String[]{"*"};
-                break;
-        }
 
-        List<String> lowerAndUpperExts = new ArrayList<>();
-        for (String s: filesExtension) {
+    /**
+     * Open file selector (Open files button in UI)
+     */
+    @FXML
+    void openFilesChooser() {
+        var filesExtension = switch (paneType) {
+            case "Video" -> appPreferences.getVideoExtensionsList();
+            case "Audio" -> appPreferences.getAudioExtensionsList();
+            case "Subtitles" -> appPreferences.getSubsExtensionsList();
+            default -> new String[]{"*"};
+        };
+
+        var lowerAndUpperExts = new ArrayList<String>();
+        for (var s : filesExtension) {
             lowerAndUpperExts.add(s);
             lowerAndUpperExts.add(s.toUpperCase());
         }
 
-        List<File> filesReceivedList;
-
-        FileChooser fc = new FileChooser();
-        fc.setTitle(resourceBundle.getString("SelectFile"));
+        var fileChooser = new FileChooser();
+        fileChooser.setTitle(resourceBundle.getString("SelectFile"));
         if (folderToOpen == null)
-            fc.setInitialDirectory(new File(System.getProperty("user.home")));
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         else
-            fc.setInitialDirectory(new File(folderToOpen));
+            fileChooser.setInitialDirectory(new File(folderToOpen));
 
-        fc.getExtensionFilters().addAll(new FileChooser.ExtensionFilter(paneType,
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter(paneType,
                 lowerAndUpperExts.toArray(new String[0])));
 
-        filesReceivedList = fc.showOpenMultipleDialog(paneListView.getScene().getWindow());
+        var filesReceivedList = fileChooser.showOpenMultipleDialog(paneListView.getScene().getWindow());
         if (filesReceivedList == null) {
-            System.out.println("No files selected");
+            log.debug("No files selected");
             return;
         }
 
-        File[] filesReceived = new File[filesReceivedList.size()];
+        var filesReceived = new File[filesReceivedList.size()];
         filesReceivedList.toArray(filesReceived);
         displayFiles(filesReceived);
     }
+
     /**
      * Set files using lists. Used if playlist loaded
-     * */
-    public void setFilesFromList(String[] fileLocations){
+     *
+     */
+    public void setFilesFromList(String[] fileLocations) {
         cleanList();
 
         if (fileLocations == null || fileLocations.length == 0)
             return;
 
-        File[] files = new File[fileLocations.length];
-        for (int i = 0; i < fileLocations.length; i++)
+        var files = new File[fileLocations.length];
+        for (var i = 0; i < fileLocations.length; i++)
             files[i] = new File(fileLocations[i]);
         displayFiles(files);
     }
 
-    private void displayFiles(File[] files){
+    private void displayFiles(File[] files) {
         if (files == null || files.length == 0)
             return;
 
@@ -261,41 +259,44 @@ public class ControllerPane implements Initializable {
         paneListView.setItems(paneFileList);
         paneListView.getSelectionModel().select(0);
     }
+
     @FXML
-    public void cleanList(){
+    public void cleanList() {
         paneListView.getItems().clear();
     }
 
     @FXML
-    private void up(){
-        int index = paneListView.getSelectionModel().getSelectedIndex();
-        if (index > 0){
+    private void up() {
+        var index = paneListView.getSelectionModel().getSelectedIndex();
+        if (index > 0) {
             paneFileList.add(index - 1, paneListView.getSelectionModel().getSelectedItem());
             paneFileList.remove(index + 1);
             paneListView.getSelectionModel().select(index - 1);
         }
     }
+
     @FXML
-    private void down(){
-        int index = paneListView.getSelectionModel().getSelectedIndex();
-        if (index + 1 < paneFileList.size() ){
+    private void down() {
+        var index = paneListView.getSelectionModel().getSelectedIndex();
+        if (index + 1 < paneFileList.size()) {
             paneFileList.add(index + 2, paneListView.getSelectionModel().getSelectedItem());
             paneFileList.remove(index);
             paneListView.getSelectionModel().select(index + 1);
         }
     }
+
     @FXML
-    private void delete(){
+    private void delete() {
         paneFileList.remove(paneListView.getSelectionModel().getSelectedItem());
     }
 
     @FXML
-    private void keyPressed(KeyEvent event){
+    private void keyPressed(KeyEvent event) {
         if (event.getCode().toString().equals("DELETE"))
             delete();
     }
 
-    public ReadOnlyIntegerProperty getSelectedIndexProperty(){
+    public ReadOnlyIntegerProperty getSelectedIndexProperty() {
         return paneListView.getSelectionModel().selectedIndexProperty();
     }
 }

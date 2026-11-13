@@ -21,6 +21,8 @@ package mplayer4anime.ui;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import mplayer4anime.AppPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,6 +36,8 @@ import java.util.jar.JarFile;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 public class SettingsLanguagesSetup {
+    private static final Logger log = LoggerFactory.getLogger(SettingsLanguagesSetup.class);
+
     private final ObservableList<LocaleHolder> languages;
     private File thisApplicationFile;
     private LocaleHolder recentlyUsedLanguageHolder;
@@ -67,7 +71,7 @@ public class SettingsLanguagesSetup {
                     .forEach(languages::add);
         }
         catch (IOException e) {
-            e.printStackTrace();
+            log.error("Failed to read locale entries from JAR", e);
         }
     }
 
@@ -82,7 +86,7 @@ public class SettingsLanguagesSetup {
             });
         }
         catch (Exception e){
-            e.printStackTrace();
+            log.error("Failed to read locale files from filesystem", e);
         }
     }
 

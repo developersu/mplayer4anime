@@ -50,7 +50,7 @@ public class AboutController implements Initializable {
 
     @FXML
     private void buttonClickOk() {
-        Stage thisStage = (Stage) buttonOk.getScene().getWindow();
+        var thisStage = (Stage) buttonOk.getScene().getWindow();
         thisStage.close();
     }
 

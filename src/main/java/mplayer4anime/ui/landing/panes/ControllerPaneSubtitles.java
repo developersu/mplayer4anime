@@ -1,3 +1,21 @@
+/*
+    Copyright 2018-2026 Dmitry Isaenko
+
+    This file is part of mplayer4anime.
+
+    mplayer4anime is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    mplayer4anime is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with mplayer4anime.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package mplayer4anime.ui.landing.panes;
 
 import javafx.collections.FXCollections;
@@ -27,7 +45,7 @@ public class ControllerPaneSubtitles extends ControllerPane {
      * Set encoding list and select element
      * */
     public void setEncoding(String[] list, String selection){
-        String currentlySelectedValue = subtEncoding.getValue();
+        var currentlySelectedValue = subtEncoding.getValue();
 
         subEncodingList.clear();
         subEncodingList.setAll(list);
@@ -38,12 +56,12 @@ public class ControllerPaneSubtitles extends ControllerPane {
             if (currentlySelectedValue !=null && !currentlySelectedValue.isEmpty() && subEncodingList.contains(currentlySelectedValue))
                 subtEncoding.getSelectionModel().select(currentlySelectedValue);
             else
-                subtEncoding.setValue(subEncodingList.get(0));
+                subtEncoding.setValue(subEncodingList.getFirst());
         else {
             if (subEncodingList.contains(selection))
                 subtEncoding.getSelectionModel().select(selection);
             else
-                subtEncoding.setValue(subEncodingList.get(0));
+                subtEncoding.setValue(subEncodingList.getFirst());
         }
     }
     /**

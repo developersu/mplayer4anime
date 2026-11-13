@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -24,12 +24,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
-import mplayer4anime.ipc.SingleInstanceHandler;
+import mplayer4anime.ipc.SingleInstanceGuard;
 import mplayer4anime.ui.landing.LandingController;
 
 import java.util.ResourceBundle;
-
-import static java.util.Objects.requireNonNull;
 
 //TODO: Use one copy of AppPreferences object widely
 //TODO: Drag-n-drop playlist/files/audio
@@ -55,12 +53,19 @@ public class MainFX extends Application {
 
         LandingController landingController = loader.getController();
         landingController.setHostServices(getHostServices());
-        SingleInstanceHandler singleInstanceHandler;
 
-        if (getParameters().getUnnamed().isEmpty())
-            singleInstanceHandler = new SingleInstanceHandler(landingController, null);
-        else
-            singleInstanceHandler = new SingleInstanceHandler(landingController, getParameters().getUnnamed().getFirst());
+        var startArgument = getParameters().getUnnamed().isEmpty() ?
+                null : getParameters().getUnnamed().getFirst();
+        var singleInstanceGuard = new SingleInstanceGuard();
+        var startResult = singleInstanceGuard.start(
+                startArgument, landingController::setPlaylistAsArgument,
+                () -> {
+                    primaryStage.toFront();
+                    primaryStage.requestFocus();
+                });
+        // Another instance already ran and received our argument: this launch is done.
+        if (startResult == SingleInstanceGuard.StartResult.SECONDARY)
+            System.exit(0);
 
         primaryStage.getIcons().addAll(
                 new Image("/res/app_icon32x32.png"),
@@ -75,10 +80,10 @@ public class MainFX extends Application {
                 preferences.getSceneHeight());
         primaryStage.setScene(scene);
         // Make linkage to controller method to handle exit() event in there.
-        primaryStage.setOnHidden(e -> {
+        primaryStage.setOnHidden(_ -> {
             preferences.setSceneHeight(scene.getHeight());
             preferences.setSceneWidth(scene.getWidth());
-            singleInstanceHandler.finishWork();
+            singleInstanceGuard.close();
             landingController.shutdown();
         });
         //Runtime.getRuntime().addShutdownHook(new Thread(sihThread::interrupt));

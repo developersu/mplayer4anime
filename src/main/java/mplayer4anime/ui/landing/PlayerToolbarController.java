@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2023 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
      
     This file is part of mplayer4anime.
 
@@ -55,20 +55,21 @@ public class PlayerToolbarController implements Initializable {
         fullScreen.setSelected(appPreferences.getFullScreenSelected());
         subsHide.setSelected(appPreferences.getSubtitlesHideSelected());
 
-        stopBtn.setOnAction(event -> player.stop());
-        volumeUpBtn.setOnAction(event -> player.volumeUp());
-        volumeDownBtn.setOnAction(event -> player.volumeDown());
-        muteBtn.setOnAction(event -> player.mute());
-        playBtn.setOnAction(event -> play());
-        playPrevTrackBtn.setOnAction(event -> playPrevTrack());
-        playNextTrackBtn.setOnAction(event -> playNextTrack());
-        subsTriggerBtn.setOnAction(event -> player.subtitlesSwitch());
-        fullscreenBtn.setOnAction(event -> player.fullscreenSwitch());
+        stopBtn.setOnAction(_ -> player.stop());
+        volumeUpBtn.setOnAction(_ -> player.volumeUp());
+        volumeDownBtn.setOnAction(_ -> player.volumeDown());
+        muteBtn.setOnAction(_ -> player.mute());
+        playBtn.setOnAction(_ -> play());
+        playPrevTrackBtn.setOnAction(_ -> playPrevTrack());
+        playNextTrackBtn.setOnAction(_ -> playNextTrack());
+        subsTriggerBtn.setOnAction(_ -> player.subtitlesSwitch());
+        fullscreenBtn.setOnAction(_ -> player.fullscreenSwitch());
     }
+
     public void initializeMainUiController(IPlayer player,
                                            ControllerPane mkvPaneController,
-                                           ControllerPane  mkaPaneController,
-                                           ControllerPaneSubtitles subPaneController){
+                                           ControllerPane mkaPaneController,
+                                           ControllerPaneSubtitles subPaneController) {
         this.player = player;
         this.mkvPaneController = mkvPaneController;
         this.mkaPaneController = mkaPaneController;
@@ -84,20 +85,21 @@ public class PlayerToolbarController implements Initializable {
 
         playPrevTrackBtn.disableProperty().bind(
                 Bindings.isEmpty(mkvPaneController.getPaneFileList()).or(
-                Bindings.equal(mkvPaneController.getSelectedIndexProperty(), 0)
+                        Bindings.equal(mkvPaneController.getSelectedIndexProperty(), 0)
                 ));
 
         playNextTrackBtn.disableProperty().bind(
                 Bindings.isEmpty(mkvPaneController.getPaneFileList()).or(
-                Bindings.equal(mkvPaneController.getSelectedIndexProperty(),
-                        Bindings.subtract(Bindings.size(mkvPaneController.getPaneFileList()), 1))
+                        Bindings.equal(mkvPaneController.getSelectedIndexProperty(),
+                                Bindings.subtract(Bindings.size(mkvPaneController.getPaneFileList()), 1))
                 ));
     }
-    private void bindButtonToEmptyList(ButtonBase button){
+
+    private void bindButtonToEmptyList(ButtonBase button) {
         button.disableProperty().bind(Bindings.isEmpty(mkvPaneController.getPaneFileList()));
     }
 
-    private void play(){
+    private void play() {
         if (mkvPaneController.getElementSelected() == null)
             return;
 
@@ -111,8 +113,8 @@ public class PlayerToolbarController implements Initializable {
         );
     }
 
-    private void playPrevTrack(){
-        int index = mkvPaneController.getElementSelectedIndex() - 1;
+    private void playPrevTrack() {
+        var index = mkvPaneController.getElementSelectedIndex() - 1;
         if (index < 0)
             return;
 
@@ -136,8 +138,8 @@ public class PlayerToolbarController implements Initializable {
         );
     }
 
-    private void playNextTrack(){
-        int index = mkvPaneController.getElementSelectedIndex() + 1;
+    private void playNextTrack() {
+        var index = mkvPaneController.getElementSelectedIndex() + 1;
         if (index >= mkvPaneController.getElementsCount())
             return;
 
@@ -161,7 +163,7 @@ public class PlayerToolbarController implements Initializable {
         );
     }
 
-    void shutdown(){
+    void shutdown() {
         appPreferences.setFullScreenSelected(fullScreen.isSelected());
         appPreferences.setSubtitlesHideSelected(subsHide.isSelected());
     }

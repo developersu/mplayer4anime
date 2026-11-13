@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
      
     This file is part of mplayer4anime.
 
@@ -19,14 +19,14 @@
 package mplayer4anime.mpv;
 
 public enum Mpv_Format {
-    MPV_FORMAT_NONE, //0;
-    MPV_FORMAT_STRING, //1;
-    MPV_FORMAT_OSD_STRING, //2;
-    MPV_FORMAT_FLAG, //3;
-    MPV_FORMAT_INT64, //4;
-    MPV_FORMAT_DOUBLE, //5;
-    MPV_FORMAT_NODE, //6;
-    MPV_FORMAT_NODE_ARRAY, //7;
-    MPV_FORMAT_NODE_MAP, //8;
-    MPV_FORMAT_BYTE_ARRAY; //9;
+    MPV_FORMAT_NONE,        // 0;
+    MPV_FORMAT_STRING,      // 1;
+    MPV_FORMAT_OSD_STRING,  // 2;
+    MPV_FORMAT_FLAG,        // 3;
+    MPV_FORMAT_INT64,       // 4;
+    MPV_FORMAT_DOUBLE,      // 5;
+    MPV_FORMAT_NODE,        // 6;
+    MPV_FORMAT_NODE_ARRAY,  // 7;
+    MPV_FORMAT_NODE_MAP,    // 8;
+    MPV_FORMAT_BYTE_ARRAY   // 9;
 }

@@ -27,7 +27,7 @@ public class AppPreferences {
     private final Preferences preferences = Preferences.userRoot().node("mplayer4anime");
     private final Locale locale;
 
-    private AppPreferences(){
+    private AppPreferences() {
         var localeCode = preferences.get("locale", Locale.getDefault().toString());
         if (localeCode.length() < 5)
             this.locale = Locale.of("en", "US");
@@ -39,80 +39,135 @@ public class AppPreferences {
         return INSTANCE;
     }
 
-    public void setPath(String path){
+    public void setPath(String path) {
         preferences.put("PATH", path);
     }
 
-    public String getPath(){
+    public String getPath() {
         return preferences.get("PATH", "mplayer");
     }
 
-    /** Return subtitles priority to show
-    * @return
-     * TRUE - Subtitles tab opens first
+    /**
+     * Return subtitles priority to show
+     *
+     * @return TRUE - Subtitles tab opens first
      * FALSE - Subtitles tab opens as usual
-    */
-    public boolean getSubtitlesFirst(){
+     */
+    public boolean getSubtitlesFirst() {
         return preferences.getBoolean("SUBS_TAB_FIRST", false);
     }
 
-    public void setSubtitlesFirst(boolean set){
+    public void setSubtitlesFirst(boolean set) {
         preferences.putBoolean("SUBS_TAB_FIRST", set);
     }
 
-    /** Convert strings array to singls string.
+    /**
+     * Convert strings array to singls string.
      * Used in:
      * setSubsExtensionsList
      * setSubsEncodingList
      */
-    private void storeSingleStringList(String whichList, String[] strArr){
-        StringBuilder collect = new StringBuilder();
-        for (String e : strArr) {
+    private void storeSingleStringList(String whichList, String[] strArr) {
+        var collect = new StringBuilder();
+        for (var e : strArr) {
             collect.append(e);
             collect.append(" ");
         }
-        String strToStore = collect.toString();
+        var strToStore = collect.toString();
         preferences.put(whichList, strToStore);
     }
-    /** Handle lists of the video files extensions */
-    public void setVideoExtensionsList(String[] videoExtensionsList){ storeSingleStringList("VIDEO_EXTENSIONS_LIST", videoExtensionsList); }
-    public String[] getVideoExtensionsList(){ return preferences.get("VIDEO_EXTENSIONS_LIST", "*.mkv *.avi *.mp4").split(" "); }
-    /** Handle lists of the audio files extensions */
-    public void setAudioExtensionsList(String[] audioExtensionsList){ storeSingleStringList("AUDIO_EXTENSIONS_LIST", audioExtensionsList); }
-    public String[] getAudioExtensionsList(){ return preferences.get("AUDIO_EXTENSIONS_LIST", "*.mka *.ac3").split(" "); }
-     /** Handle lists of the subtitles extensions selector */
-    public void setSubsExtensionsList(String[] subsList){ storeSingleStringList("SUBS_EXTENSIONS_LIST", subsList); }
-    public String[] getSubsExtensionsList(){ return preferences.get("SUBS_EXTENSIONS_LIST", "*.ass *.srt ").split(" "); }
 
-    /** Handle lists of the subtitles encodings selector */
-    public void setSubsEncodingList(String[] subsEncodingList){ storeSingleStringList("SUBS_ENCODINGS_LIST", subsEncodingList); }
-    public String[] getSubsEncodingList(){ return preferences.get("SUBS_ENCODINGS_LIST", "default utf8 cp1251 koi8-r").split(" "); }
+    /**
+     * Handle lists of the video files extensions
+     */
+    public void setVideoExtensionsList(String[] videoExtensionsList) {
+        storeSingleStringList("VIDEO_EXTENSIONS_LIST", videoExtensionsList);
+    }
 
-    /** Save & recover selected by user Subtitles encoding */
-    public void setLastTimeUsedSubsEncoding(String selected){ preferences.put("SUBS_ENCODING_LAST_TIME_SELECTED", selected); }
-    public String getLastTimeUsedSubsEncoding(){ return preferences.get("SUBS_ENCODING_LAST_TIME_SELECTED", ""); }
+    public String[] getVideoExtensionsList() {
+        return preferences.get("VIDEO_EXTENSIONS_LIST", "*.mkv *.avi *.mp4").split(" ");
+    }
 
-    /** Save & recover Full Screen checkbox, if selected */
-    public boolean getFullScreenSelected(){
+    /**
+     * Handle lists of the audio files extensions
+     */
+    public void setAudioExtensionsList(String[] audioExtensionsList) {
+        storeSingleStringList("AUDIO_EXTENSIONS_LIST", audioExtensionsList);
+    }
+
+    public String[] getAudioExtensionsList() {
+        return preferences.get("AUDIO_EXTENSIONS_LIST", "*.mka *.ac3").split(" ");
+    }
+
+    /**
+     * Handle lists of the subtitles extensions selector
+     */
+    public void setSubsExtensionsList(String[] subsList) {
+        storeSingleStringList("SUBS_EXTENSIONS_LIST", subsList);
+    }
+
+    public String[] getSubsExtensionsList() {
+        return preferences.get("SUBS_EXTENSIONS_LIST", "*.ass *.srt ").split(" ");
+    }
+
+    /**
+     * Handle lists of the subtitles encodings selector
+     */
+    public void setSubsEncodingList(String[] subsEncodingList) {
+        storeSingleStringList("SUBS_ENCODINGS_LIST", subsEncodingList);
+    }
+
+    public String[] getSubsEncodingList() {
+        return preferences.get("SUBS_ENCODINGS_LIST", "default utf8 cp1251 koi8-r").split(" ");
+    }
+
+    /**
+     * Save & recover selected by user Subtitles encoding
+     */
+    public void setLastTimeUsedSubsEncoding(String selected) {
+        preferences.put("SUBS_ENCODING_LAST_TIME_SELECTED", selected);
+    }
+
+    public String getLastTimeUsedSubsEncoding() {
+        return preferences.get("SUBS_ENCODING_LAST_TIME_SELECTED", "");
+    }
+
+    /**
+     * Save & recover Full Screen checkbox, if selected
+     */
+    public boolean getFullScreenSelected() {
         return preferences.getBoolean("FULL_SCREEN_SELECTED", false);
     }
-    public void setFullScreenSelected(boolean set){ preferences.putBoolean("FULL_SCREEN_SELECTED", set); }
 
-    /** Save & recover Subtitles checkbox, if selected */
-    public boolean getSubtitlesHideSelected(){
+    public void setFullScreenSelected(boolean set) {
+        preferences.putBoolean("FULL_SCREEN_SELECTED", set);
+    }
+
+    /**
+     * Save & recover Subtitles checkbox, if selected
+     */
+    public boolean getSubtitlesHideSelected() {
         return preferences.getBoolean("FULL_SUBTITLES_HIDE_SELECTED", false);
     }
-    public void setSubtitlesHideSelected(boolean set){ preferences.putBoolean("FULL_SUBTITLES_HIDE_SELECTED", set); }
 
-    /** Return recently opened elements */
-    public String[] getRecentPlaylists(){
-        String[] recentPlaylists = new String[10];
-        for (int i = 0; i < 10; i++)
+    public void setSubtitlesHideSelected(boolean set) {
+        preferences.putBoolean("FULL_SUBTITLES_HIDE_SELECTED", set);
+    }
+
+    /**
+     * Return recently opened elements
+     */
+    public String[] getRecentPlaylists() {
+        var recentPlaylists = new String[10];
+        for (var i = 0; i < 10; i++)
             recentPlaylists[i] = preferences.get("RECENT_PLS_" + i, "");
         return recentPlaylists;
     }
-    /** Store recently opened elements */
-    public void setRecentPlaylists(String[] recentPlaylists){
+
+    /**
+     * Store recently opened elements
+     */
+    public void setRecentPlaylists(String[] recentPlaylists) {
         if (recentPlaylists != null && recentPlaylists.length > 0) {
             int i;
             for (i = 0; i < recentPlaylists.length && !(i > 10); i++)
@@ -120,38 +175,77 @@ public class AppPreferences {
                     preferences.put("RECENT_PLS_" + i, recentPlaylists[i]);
                 else
                     preferences.put("RECENT_PLS_" + i, "");
-            for (;i < 10; i++)                                             // Not needed. Logic may handle received String to be less or greater then String[10], but it never happened.
+            for (; i < 10; i++)                                             // Not needed. Logic may handle received String to be less or greater then String[10], but it never happened.
                 preferences.put("RECENT_PLS_" + i, "");
         }
     }
+
     // Window size
-    public double getSceneWidth(){ return preferences.getDouble("window_width", 1200.0); }
-    public void setSceneWidth(double value){ preferences.putDouble("window_width", value); }
+    public double getSceneWidth() {
+        return preferences.getDouble("window_width", 1200.0);
+    }
 
-    public double getSceneHeight(){ return preferences.getDouble("window_height", 800.0); }
-    public void setSceneHeight(double value){ preferences.putDouble("window_height", value); }
+    public void setSceneWidth(double value) {
+        preferences.putDouble("window_width", value);
+    }
 
-    public int getBackendEngineIndexId(){ return preferences.getInt("backend_player", 0); }
-    public void setBackendEngineIndexId(int value){ preferences.putInt("backend_player", value); }
+    public double getSceneHeight() {
+        return preferences.getDouble("window_height", 800.0);
+    }
 
-    public String getRecentPlaylist(){
+    public void setSceneHeight(double value) {
+        preferences.putDouble("window_height", value);
+    }
+
+    public int getBackendEngineIndexId() {
+        return preferences.getInt("backend_player", 0);
+    }
+
+    public void setBackendEngineIndexId(int value) {
+        preferences.putInt("backend_player", value);
+    }
+
+    public String getRecentPlaylist() {
         return preferences.get("RECENT_PLS_0", "");
     }
-    public boolean getOpenLatestPlaylistOnStart(){ return preferences.getBoolean("open_latest_playlist", true); }
-    public void setOpenLatestPlaylistOnStart(boolean value){ preferences.putBoolean("open_latest_playlist" , value); }
 
-    public int getLatestPositionVideo(){ return preferences.getInt("latest_video_pos", 1); }
-    public void setLatestPositionVideo(int value){
+    public boolean getOpenLatestPlaylistOnStart() {
+        return preferences.getBoolean("open_latest_playlist", true);
+    }
+
+    public void setOpenLatestPlaylistOnStart(boolean value) {
+        preferences.putBoolean("open_latest_playlist", value);
+    }
+
+    public int getLatestPositionVideo() {
+        return preferences.getInt("latest_video_pos", 1);
+    }
+
+    public void setLatestPositionVideo(int value) {
         preferences.putInt("latest_video_pos", Math.max(value, 0));
     }
-    public int getLatestPositionAudio(){ return preferences.getInt("latest_audio_pos", 1); }
-    public void setLatestPositionAudio(int value){
+
+    public int getLatestPositionAudio() {
+        return preferences.getInt("latest_audio_pos", 1);
+    }
+
+    public void setLatestPositionAudio(int value) {
         preferences.putInt("latest_audio_pos", Math.max(value, 0));
     }
-    public int getLatestPositionSubs(){ return preferences.getInt("latest_subs_pos", 1); }
-    public void setLatestPositionSubs(int value){
+
+    public int getLatestPositionSubs() {
+        return preferences.getInt("latest_subs_pos", 1);
+    }
+
+    public void setLatestPositionSubs(int value) {
         preferences.putInt("latest_subs_pos", Math.max(value, 0));
     }
-    public Locale getLocale(){ return this.locale; }
-    public void setLocale(String langStr){ preferences.put("locale", langStr); }
+
+    public Locale getLocale() {
+        return this.locale;
+    }
+
+    public void setLocale(String langStr) {
+        preferences.put("locale", langStr);
+    }
 }

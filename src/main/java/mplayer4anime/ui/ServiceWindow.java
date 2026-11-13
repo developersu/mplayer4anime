@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -22,21 +22,24 @@ import javafx.scene.control.Alert;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 
+import static javafx.scene.control.Alert.AlertType.ERROR;
+import static javafx.scene.control.Alert.AlertType.INFORMATION;
+
 /**
- * Creates window with notification
- * */
+ * Notification pop-up windows
+ */
 public class ServiceWindow {
 
-    public static void getErrorNotification(String title, String body){
-        getNotification(title, body, Alert.AlertType.ERROR);
+    public static void getErrorNotification(String title, String body) {
+        getNotification(title, body, ERROR);
     }
 
-    public static void getInfoNotification(String title, String body){
-        getNotification(title, body, Alert.AlertType.INFORMATION);
+    public static void getInfoNotification(String title, String body) {
+        getNotification(title, body, INFORMATION);
     }
 
-    private static void getNotification(String title, String body, Alert.AlertType type){
-        Alert alertBox = new Alert(type);
+    private static void getNotification(String title, String body, Alert.AlertType type) {
+        var alertBox = new Alert(type);
         alertBox.setTitle(title);
         alertBox.setHeaderText(null);
         alertBox.setContentText(body);
@@ -45,7 +48,7 @@ public class ServiceWindow {
         alertBox.setResizable(true);
         alertBox.show();
 
-        Stage dialogStage = (Stage) alertBox.getDialogPane().getScene().getWindow();
+        var dialogStage = (Stage) alertBox.getDialogPane().getScene().getWindow();
         dialogStage.setAlwaysOnTop(true);
         dialogStage.toFront();
     }

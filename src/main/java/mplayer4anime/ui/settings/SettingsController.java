@@ -20,20 +20,20 @@ package mplayer4anime.ui.settings;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import mplayer4anime.AppPreferences;
+import mplayer4anime.MediatorControl;
 import mplayer4anime.ui.LocaleHolder;
 import mplayer4anime.ui.ServiceWindow;
 import mplayer4anime.ui.SettingsLanguagesSetup;
 
-import java.io.File;
 import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
-
-import mplayer4anime.MediatorControl;
 
 public class SettingsController implements Initializable {
     private AppPreferences appPreferences;
@@ -77,22 +77,22 @@ public class SettingsController implements Initializable {
     }
 
     @FXML
-    private void findPathToMplayer(){
-        FileChooser fileChooser = new FileChooser();
+    private void findPathToMplayer() {
+        var fileChooser = new FileChooser();
         fileChooser.setTitle("mplayer");
 
         // In case we use Windows, limit selectable file to .exe
         if (System.getProperty("os.name").contains("Windows"))
             fileChooser.getExtensionFilters().setAll(new FileChooser.ExtensionFilter("mplayer", "*.exe"));
 
-        File mplayerExecutableFile = fileChooser.showOpenDialog(null);
+        var mplayerExecutableFile = fileChooser.showOpenDialog(null);
 
         if (mplayerExecutableFile != null)
             pathToMplayerLbl.setText(mplayerExecutableFile.toString());
     }
 
     @FXML
-    private void clearPath(){
+    private void clearPath() {
         if (System.getProperty("os.name").contains("Windows"))
             pathToMplayerLbl.setText("mplayer\\mplayer.exe");
         else
@@ -100,18 +100,18 @@ public class SettingsController implements Initializable {
     }
 
     @FXML
-    private void Cancel(){
+    private void Cancel() {
         close();
     }
 
     @FXML
-    private void Ok(){
+    private void Ok() {
         Apply();
         close();
     }
 
     @FXML
-    private void Apply(){
+    private void Apply() {
         appPreferences.setPath(pathToMplayerLbl.getText());
         appPreferences.setSubtitlesFirst(subtitlesFirstCheckBox.isSelected());
         appPreferences.setSubsExtensionsList(subExtensionListController.getList());
@@ -134,8 +134,8 @@ public class SettingsController implements Initializable {
                         .getString("windowBodyRestartToApplyLang"));
     }
 
-    private void close(){
-        Stage currentWindowStage = (Stage) pathToMplayerLbl.getScene().getWindow();
+    private void close() {
+        var currentWindowStage = (Stage) pathToMplayerLbl.getScene().getWindow();
         currentWindowStage.close();
     }
 }

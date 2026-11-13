@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -27,9 +27,10 @@ public class MediatorControl {
         private static final MediatorControl INSTANCE = new MediatorControl();
     }
 
-    private MediatorControl() {}
+    private MediatorControl() {
+    }
 
-    public static MediatorControl getInstance(){
+    public static MediatorControl getInstance() {
         return MediatorControlHold.INSTANCE;
     }
 

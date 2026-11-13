@@ -26,11 +26,8 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import mplayer4anime.AppPreferences;
-import mplayer4anime.MainFX;
 
 import java.util.ResourceBundle;
-
-import static java.util.Objects.requireNonNull;
 
 public class AboutWindow {
 
@@ -39,7 +36,7 @@ public class AboutWindow {
         stageAbout.setMinWidth(500);
         stageAbout.setMinHeight(300);
 
-        FXMLLoader loaderAbout = new FXMLLoader(getClass().getResource("/About/AboutLayout.fxml"));
+        var loaderAbout = new FXMLLoader(getClass().getResource("/About/AboutLayout.fxml"));
         var resourceBundle = ResourceBundle.getBundle("locale", AppPreferences.get().getLocale());
         loaderAbout.setResources(resourceBundle);
 

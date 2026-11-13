@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2023 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
      
     This file is part of mplayer4anime.
 
@@ -68,7 +68,7 @@ public class MpvSlave implements IPlayer {
                           boolean subtitlesHidden,
                           boolean isFullscreen) {
         //TODO: fix
-        Thread thread = new Thread(new MpvProcess(VideoFile, AudioFile, SubtitlesFile));
+        var thread = new Thread(new MpvProcess(VideoFile, AudioFile, SubtitlesFile));
         thread.start();
     }
 

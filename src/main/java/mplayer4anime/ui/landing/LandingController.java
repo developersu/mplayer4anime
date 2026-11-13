@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2023 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -20,26 +20,27 @@ package mplayer4anime.ui.landing;
 
 import javafx.application.HostServices;
 import javafx.application.Platform;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.*;
-
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
-import mplayer4anime.ui.about.AboutWindow;
 import mplayer4anime.AppPreferences;
 import mplayer4anime.IPlayer;
 import mplayer4anime.MediatorControl;
+import mplayer4anime.mplayer.MplayerSlave;
+import mplayer4anime.mpv.MpvSlave;
 import mplayer4anime.playlists.JsonStorage;
 import mplayer4anime.playlists.Playlists;
 import mplayer4anime.ui.ServiceWindow;
-import mplayer4anime.ui.settings.SettingsWindow;
+import mplayer4anime.ui.about.AboutWindow;
 import mplayer4anime.ui.landing.panes.ControllerPane;
 import mplayer4anime.ui.landing.panes.ControllerPaneSubtitles;
-import mplayer4anime.mplayer.MplayerSlave;
-import mplayer4anime.mpv.MpvSlave;
+import mplayer4anime.ui.settings.SettingsWindow;
 
-import java.io.*;
+import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -69,7 +70,7 @@ public class LandingController implements Initializable {
 
     // If application started with playlist passed as an argument, then we'll try to load it (if it's valid).
     public void setPlaylistAsArgument(String playlist) {
-        JsonStorage jsonStorage = Playlists.readByPath(resourceBundle, new File(playlist));
+        var jsonStorage = Playlists.readByPath(resourceBundle, new File(playlist));
         setAllLists(jsonStorage);
     }
 
@@ -91,7 +92,7 @@ public class LandingController implements Initializable {
             tabPane.getSelectionModel().select(1);  // 0 is mka 1 is subs
         }
 
-        String[] recentPlaylists = appPreferences.getRecentPlaylists();
+        var recentPlaylists = appPreferences.getRecentPlaylists();
         for (int i = recentPlaylists.length - 1; i >= 0; i--) {
             if (recentPlaylists[i].isEmpty())
                 continue;
@@ -114,11 +115,11 @@ public class LandingController implements Initializable {
 
     private void loadLatestPlaylist() {
         try {
-            String recentPlaylist = appPreferences.getRecentPlaylist();
+            var recentPlaylist = appPreferences.getRecentPlaylist();
             if ("".equals(recentPlaylist))
                 return;
             // TODO: IF video set, if playlist has been opened before
-            JsonStorage jsonStorage = Playlists.readByPathSilent(new File(recentPlaylist));
+            var jsonStorage = Playlists.readByPathSilent(new File(recentPlaylist));
             setAllLists(jsonStorage);
             mkvPaneController.setElementSelectedByIndex(appPreferences.getLatestPositionVideo());
             mkaPaneController.setElementSelectedByIndex(appPreferences.getLatestPositionAudio());
@@ -134,7 +135,7 @@ public class LandingController implements Initializable {
 
     @FXML
     private void closeBtn() {
-        Stage currentStage = (Stage) tabPane.getScene().getWindow();
+        var currentStage = (Stage) tabPane.getScene().getWindow();
         currentStage.close();
     }
 
@@ -144,8 +145,8 @@ public class LandingController implements Initializable {
         appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getSelectedEncoding());
         playerToolbarController.shutdown();
         // TODO: remove from here; too sophisticated
-        String[] storeRecentArr = new String[10];
-        for (int i = 0; i < recentlyOpenedMenu.getItems().size() - 2 && !(i > 9); i++) {       // Don't take separator and Clean button
+        var storeRecentArr = new String[10];
+        for (var i = 0; i < recentlyOpenedMenu.getItems().size() - 2 && !(i > 9); i++) {       // Don't take separator and Clean button
             storeRecentArr[i] = (String) recentlyOpenedMenu.getItems().get(i).getUserData();
         }
         appPreferences.setRecentPlaylists(storeRecentArr);
@@ -194,7 +195,7 @@ public class LandingController implements Initializable {
 
     @FXML
     private void openBtn() {
-        JsonStorage jsonStorage = Playlists.openPlaylistFileChooser(resourceBundle);
+        var jsonStorage = Playlists.openPlaylistFileChooser(resourceBundle);
         setAllLists(jsonStorage);
     }
 
@@ -218,7 +219,7 @@ public class LandingController implements Initializable {
                     resourceBundle.getString("ErrorUnableToSaveEmptyPlaylist"));
             return;
         }
-        JsonStorage jsonStorage = new JsonStorage(
+        var jsonStorage = new JsonStorage(
                 mkvPaneController.getElementsAll(),
                 mkaPaneController.getElementsAll(),
                 subPaneController.getElementsAll(),
@@ -238,7 +239,7 @@ public class LandingController implements Initializable {
             return;
         }
 
-        JsonStorage jsonStorage = new JsonStorage(
+        var jsonStorage = new JsonStorage(
                 mkvPaneController.getElementsAll(),
                 mkaPaneController.getElementsAll(),
                 subPaneController.getElementsAll(),
@@ -256,31 +257,27 @@ public class LandingController implements Initializable {
     }
 
     private void addRecentlyOpened(String playlistPath) {
-        ObservableList<MenuItem> items = recentlyOpenedMenu.getItems();
-        for (MenuItem item : items) {
-            if (item.getUserData() != null && item.getUserData().equals(playlistPath)) {
-                items.remove(item);
-                items.add(0, item);
-                return;
-            }
+        var items = recentlyOpenedMenu.getItems();
+        var existing = items.stream()
+                .filter(item -> playlistPath.equals(item.getUserData()))
+                .findFirst();
+        if (existing.isPresent()) {
+            items.remove(existing.get());
+            items.addFirst(existing.get());
+            return;
         }
 
-        MenuItem menuItem = new MenuItem();
-        String playListName;
-
-        playListName = playlistPath.substring(
+        var playListName = playlistPath.substring(
                 playlistPath.lastIndexOf(File.separator) + 1, playlistPath.lastIndexOf("."));
+        var menuItem = new MenuItem();
         menuItem.setText(playListName);
-
         menuItem.setUserData(playlistPath);
-        menuItem.setOnAction(actionEvent -> {
-            JsonStorage jsonStorage = Playlists.readByPath(resourceBundle, new File(playlistPath));
-            setAllLists(jsonStorage);
-        });
+        menuItem.setOnAction(_ ->
+                setAllLists(Playlists.readByPath(resourceBundle, new File(playlistPath))));
         // Limit list to 13 elements (2 in the end are separator and clear button)
         if (items.size() >= 11)
             items.remove(9, recentlyOpenedMenu.getItems().size() - 2);
-        items.add(0, menuItem);
+        items.addFirst(menuItem);
     }
 }
 

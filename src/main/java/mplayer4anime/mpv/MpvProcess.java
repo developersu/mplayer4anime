@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
      
     This file is part of mplayer4anime.
 
@@ -20,10 +20,16 @@ package mplayer4anime.mpv;
 
 import com.sun.jna.ptr.IntByReference;
 import mplayer4anime.ui.ServiceWindow;
-import static mplayer4anime.mpv.Mpv_Events.*;
-import static mplayer4anime.mpv.Mpv_Format.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import static mplayer4anime.mpv.Mpv_Events.MPV_EVENT_SHUTDOWN;
+import static mplayer4anime.mpv.Mpv_Events.MPV_EVENT_START_FILE;
+import static mplayer4anime.mpv.Mpv_Format.MPV_FORMAT_FLAG;
 
 public class MpvProcess implements Runnable{
+    private static final Logger log = LoggerFactory.getLogger(MpvProcess.class);
+
     private final String videoFilename;
     private final String audioFilename;
     private final String subsFilename;
@@ -44,10 +50,10 @@ public class MpvProcess implements Runnable{
             return;
         }
 
-        long ctx = libMpv.mpv_create();
+        var ctx = libMpv.mpv_create();
         libMpv.mpv_set_option_string(ctx, "input-default-bindings", "yes");
         libMpv.mpv_set_option_string(ctx, "input-vo-keyboard", "yes");
-        IntByReference value = new IntByReference(1);
+        var value = new IntByReference(1);
         libMpv.mpv_set_option(ctx, "osc", MPV_FORMAT_FLAG.ordinal(), value);
         libMpv.mpv_initialize(ctx);
 
@@ -55,10 +61,10 @@ public class MpvProcess implements Runnable{
         //libMpv.mpv_command(ctx, new String[]{"audio-add", audioFilename});
         //libMpv.mpv_command(ctx, new String[]{"subs-add", subsFilename});
         while (true){
-            mpv_event event = libMpv.mpv_wait_event(ctx, 10000);
+            var event = libMpv.mpv_wait_event(ctx, 10000);
             if (event.event_id == MPV_EVENT_SHUTDOWN.ordinal())
                 break;
-            System.out.println(Mpv_Events.values()[event.event_id].name());
+            log.debug("MPV event: {}", Mpv_Events.values()[event.event_id].name());
 
             if (event.event_id == MPV_EVENT_START_FILE.ordinal())
                 libMpv.mpv_command(ctx, new String[]{"audio-add", audioFilename});

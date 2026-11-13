@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2021 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -18,28 +18,32 @@
  */
 package mplayer4anime.mplayer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 
-public class LineRedirecter extends Thread {
+public class LineRedirector extends Thread {
+    private static final Logger log = LoggerFactory.getLogger(LineRedirector.class);
+
     private final InputStream inStream;
     private final OutputStream outStream;
 
-    LineRedirecter(InputStream inStream, OutputStream outStream){
+    LineRedirector(InputStream inStream, OutputStream outStream) {
         this.inStream = inStream;
         this.outStream = outStream;
     }
 
-    public void run(){
-        try {
-            BufferedReader bufferReader = new BufferedReader(new InputStreamReader(inStream));
-            PrintStream printStream = new PrintStream(outStream);
+    public void run() {
+        try (var bufferReader = new BufferedReader(new InputStreamReader(inStream))) {
+            var printStream = new PrintStream(outStream);
             String playerOutput;
             while ((playerOutput = bufferReader.readLine()) != null) {
                 printStream.println(playerOutput);
             }
         }
-        catch (IOException e){
-            e.printStackTrace();
+        catch (IOException e) {
+            log.warn("Error redirecting player output stream", e);
         }
 
     }

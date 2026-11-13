@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2023 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
      
     This file is part of mplayer4anime.
 
@@ -20,24 +20,32 @@ package mplayer4anime;
 
 public interface IPlayer {
     void subtitlesSwitch();
+
     void fullscreenSwitch();
+
     void mute();
+
     void forcePlay(String mplayerPath,
-                          String VideoFile,
-                          String AudioFile,
-                          String SubtitlesFile,
-                          String subtitlesEncoding,
-                          boolean subtitlesHidden,
-                          boolean isFullscreen);
+                   String VideoFile,
+                   String AudioFile,
+                   String SubtitlesFile,
+                   String subtitlesEncoding,
+                   boolean subtitlesHidden,
+                   boolean isFullscreen);
+
     boolean pause();
+
     void playPause(String mplayerPath,
-                          String VideoFile,
-                          String AudioFile,
-                          String SubtitlesFile,
-                          String subtitlesEncoding,
-                          boolean subtitlesHidden,
-                          boolean isFullscreen);
+                   String VideoFile,
+                   String AudioFile,
+                   String SubtitlesFile,
+                   String subtitlesEncoding,
+                   boolean subtitlesHidden,
+                   boolean isFullscreen);
+
     void stop();
+
     void volumeUp();
+
     void volumeDown();
 }

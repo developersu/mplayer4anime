@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2023 Dmitry Isaenko
+    Copyright 2018-2026 Dmitry Isaenko
      
     This file is part of mplayer4anime.
 
@@ -20,12 +20,16 @@ package mplayer4anime.mplayer;
 
 import mplayer4anime.IPlayer;
 import mplayer4anime.ui.ServiceWindow;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
 
 public class MplayerSlave implements IPlayer {
+    private static final Logger log = LoggerFactory.getLogger(MplayerSlave.class);
+
     private Process player;
     private PrintStream playerIn;
     private BufferedReader playerOutErr;
@@ -52,7 +56,7 @@ public class MplayerSlave implements IPlayer {
 
         try {
             String returnedStr;
-            int returnedInt = 1;
+            var returnedInt = 1;
             while ((returnedStr = playerOutErr.readLine()) != null) {
                 if (returnedStr.startsWith("ANS_SUB_VISIBILITY=")) {
                     returnedInt = Integer.parseInt(returnedStr.substring("ANS_SUB_VISIBILITY=".length()));
@@ -65,8 +69,7 @@ public class MplayerSlave implements IPlayer {
                 playerSingleCommand("sub_visibility 1");
         }
         catch (IOException e) {
-            e.printStackTrace();
-            System.out.println("Can't determine whether subtitles enabled or disabled");
+            log.error("Can't determine whether subtitles enabled or disabled", e);
         }
     }
     @Override
@@ -94,7 +97,7 @@ public class MplayerSlave implements IPlayer {
             playPause(mplayerPath, VideoFile, AudioFile, SubtitlesFile, subtitlesEncoding, subtitlesHidden, isFullscreen);
         }
         catch (InterruptedException e){
-            e.printStackTrace();
+            log.error("Interrupted while restarting mplayer", e);
         }
     }
     @Override
@@ -117,9 +120,9 @@ public class MplayerSlave implements IPlayer {
         if (pause())
             return;
 
-        boolean isAudio = AudioFile != null;
-        boolean isSubtitles = SubtitlesFile != null;
-        boolean SubEncodingDefault = subtitlesEncoding.equals("default");
+        var isAudio = AudioFile != null;
+        var isSubtitles = SubtitlesFile != null;
+        var SubEncodingDefault = subtitlesEncoding.equals("default");
 
         try {
             player = new ProcessBuilder(                        // FUCKING MAGIC! DON'T CHANGE SEQUENCE
@@ -137,13 +140,13 @@ public class MplayerSlave implements IPlayer {
                     isSubtitles?SubEncodingDefault?"": subtitlesEncoding:""
             ).start();
 
-            PipedInputStream readFrom = new PipedInputStream(256 * 1024);
-            PipedOutputStream writeTo = new PipedOutputStream(readFrom);
+            var readFrom = new PipedInputStream(256 * 1024);
+            var writeTo = new PipedOutputStream(readFrom);
 
             playerOutErr = new BufferedReader(new InputStreamReader(readFrom));
 
-            new LineRedirecter(player.getInputStream(), writeTo).start();
-            new LineRedirecter(player.getErrorStream(), writeTo).start();
+            new LineRedirector(player.getInputStream(), writeTo).start();
+            new LineRedirector(player.getErrorStream(), writeTo).start();
 
             playerIn = new PrintStream(player.getOutputStream());
 
