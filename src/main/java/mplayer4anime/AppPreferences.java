@@ -18,10 +18,12 @@
  */
 package mplayer4anime;
 
+import mplayer4anime.ui.landing.panes.PaneType;
+
+import java.util.ArrayList;
 import java.util.Locale;
 import java.util.prefs.Preferences;
 
-// Rule application settings
 public class AppPreferences {
     private static final AppPreferences INSTANCE = new AppPreferences();
     private final Preferences preferences = Preferences.userRoot().node("mplayer4anime");
@@ -108,6 +110,20 @@ public class AppPreferences {
 
     public String[] getSubsExtensionsList() {
         return preferences.get("SUBS_EXTENSIONS_LIST", "*.ass *.srt ").split(" ");
+    }
+
+    public String[] getExtensionsForPane(PaneType paneType) {
+        var raw = switch (paneType) {
+            case VIDEO -> getVideoExtensionsList();
+            case AUDIO -> getAudioExtensionsList();
+            case SUBTITLES -> getSubsExtensionsList();
+        };
+        var result = new ArrayList<String>();
+        for (var s : raw) {
+            result.add(s);
+            result.add(s.toUpperCase());
+        }
+        return result.toArray(new String[0]);
     }
 
     /**

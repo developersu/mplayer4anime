@@ -45,6 +45,8 @@ import java.io.File;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import static mplayer4anime.ui.landing.panes.PaneType.*;
+
 public class LandingController implements Initializable {
 
     private static final int MAX_RECENT_PLAYLISTS = 10;
@@ -88,9 +90,9 @@ public class LandingController implements Initializable {
         // Register this controller in mediator
         MediatorControl.getInstance().registerMainController(this);
 
-        mkvPaneController.setPaneType("Video");
-        mkaPaneController.setPaneType("Audio");
-        subPaneController.setPaneType("Subtitles");
+        mkvPaneController.setPaneType(VIDEO);
+        mkaPaneController.setPaneType(AUDIO);
+        subPaneController.setPaneType(SUBTITLES);
 
         // Disable Save/Save as if there is no video in the corresponding panes
         var saveActionsDisabled = Bindings.isEmpty(mkvPaneController.getPaneFileList());
@@ -134,9 +136,9 @@ public class LandingController implements Initializable {
             // TODO: IF video set, if playlist has been opened before
             var jsonStorage = playlists.readQuiet(new File(recentPlaylist));
             setAllLists(jsonStorage);
-            mkvPaneController.setElementSelectedByIndex(appPreferences.getLatestPositionVideo());
-            mkaPaneController.setElementSelectedByIndex(appPreferences.getLatestPositionAudio());
-            subPaneController.setElementSelectedByIndex(appPreferences.getLatestPositionSubs());
+            mkvPaneController.setSelected(appPreferences.getLatestPositionVideo());
+            mkaPaneController.setSelected(appPreferences.getLatestPositionAudio());
+            subPaneController.setSelected(appPreferences.getLatestPositionSubs());
         }
         catch (Exception ignore) {
         }
@@ -164,9 +166,9 @@ public class LandingController implements Initializable {
         }
         appPreferences.setRecentPlaylists(storeRecentArr);
 
-        appPreferences.setLatestPositionVideo(mkvPaneController.getElementSelectedIndex());
-        appPreferences.setLatestPositionAudio(mkaPaneController.getElementSelectedIndex());
-        appPreferences.setLatestPositionSubs(subPaneController.getElementSelectedIndex());
+        appPreferences.setLatestPositionVideo(mkvPaneController.getSelected());
+        appPreferences.setLatestPositionAudio(mkaPaneController.getSelected());
+        appPreferences.setLatestPositionSubs(subPaneController.getSelected());
 
         Platform.exit();
     }
@@ -214,9 +216,9 @@ public class LandingController implements Initializable {
 
     private void setAllLists(JsonStorage jsonStorage) {
         if (jsonStorage != null) {
-            mkvPaneController.setFilesFromList(jsonStorage.getVideo());
-            mkaPaneController.setFilesFromList(jsonStorage.getAudio());
-            subPaneController.setFilesFromList(jsonStorage.getSubs());
+            mkvPaneController.setFiles(jsonStorage.getVideo());
+            mkaPaneController.setFiles(jsonStorage.getAudio());
+            subPaneController.setFiles(jsonStorage.getSubs());
             subPaneController.selectEncodingValue(jsonStorage.getSubEncoding(), appPreferences);
 
             currentPlaylistLocation = playlists.getPlaylistLocation();              // TODO: Implement listener? mmm...
@@ -227,15 +229,15 @@ public class LandingController implements Initializable {
 
     @FXML
     private void saveBtn() {
-        if (mkvPaneController.getElementsCount() == 0) {
+        if (mkvPaneController.getElementsSize() == 0) {
             ServiceWindow.getErrorNotification(resourceBundle.getString("Error"),
                     resourceBundle.getString("ErrorUnableToSaveEmptyPlaylist"));
             return;
         }
         var jsonStorage = new JsonStorage(
-                mkvPaneController.getElementsAll(),
-                mkaPaneController.getElementsAll(),
-                subPaneController.getElementsAll(),
+                mkvPaneController.getElements(),
+                mkaPaneController.getElements(),
+                subPaneController.getElements(),
                 subPaneController.getSelectedEncoding());
         if (playlists.save(jsonStorage)) {
             this.currentPlaylistLocation = playlists.getPlaylistLocation();
@@ -246,16 +248,16 @@ public class LandingController implements Initializable {
 
     @FXML
     private void saveAsBtn() {
-        if (mkvPaneController.getElementsCount() == 0) {
+        if (mkvPaneController.getElementsSize() == 0) {
             ServiceWindow.getErrorNotification(resourceBundle.getString("Error"),
                     resourceBundle.getString("ErrorUnableToSaveEmptyPlaylist"));
             return;
         }
 
         var jsonStorage = new JsonStorage(
-                mkvPaneController.getElementsAll(),
-                mkaPaneController.getElementsAll(),
-                subPaneController.getElementsAll(),
+                mkvPaneController.getElements(),
+                mkaPaneController.getElements(),
+                subPaneController.getElements(),
                 subPaneController.getSelectedEncoding());
         if (playlists.saveAs(jsonStorage)) {
             this.currentPlaylistLocation = playlists.getPlaylistLocation();

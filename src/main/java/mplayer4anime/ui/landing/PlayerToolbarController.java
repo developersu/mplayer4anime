@@ -100,13 +100,13 @@ public class PlayerToolbarController implements Initializable {
     }
 
     private void play() {
-        if (mkvPaneController.getElementSelected() == null)
+        if (mkvPaneController.getSelectedAbsolutePath() == null)
             return;
 
         player.playPause(appPreferences.getPath(),
-                mkvPaneController.getElementSelected(),
-                mkaPaneController.getElementSelected(),
-                subPaneController.getElementSelected(),
+                mkvPaneController.getSelectedAbsolutePath(),
+                mkaPaneController.getSelectedAbsolutePath(),
+                subPaneController.getSelectedAbsolutePath(),
                 subPaneController.getSelectedEncoding(),
                 subsHide.isSelected(),
                 fullScreen.isSelected()
@@ -114,24 +114,24 @@ public class PlayerToolbarController implements Initializable {
     }
 
     private void playPrevTrack() {
-        var index = mkvPaneController.getElementSelectedIndex() - 1;
+        var index = mkvPaneController.getSelected() - 1;
         if (index < 0)
             return;
 
-        mkvPaneController.setElementSelectedByIndex(index);
+        mkvPaneController.setSelected(index);
 
-        index = mkaPaneController.getElementSelectedIndex();
+        index = mkaPaneController.getSelected();
         if (index > 0)
-            mkaPaneController.setElementSelectedByIndex(index - 1);
+            mkaPaneController.setSelected(index - 1);
 
-        index = subPaneController.getElementSelectedIndex();
+        index = subPaneController.getSelected();
         if (index > 0)
-            subPaneController.setElementSelectedByIndex(index - 1);
+            subPaneController.setSelected(index - 1);
 
         player.forcePlay(appPreferences.getPath(),
-                mkvPaneController.getElementSelected(),
-                mkaPaneController.getElementSelected(),
-                subPaneController.getElementSelected(),
+                mkvPaneController.getSelectedAbsolutePath(),
+                mkaPaneController.getSelectedAbsolutePath(),
+                subPaneController.getSelectedAbsolutePath(),
                 subPaneController.getSelectedEncoding(),
                 subsHide.isSelected(),
                 fullScreen.isSelected()
@@ -139,24 +139,24 @@ public class PlayerToolbarController implements Initializable {
     }
 
     private void playNextTrack() {
-        var index = mkvPaneController.getElementSelectedIndex() + 1;
-        if (index >= mkvPaneController.getElementsCount())
+        var index = mkvPaneController.getSelected() + 1;
+        if (index >= mkvPaneController.getElementsSize())
             return;
 
-        mkvPaneController.setElementSelectedByIndex(index);
+        mkvPaneController.setSelected(index);
 
-        index = mkaPaneController.getElementSelectedIndex() + 1;
-        if (index < mkaPaneController.getElementsCount())
-            mkaPaneController.setElementSelectedByIndex(index);
+        index = mkaPaneController.getSelected() + 1;
+        if (index < mkaPaneController.getElementsSize())
+            mkaPaneController.setSelected(index);
 
-        index = subPaneController.getElementSelectedIndex() + 1;
-        if (index < subPaneController.getElementsCount())
-            subPaneController.setElementSelectedByIndex(index);
+        index = subPaneController.getSelected() + 1;
+        if (index < subPaneController.getElementsSize())
+            subPaneController.setSelected(index);
 
         player.forcePlay(appPreferences.getPath(),
-                mkvPaneController.getElementSelected(),
-                mkaPaneController.getElementSelected(),
-                subPaneController.getElementSelected(),
+                mkvPaneController.getSelectedAbsolutePath(),
+                mkaPaneController.getSelectedAbsolutePath(),
+                subPaneController.getSelectedAbsolutePath(),
                 subPaneController.getSelectedEncoding(),
                 subsHide.isSelected(),
                 fullScreen.isSelected()

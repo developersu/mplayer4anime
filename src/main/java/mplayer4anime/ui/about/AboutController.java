@@ -29,7 +29,6 @@ import javafx.stage.Stage;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-
 public class AboutController implements Initializable {
 
     private HostServices hostServices;

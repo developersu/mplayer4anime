@@ -33,8 +33,8 @@ public class ControllerPaneSubtitles extends ControllerPane {
     private ChoiceBox<String> subtEncoding;
     private ObservableList<String> subEncodingList;
 
-    public void initialize(URL url, ResourceBundle rb) {
-        super.initialize(url, rb);
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+        super.initialize(url, resourceBundle);
         this.subEncodingList = FXCollections.observableArrayList();
     }
     /** Return selected file encoding */
