@@ -112,11 +112,8 @@ public class Playlists {
      * Open playlist using GUI
      */
     public JsonStorage read(File playlistFile) {
-        if (playlistFile == null) {
-            getErrorNotification(str("Error"), str("playlist_file_not_selected"));
+        if (playlistFile == null)
             return null;
-        }
-
         try {
             return parse(playlistFile);
         }
