@@ -22,127 +22,143 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import javafx.stage.FileChooser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.util.ResourceBundle;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.nio.file.StandardCopyOption.ATOMIC_MOVE;
+import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 import static mplayer4anime.ui.ServiceWindow.getErrorNotification;
 
 public class Playlists {
-    private static String playlistLocation;
+    private static final Logger log = LoggerFactory.getLogger(Playlists.class);
 
-    //TODO: Show popUp if unable to write! Or nothing to write! Or overwrite!
-    //TODO: Disable 'Save' button if no files added
-    public static boolean saveAs(ResourceBundle rb, JsonStorage jStorage) {
-        var fileChooser = new FileChooser();
-        fileChooser.setTitle(rb.getString("SelectFile"));
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
-        fileChooser.setInitialFileName("MyPlaylist.alpr");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Playlists (*.alpr)", "*.alpr"));
+    private static final Gson GSON = new Gson();
+    private static final Gson PRETTY_GSON = new GsonBuilder().setPrettyPrinting().create();
 
-        return writeFile(rb, fileChooser.showSaveDialog(null), jStorage);
+    private String playlistLocation;
+    private final ResourceBundle resourceBundle;
+
+    public Playlists(ResourceBundle resourceBundle) {
+        this.resourceBundle = resourceBundle;
     }
 
-    public static boolean saveCurrent(ResourceBundle rb, JsonStorage jStorage) {
-        if (playlistLocation == null || playlistLocation.isEmpty())
-            return Playlists.saveAs(rb, jStorage);
+    // TODO: Consider adding option to be able to create playlists with relative paths
+    public boolean saveAs(JsonStorage jStorage) {
+        var fileChooser = new FileChooser();
+        fileChooser.setTitle(str("SelectFile"));
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+        fileChooser.setInitialFileName("MyPlaylist.alpr");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Playlists (*.alpr)", "*.alpr"));
+        return write(fileChooser.showSaveDialog(null), jStorage);
+    }
 
-        return writeFile(rb, new File(playlistLocation), jStorage);
+    public boolean save(JsonStorage jStorage) {
+        if (playlistLocation == null || playlistLocation.isEmpty())
+            return saveAs(jStorage);
+
+        return write(new File(playlistLocation), jStorage);
     }
 
     /**
-     * @return true for success, false for failure
-     *
+     * @return true on success
      */
-    private static boolean writeFile(ResourceBundle rb, File playlistFile, JsonStorage jStorage) {
-        if (playlistFile == null) {
-            getErrorNotification(rb.getString("Error"), "Unable to save: File not selected");// TODO: translate
+    private boolean write(File playlistFile, JsonStorage jStorage) {
+        if (playlistFile == null)
             return false;
-        }
 
-        if (!playlistFile.getAbsolutePath().endsWith(".alpr")) {
+        if (!playlistFile.getAbsolutePath().endsWith(".alpr"))
             playlistFile = new File(playlistFile.getAbsolutePath() + ".alpr");
-        }
 
-        try (var writer = new OutputStreamWriter(new FileOutputStream(playlistFile.getAbsolutePath()), UTF_8)) {
-            var jsonObject = new GsonBuilder().setPrettyPrinting().create();
-            jsonObject.toJson(jStorage, writer);
-            writer.close();
+        File tmpFile = null;
+        try {
+            tmpFile = File.createTempFile(".alpr-", ".tmp", playlistFile.getParentFile());
+            try (var writer = new OutputStreamWriter(Files.newOutputStream(tmpFile.toPath()), UTF_8)) {
+                PRETTY_GSON.toJson(jStorage, writer);
+            }
+            Files.move(tmpFile.toPath(), playlistFile.toPath(), REPLACE_EXISTING, ATOMIC_MOVE);
             playlistLocation = playlistFile.getAbsolutePath();
             return true;
         }
         catch (java.io.FileNotFoundException e) {
-            getErrorNotification(rb.getString("Error"), rb.getString("ErrorFileNotFound"));
-        }
-        catch (java.io.UnsupportedEncodingException e) {
-            getErrorNotification(rb.getString("Error"), rb.getString("ErrorOnSaveIncorrectEncoding"));
+            getErrorNotification(str("Error"), str("ErrorFileNotFound"));
         }
         catch (java.io.IOException e) {
-            getErrorNotification(rb.getString("Error"), rb.getString("ErrorOnSaveIOProblem"));
+            getErrorNotification(str("Error"), str("ErrorOnSaveIOProblem"));
+        }
+        finally {
+            if (tmpFile != null && tmpFile.exists())
+                tmpFile.delete();
         }
         return false;
     }
 
-    /**
-     * Interface for Opening playlists via FileChooser
-     **/
-    public static JsonStorage openPlaylistFileChooser(ResourceBundle rb) {
+    public JsonStorage openFileChooser() {
         var fileChooser = new FileChooser();
-        fileChooser.setTitle(rb.getString("SelectFile"));
+        fileChooser.setTitle(str("SelectFile"));
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
         fileChooser.setInitialFileName("MyPlaylist.alpr");
-        fileChooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Playlists (*.alpr)", "*.alpr"));
-
-        return readByPath(rb, fileChooser.showOpenDialog(null));
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Playlists (*.alpr)", "*.alpr"));
+        return read(fileChooser.showOpenDialog(null));
     }
 
     /**
-     * Interface for Opening playlists using file itself
+     * Open playlist using GUI
      */
-    public static JsonStorage readByPath(ResourceBundle rb, File playlistFile) {
+    public JsonStorage read(File playlistFile) {
         if (playlistFile == null) {
-            getErrorNotification(rb.getString("Error"), "Playlist file not selected"); // TODO: translate
+            getErrorNotification(str("Error"), str("playlist_file_not_selected"));
             return null;
         }
 
-        try (var reader = new InputStreamReader(new FileInputStream(playlistFile))) {
-            var jStorage = new Gson().fromJson(reader, JsonStorage.class);
-            if (jStorage == null)
-                return null;
-            playlistLocation = playlistFile.getAbsolutePath();
-            return jStorage;
+        try {
+            return parse(playlistFile);
         }
         catch (FileNotFoundException e) {
-            getErrorNotification(rb.getString("Error"), rb.getString("ErrorFileNotFound"));
+            getErrorNotification(str("Error"), str("ErrorFileNotFound"));
         }
         catch (JsonSyntaxException e) {
-            getErrorNotification(rb.getString("Error"), rb.getString("ErrorOnOpenIncorrectFormatOfFile"));
+            getErrorNotification(str("Error"), str("ErrorOnOpenIncorrectFormatOfFile"));
         }
         catch (IOException e) {
-            getErrorNotification(rb.getString("Error"), rb.getString("ErrorOnOpenIOProblem"));
+            getErrorNotification(str("Error"), str("ErrorOnOpenIOProblem"));
         }
         return null;
     }
 
-    public static JsonStorage readByPathSilent(File playlistFile) {
+    public JsonStorage readQuiet(File playlistFile) {
+        if (playlistFile == null)
+            return null;
+        try {
+            return parse(playlistFile);
+        }
+        catch (Exception e) {
+            log.warn("Read file failure", e);
+        }
+        return null;
+    }
+
+    private JsonStorage parse(File playlistFile) throws IOException, JsonSyntaxException {
         try (var reader = new InputStreamReader(Files.newInputStream(playlistFile.toPath()))) {
-            var jStorage = new Gson().fromJson(reader, JsonStorage.class);
+            var jStorage = GSON.fromJson(reader, JsonStorage.class);
             if (jStorage == null)
                 return null;
             playlistLocation = playlistFile.getAbsolutePath();
             return jStorage;
         }
-        catch (Exception ignore) {
-        }
-        return null;
     }
 
-    /**
-     * Return path to file opened
-     */
-    public static String getPlaylistLocation() {
+    private String str(String key) {
+        return resourceBundle.getString(key);
+    }
+
+    public String getPlaylistLocation() {
         return playlistLocation;
     }
 }

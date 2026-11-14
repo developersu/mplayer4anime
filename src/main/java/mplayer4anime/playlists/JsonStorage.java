@@ -1,28 +1,51 @@
 package mplayer4anime.playlists;
 
+import com.google.gson.annotations.SerializedName;
+
 public class JsonStorage {
-    private final String Ver;
-    private final String[] Video;
-    private final String[] Audio;
-    private final String[] Subtitles;
-    private final String SubEncoding;
+    @SerializedName("Ver")
+    private final String version;
+    @SerializedName("Video")
+    private final String[] video;
+    @SerializedName("Audio")
+    private final String[] audio;
+    @SerializedName("Subtitles")
+    private final String[] subtitles;
+    @SerializedName("SubEncoding")
+    private final String subEncoding;
 
-    public String getVer() {return Ver; }
-    public String[] getVideo() {return Video; }
-    public String[] getAudio() {return Audio; }
-    public String[] getSubs() {return Subtitles; }
-    public String getSubEncoding() {return SubEncoding; }
+    public JsonStorage(String[] videoArray,
+                       String[] audioArray,
+                       String[] subsArray,
+                       String subEncoding) {
+        version = "1";
+        video = videoArray;
+        audio = audioArray;
+        subtitles = subsArray;
 
-    public JsonStorage(String[] videoArr, String[] audioArr, String[] subsArr, String subEncoding){
-        Ver = "1";
-        Video = videoArr;
-        Audio = audioArr;
-        Subtitles = subsArr;
-
-        if (subsArr != null && subsArr.length != 0)
-            this.SubEncoding = subEncoding;
+        if (subsArray != null && subsArray.length != 0)
+            this.subEncoding = subEncoding;
         else
-            this.SubEncoding = "";
+            this.subEncoding = "";
     }
 
+    public String getVersion() {
+        return version;
+    }
+
+    public String[] getVideo() {
+        return video;
+    }
+
+    public String[] getAudio() {
+        return audio;
+    }
+
+    public String[] getSubs() {
+        return subtitles;
+    }
+
+    public String getSubEncoding() {
+        return subEncoding;
+    }
 }

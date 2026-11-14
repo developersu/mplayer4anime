@@ -79,7 +79,7 @@
     -fx-background-color: none;       
 }
 .splitMenuButton .menu-item .label:hover{
-    -fx-background-color: #000000;
+    -fx-background-color: #303030;
     -fx-text-base-color: white;
     -fx-focus-color: red;
 }
@@ -94,7 +94,7 @@
 
 /* -======================== TAB PANE =========================- */
 .tab-paneSettings .tab SVGPath{
-    -fx-fill: #000000;
+    -fx-fill: #303030;
 }
 .tab-paneSettings .tab:selected SVGPath{
     -fx-fill: #c30000;

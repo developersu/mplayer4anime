@@ -20,6 +20,7 @@ package mplayer4anime.ui.landing;
 
 import javafx.application.HostServices;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Label;
@@ -45,6 +46,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class LandingController implements Initializable {
+
+    private static final int MAX_RECENT_PLAYLISTS = 10;
+
     @FXML
     private ControllerPane mkvPaneController, mkaPaneController;
     @FXML
@@ -55,6 +59,8 @@ public class LandingController implements Initializable {
     private Label statusLbl;
     @FXML
     private Menu recentlyOpenedMenu;
+    @FXML
+    private MenuItem saveMenuItem, saveAsMenuItem;
 
     @FXML
     private TabPane tabPane;
@@ -65,24 +71,31 @@ public class LandingController implements Initializable {
     private HostServices hostServices;
     private String currentPlaylistLocation;
     private String backend;
+    private Playlists playlists;
 
     private IPlayer player;
 
     // If application started with playlist passed as an argument, then we'll try to load it (if it's valid).
     public void setPlaylistAsArgument(String playlist) {
-        var jsonStorage = Playlists.readByPath(resourceBundle, new File(playlist));
+        var jsonStorage = playlists.readQuiet(new File(playlist));
         setAllLists(jsonStorage);
     }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
+        playlists = new Playlists(resourceBundle);
         // Register this controller in mediator
         MediatorControl.getInstance().registerMainController(this);
 
         mkvPaneController.setPaneType("Video");
         mkaPaneController.setPaneType("Audio");
         subPaneController.setPaneType("Subtitles");
+
+        // Disable Save/Save as if there is no video in the corresponding panes
+        var saveActionsDisabled = Bindings.isEmpty(mkvPaneController.getPaneFileList());
+        saveMenuItem.disableProperty().bind(saveActionsDisabled);
+        saveAsMenuItem.disableProperty().bind(saveActionsDisabled);
 
         // Set default list of encodings of the subtitles files:
         subPaneController.setEncoding(appPreferences.getSubsEncodingList(), appPreferences.getLastTimeUsedSubsEncoding());
@@ -119,7 +132,7 @@ public class LandingController implements Initializable {
             if ("".equals(recentPlaylist))
                 return;
             // TODO: IF video set, if playlist has been opened before
-            var jsonStorage = Playlists.readByPathSilent(new File(recentPlaylist));
+            var jsonStorage = playlists.readQuiet(new File(recentPlaylist));
             setAllLists(jsonStorage);
             mkvPaneController.setElementSelectedByIndex(appPreferences.getLatestPositionVideo());
             mkaPaneController.setElementSelectedByIndex(appPreferences.getLatestPositionAudio());
@@ -195,7 +208,7 @@ public class LandingController implements Initializable {
 
     @FXML
     private void openBtn() {
-        var jsonStorage = Playlists.openPlaylistFileChooser(resourceBundle);
+        var jsonStorage = playlists.openFileChooser();
         setAllLists(jsonStorage);
     }
 
@@ -206,7 +219,7 @@ public class LandingController implements Initializable {
             subPaneController.setFilesFromList(jsonStorage.getSubs());
             subPaneController.selectEncodingValue(jsonStorage.getSubEncoding(), appPreferences);
 
-            currentPlaylistLocation = Playlists.getPlaylistLocation();              // TODO: Implement listener? mmm...
+            currentPlaylistLocation = playlists.getPlaylistLocation();              // TODO: Implement listener? mmm...
             statusLbl.setText(currentPlaylistLocation);
             addRecentlyOpened(currentPlaylistLocation);
         }
@@ -224,8 +237,8 @@ public class LandingController implements Initializable {
                 mkaPaneController.getElementsAll(),
                 subPaneController.getElementsAll(),
                 subPaneController.getSelectedEncoding());
-        if (Playlists.saveCurrent(resourceBundle, jsonStorage)) {
-            this.currentPlaylistLocation = Playlists.getPlaylistLocation();
+        if (playlists.save(jsonStorage)) {
+            this.currentPlaylistLocation = playlists.getPlaylistLocation();
             this.statusLbl.setText(currentPlaylistLocation);    //TODO: update header of the application to include this?
             addRecentlyOpened(currentPlaylistLocation);
         }
@@ -244,8 +257,8 @@ public class LandingController implements Initializable {
                 mkaPaneController.getElementsAll(),
                 subPaneController.getElementsAll(),
                 subPaneController.getSelectedEncoding());
-        if (Playlists.saveAs(resourceBundle, jsonStorage)) {
-            this.currentPlaylistLocation = Playlists.getPlaylistLocation();
+        if (playlists.saveAs(jsonStorage)) {
+            this.currentPlaylistLocation = playlists.getPlaylistLocation();
             this.statusLbl.setText(currentPlaylistLocation);    //TODO: update header of the application to include this?
             addRecentlyOpened(currentPlaylistLocation);
         }
@@ -273,10 +286,11 @@ public class LandingController implements Initializable {
         menuItem.setText(playListName);
         menuItem.setUserData(playlistPath);
         menuItem.setOnAction(_ ->
-                setAllLists(Playlists.readByPath(resourceBundle, new File(playlistPath))));
-        // Limit list to 13 elements (2 in the end are separator and clear button)
-        if (items.size() >= 11)
-            items.remove(9, recentlyOpenedMenu.getItems().size() - 2);
+                setAllLists(playlists.read(new File(playlistPath))));
+        // The menu always ends with 2 fixed items (separator + "Clean all").
+        // Keep at most MAX_RECENT_PLAYLISTS playlists, evicting the oldest.
+        if (items.size() - 2 >= MAX_RECENT_PLAYLISTS)
+            items.remove(items.size() - 3);    // oldest playlist sits just before the separator
         items.addFirst(menuItem);
     }
 }
