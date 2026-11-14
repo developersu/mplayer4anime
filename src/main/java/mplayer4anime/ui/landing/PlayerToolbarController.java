@@ -107,7 +107,7 @@ public class PlayerToolbarController implements Initializable {
                 mkvPaneController.getSelectedAbsolutePath(),
                 mkaPaneController.getSelectedAbsolutePath(),
                 subPaneController.getSelectedAbsolutePath(),
-                subPaneController.getSelectedEncoding(),
+                subPaneController.getEncoding(),
                 subsHide.isSelected(),
                 fullScreen.isSelected()
         );
@@ -132,7 +132,7 @@ public class PlayerToolbarController implements Initializable {
                 mkvPaneController.getSelectedAbsolutePath(),
                 mkaPaneController.getSelectedAbsolutePath(),
                 subPaneController.getSelectedAbsolutePath(),
-                subPaneController.getSelectedEncoding(),
+                subPaneController.getEncoding(),
                 subsHide.isSelected(),
                 fullScreen.isSelected()
         );
@@ -157,7 +157,7 @@ public class PlayerToolbarController implements Initializable {
                 mkvPaneController.getSelectedAbsolutePath(),
                 mkaPaneController.getSelectedAbsolutePath(),
                 subPaneController.getSelectedAbsolutePath(),
-                subPaneController.getSelectedEncoding(),
+                subPaneController.getEncoding(),
                 subsHide.isSelected(),
                 fullScreen.isSelected()
         );

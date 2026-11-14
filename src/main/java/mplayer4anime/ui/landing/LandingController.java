@@ -100,7 +100,7 @@ public class LandingController implements Initializable {
         saveAsMenuItem.disableProperty().bind(saveActionsDisabled);
 
         // Set default list of encodings of the subtitles files:
-        subPaneController.setEncoding(appPreferences.getSubsEncodingList(), appPreferences.getLastTimeUsedSubsEncoding());
+        subPaneController.setEncodings(appPreferences.getSubsEncodingList(), appPreferences.getLastTimeUsedSubsEncoding());
 
         // If subtitles should be opened first, per user's settings let's show it first
         if (appPreferences.getSubtitlesFirst()) {
@@ -157,7 +157,7 @@ public class LandingController implements Initializable {
     // Will be used to store lists previously opened.
     // Linkage established by ohHidden in MainFX.java class
     public void shutdown() {
-        appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getSelectedEncoding());
+        appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getEncoding());
         playerToolbarController.shutdown();
         // TODO: remove from here; too sophisticated
         var storeRecentArr = new String[10];
@@ -190,9 +190,9 @@ public class LandingController implements Initializable {
     // This function called from MediatorControl after mediator receives request form SettingsController indicating that user updated some required fields.
     public void updateAfterSettingsChanged() {
         /* update list of encoding */
-        subPaneController.setEncoding(appPreferences.getSubsEncodingList(), null);
+        subPaneController.setEncodings(appPreferences.getSubsEncodingList(), null);
         // In case of application failure should be better to save this immediately
-        appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getSelectedEncoding());
+        appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getEncoding());
         switchBackend(appPreferences.getBackendEngineIndexId());
     }
 
@@ -238,7 +238,7 @@ public class LandingController implements Initializable {
                 mkvPaneController.getElements(),
                 mkaPaneController.getElements(),
                 subPaneController.getElements(),
-                subPaneController.getSelectedEncoding());
+                subPaneController.getEncoding());
         if (playlists.save(jsonStorage)) {
             this.currentPlaylistLocation = playlists.getPlaylistLocation();
             this.statusLbl.setText(currentPlaylistLocation);    //TODO: update header of the application to include this?
@@ -258,7 +258,7 @@ public class LandingController implements Initializable {
                 mkvPaneController.getElements(),
                 mkaPaneController.getElements(),
                 subPaneController.getElements(),
-                subPaneController.getSelectedEncoding());
+                subPaneController.getEncoding());
         if (playlists.saveAs(jsonStorage)) {
             this.currentPlaylistLocation = playlists.getPlaylistLocation();
             this.statusLbl.setText(currentPlaylistLocation);    //TODO: update header of the application to include this?

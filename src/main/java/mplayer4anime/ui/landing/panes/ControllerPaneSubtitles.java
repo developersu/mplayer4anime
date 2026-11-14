@@ -25,61 +25,63 @@ import javafx.scene.control.ChoiceBox;
 import mplayer4anime.AppPreferences;
 
 import java.net.URL;
-import java.util.Arrays;
+import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class ControllerPaneSubtitles extends ControllerPane {
+    private final ObservableList<String> encodings = FXCollections.observableArrayList();
+
     @FXML
-    private ChoiceBox<String> subtEncoding;
-    private ObservableList<String> subEncodingList;
+    private ChoiceBox<String> encodingChoiceBox;
 
     public void initialize(URL url, ResourceBundle resourceBundle) {
         super.initialize(url, resourceBundle);
-        this.subEncodingList = FXCollections.observableArrayList();
     }
-    /** Return selected file encoding */
-    public String getSelectedEncoding(){
-        return subtEncoding.getSelectionModel().getSelectedItem();
+
+    public String getEncoding() {
+        return encodingChoiceBox.getValue();
     }
-    /**
-     * Set encoding list and select element
-     * */
-    public void setEncoding(String[] list, String selection){
-        var currentlySelectedValue = subtEncoding.getValue();
 
-        subEncodingList.clear();
-        subEncodingList.setAll(list);
-        subtEncoding.setItems(subEncodingList);
+    public void setEncodings(String[] newEncodingsList, String selection) {
+        var currentlySelectedValue = encodingChoiceBox.getValue();
 
-        if (selection == null || selection.isEmpty())
-            // Try to restore previously selected value if it existed before and exists in the new list
-            if (currentlySelectedValue !=null && !currentlySelectedValue.isEmpty() && subEncodingList.contains(currentlySelectedValue))
-                subtEncoding.getSelectionModel().select(currentlySelectedValue);
-            else
-                subtEncoding.setValue(subEncodingList.getFirst());
-        else {
-            if (subEncodingList.contains(selection))
-                subtEncoding.getSelectionModel().select(selection);
-            else
-                subtEncoding.setValue(subEncodingList.getFirst());
+        encodings.clear();
+        encodings.setAll(newEncodingsList);
+        encodingChoiceBox.setItems(encodings);
+
+        if (encodings.isEmpty())
+            return;
+
+        // Use the explicitly requested selection if it exists in the new newEncodingsList.
+        // Otherwise, try to restore the previously selected value if it still exists.
+        var value = selection;
+        if (value == null || value.isEmpty())
+            value = currentlySelectedValue;
+        if (value == null || !encodings.contains(value))
+            value = encodings.getFirst();
+        encodingChoiceBox.setValue(value);
+    }
+
+    // TODO: consider revising
+    // Select encoding and adds it into the drop-down if it's not in the list
+    // Updates stored lists/selection of encoding
+
+    public void selectEncodingValue(String encodingValue, AppPreferences preferences) {
+        if (encodingValue == null)
+            return;
+        encodingValue = encodingValue.trim();
+
+        // Ignore values that contain whitespace (spaces or tabs) anywhere
+        if (encodingValue.isEmpty() || encodingValue.chars().anyMatch(Character::isWhitespace))
+            return;
+
+        if (!encodings.contains(encodingValue)) {
+            encodings.add(encodingValue);
+            preferences.setSubsEncodingList(encodings.toArray(new String[0]));
         }
-    }
-    /**
-     * Select encoding and adds it into the drop-down if it's not in the list
-     * Updates stored lists/selection of encoding
-     * */
-    public void selectEncodingValue(String encodingValue, AppPreferences preferences){
-        if (encodingValue != null && !(encodingValue = encodingValue.trim()).isEmpty()) {
-            if (!encodingValue.contains("\t") && !encodingValue.contains(" ")){             // If contains spaces or tabs, ignore.
-                if (!subEncodingList.contains(encodingValue)) {
-                    subEncodingList.add(encodingValue);
-                    preferences.setSubsEncodingList(Arrays.copyOf(subEncodingList.toArray(), subEncodingList.toArray().length, String[].class));
-                }
-                if (!subtEncoding.getValue().equals(encodingValue)) {
-                    subtEncoding.getSelectionModel().select(encodingValue);
-                    preferences.setLastTimeUsedSubsEncoding(encodingValue);
-                }
-            }
+        if (!Objects.equals(encodingChoiceBox.getValue(), encodingValue)) {
+            encodingChoiceBox.setValue(encodingValue);
+            preferences.setLastTimeUsedSubsEncoding(encodingValue);
         }
     }
 }
