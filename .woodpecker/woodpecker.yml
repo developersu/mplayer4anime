@@ -1,15 +1,28 @@
 steps:
-  - name: test
+  - name: Build jar
     when:
       event: [tag, push]
     image: maven:3-amazoncorretto-25-debian
     commands:
-      - mvn -B -DskipTests clean package
+      - mvn -B -DskipTests clean package -Pwindows
       - mvn test -B
     volumes:
       - /home/docker/woodpecker/files/m2:/root/.m2
 
-  - name: archive-artifact
+  - name: Build Windows installer
+    when:
+      event: [tag, push, manual]
+    image: wheatstalk/makensis:3
+    commands:
+      - cp "$CI_WORKSPACE/target/mplayer4anime.exe" "$CI_WORKSPACE/misc/windows/NSIS/"
+      - $CI_WORKSPACE/misc/windows/create_nsis.sh
+      - cd "$CI_WORKSPACE/misc/windows/NSIS"
+      - echo Installer-*.exe
+      - cp Installer-*.exe "$CI_WORKSPACE/target"
+    volumes:
+      - /home/docker/woodpecker/files/assembly/openjdk-25.0.1:/assembly/jdk
+
+  - name: Archive artifact
     when:
       event: [tag, push]
     image: alpine:latest
