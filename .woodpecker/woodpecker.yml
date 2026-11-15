@@ -27,7 +27,10 @@ steps:
       event: [tag, push]
     image: alpine:latest
     commands:
-      - mkdir -p /builds/mplayer4anime
-      - cp target/mplayer4anime-*jar /builds/mplayer4anime/
+      - sha512sum target/mplayer4anime-*jar >> target/sha512.txt
+      - sha512sum target/Installer-*exe >> target/sha512.txt
+      - export ARTIFACTS_DIR="$(date -d @$CI_PIPELINE_CREATED +'%Y-%m-%d %H:%M %Z')"
+      - mkdir -p /builds/$CI_REPO_NAME
+      - mv target/Installer-*exe target/mplayer4anime-*jar target/sha512.txt "/builds/$CI_REPO_NAME/$ARTIFACTS_DIR"
     volumes:
       - /home/www/builds:/builds
