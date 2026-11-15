@@ -23,6 +23,7 @@ import javafx.application.HostServices;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
@@ -30,6 +31,9 @@ import java.net.URL;
 import java.util.ResourceBundle;
 
 public class AboutController implements Initializable {
+    private static final String LINK_HOME = "https://redrise.ru";
+    private static final String LINK_GITHUB = "https://github.com/developersu/mplayer4anime";
+    private static final String LINK_BLOGSPOT = "https://developersu.blogspot.com/search/label/mplayer4anime";
 
     private HostServices hostServices;
 
@@ -41,25 +45,23 @@ public class AboutController implements Initializable {
     private Button buttonOk;
     @FXML
     private Label versionLbl;
+    @FXML
+    private Hyperlink gitHubLink;
+    @FXML
+    private Hyperlink bloggerLink;
+    @FXML
+    private Hyperlink homepageLink;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         versionLbl.setText(ResourceBundle.getBundle("app").getString("_version"));
-    }
 
-    @FXML
-    private void buttonClickOk() {
-        var thisStage = (Stage) buttonOk.getScene().getWindow();
-        thisStage.close();
-    }
-
-    @FXML
-    private void gitHubUrl() {
-        hostServices.showDocument("https://github.com/developersu/mplayer4anime");
-    }
-
-    @FXML
-    private void bloggerUrl() {
-        hostServices.showDocument("https://developersu.blogspot.com/search/label/mplayer4anime");
+        buttonOk.setOnAction(e -> {
+            var thisStage = (Stage) buttonOk.getScene().getWindow();
+            thisStage.close();
+        });
+        homepageLink.setOnAction(_ -> hostServices.showDocument(LINK_HOME));
+        gitHubLink.setOnAction(_ -> hostServices.showDocument(LINK_GITHUB));
+        bloggerLink.setOnAction(_ -> hostServices.showDocument(LINK_BLOGSPOT));
     }
 }

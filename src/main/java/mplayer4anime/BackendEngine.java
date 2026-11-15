@@ -1,5 +1,5 @@
 /*
-    Copyright 2018-2026 Dmitry Isaenko
+    Copyright 2026 Dmitry Isaenko
 
     This file is part of mplayer4anime.
 
@@ -18,28 +18,29 @@
  */
 package mplayer4anime;
 
-import mplayer4anime.ui.landing.LandingController;
+import mplayer4anime.mplayer.MplayerSlave;
+import mplayer4anime.mpv.MpvSlave;
 
-public class MediatorControl {
-    private LandingController mainLandingController;
+import java.util.ResourceBundle;
 
-    private static class MediatorControlHold {
-        private static final MediatorControl INSTANCE = new MediatorControl();
+public enum BackendEngine {
+    MPLAYER {
+        @Override
+        public IPlayer createPlayer(ResourceBundle bundle) {
+            return new MplayerSlave(bundle);
+        }
+    },
+    MPV {
+        @Override
+        public IPlayer createPlayer(ResourceBundle bundle) {
+            return new MpvSlave(bundle);
+        }
+    };
+
+    public abstract IPlayer createPlayer(ResourceBundle bundle);
+
+    @Override
+    public String toString() {
+        return name().toLowerCase();
     }
-
-    private MediatorControl() {
-    }
-
-    public static MediatorControl getInstance() {
-        return MediatorControlHold.INSTANCE;
-    }
-
-    public void registerMainController(LandingController mainLandingController) {
-        this.mainLandingController = mainLandingController;
-    }
-
-    public void updateAfterSettingsChanged() {
-        mainLandingController.updateAfterSettingsChanged();
-    }
-
 }

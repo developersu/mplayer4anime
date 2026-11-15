@@ -26,31 +26,40 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import mplayer4anime.AppPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ResourceBundle;
 
 public class AboutWindow {
+    private static final Logger log = LoggerFactory.getLogger(AboutWindow.class);
 
-    public AboutWindow(HostServices hostServices) throws Exception {
-        var stageAbout = new Stage();
-        stageAbout.setMinWidth(500);
-        stageAbout.setMinHeight(300);
+    public AboutWindow(HostServices hostServices) {
+        try {
+            var stageAbout = new Stage();
+            stageAbout.setMinWidth(500);
+            stageAbout.setMinHeight(300);
 
-        var loaderAbout = new FXMLLoader(getClass().getResource("/About/AboutLayout.fxml"));
-        var resourceBundle = ResourceBundle.getBundle("locale", AppPreferences.get().getLocale());
-        loaderAbout.setResources(resourceBundle);
+            var loaderAbout = new FXMLLoader(getClass().getResource("/About/AboutLayout.fxml"));
+            var resourceBundle = ResourceBundle.getBundle("locale", AppPreferences.get().getLocale());
+            loaderAbout.setResources(resourceBundle);
 
-        Parent parentAbout = loaderAbout.load();
-        ((AboutController) loaderAbout.getController())
-                .setHostServices(hostServices);
+            Parent parentAbout = loaderAbout.load();
+            ((AboutController) loaderAbout.getController())
+                    .setHostServices(hostServices);
 
-        stageAbout.setTitle(resourceBundle.getString("about_AboutName"));
-        stageAbout.getIcons().addAll(
-                new Image("/res/app_icon32x32.png"),
-                new Image("/res/app_icon48x48.png"),
-                new Image("/res/app_icon64x64.png"),
-                new Image("/res/app_icon128x128.png"));
-        stageAbout.setScene(new Scene(parentAbout, 500, 300));
-        stageAbout.show();
+            stageAbout.setTitle(resourceBundle.getString("about_AboutName"));
+            stageAbout.getIcons().addAll(
+                    new Image("/res/app_icon32x32.png"),
+                    new Image("/res/app_icon48x48.png"),
+                    new Image("/res/app_icon64x64.png"),
+                    new Image("/res/app_icon128x128.png"));
+            stageAbout.setScene(new Scene(parentAbout, 500, 300));
+            stageAbout.show();
+        }
+        catch (IOException ioException) {
+            log.error("Failed to open 'About' window", ioException);
+        }
     }
 }

@@ -48,4 +48,6 @@ public interface IPlayer {
     void volumeUp();
 
     void volumeDown();
+
+    void dispose();
 }

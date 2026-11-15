@@ -24,31 +24,42 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import mplayer4anime.AppPreferences;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ResourceBundle;
 
 public class SettingsWindow {
+    private static final Logger log = LoggerFactory.getLogger(SettingsWindow.class);
 
-    public SettingsWindow() throws Exception {
-        var stageAbout = new Stage();
-        stageAbout.setMinWidth(570);
-        stageAbout.setMinHeight(500);
+    public SettingsWindow(Runnable onApply) {
+        try {
+            var stageAbout = new Stage();
+            stageAbout.setMinWidth(570);
+            stageAbout.setMinHeight(500);
 
-        var loaderSettings = new FXMLLoader(getClass().getResource("/Settings/SettingsLayout.fxml"));
+            var loaderSettings = new FXMLLoader(getClass().getResource("/Settings/SettingsLayout.fxml"));
 
-        var resourceBundle = ResourceBundle.getBundle("locale", AppPreferences.get().getLocale());
-        loaderSettings.setResources(resourceBundle);
+            var resourceBundle = ResourceBundle.getBundle("locale", AppPreferences.get().getLocale());
+            loaderSettings.setResources(resourceBundle);
 
-        Parent parentAbout = loaderSettings.load();
+            Parent parentAbout = loaderSettings.load();
 
-        stageAbout.setTitle(resourceBundle.getString("settings_SettingsName"));
-        stageAbout.getIcons().addAll(
-                new Image("/res/settings_icon32x32.png"),
-                new Image("/res/settings_icon32x32.png"),
-                new Image("/res/settings_icon48x48.png"),
-                new Image("/res/settings_icon64x64.png"),
-                new Image("/res/settings_icon128x128.png"));
-        stageAbout.setScene(new Scene(parentAbout, 570, 500));
-        stageAbout.show();
+            ((SettingsController) loaderSettings.getController()).setOnApplyCallback(onApply);
+
+            stageAbout.setTitle(resourceBundle.getString("settings_SettingsName"));
+            stageAbout.getIcons().addAll(
+                    new Image("/res/settings_icon32x32.png"),
+                    new Image("/res/settings_icon32x32.png"),
+                    new Image("/res/settings_icon48x48.png"),
+                    new Image("/res/settings_icon64x64.png"),
+                    new Image("/res/settings_icon128x128.png"));
+            stageAbout.setScene(new Scene(parentAbout, 570, 500));
+            stageAbout.show();
+        }
+        catch (IOException ioException) {
+            log.error("Failed to open 'Settings' window", ioException);
+        }
     }
 }

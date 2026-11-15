@@ -20,13 +20,14 @@ package mplayer4anime.ui.settings;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import mplayer4anime.AppPreferences;
-import mplayer4anime.MediatorControl;
+import mplayer4anime.BackendEngine;
 import mplayer4anime.ui.LocaleHolder;
 import mplayer4anime.ui.ServiceWindow;
 import mplayer4anime.ui.SettingsLanguagesSetup;
@@ -36,8 +37,17 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class SettingsController implements Initializable {
-    private AppPreferences appPreferences;
+    private static final boolean IS_WINDOWS = System.getProperty("os.name").contains("Windows");
+    private static final String DEFAULT_PATH_WINDOWS = "mplayer\\mplayer.exe";
+    private static final String DEFAULT_PATH = "mplayer";
+
+    private final AppPreferences appPreferences = AppPreferences.get();
     private LocaleHolder recentLanguage;
+    private Runnable onApply;
+
+    public void setOnApplyCallback(Runnable onApply) {
+        this.onApply = onApply;
+    }
 
     @FXML
     private ControllerListsSelector subExtensionListController,
@@ -49,26 +59,42 @@ public class SettingsController implements Initializable {
     @FXML
     private CheckBox subtitlesFirstCheckBox, openLatestPlaylistCheckBox;
     @FXML
-    private ChoiceBox<String> backEndEngineChoiceBox;
+    private ChoiceBox<BackendEngine> backEndEngineChoiceBox;
     @FXML
     private ChoiceBox<LocaleHolder> languageChoiceBox;
+    @FXML
+    private Button findPathToMplayerBtn, clearPathBtn, okBtn, applyBtn, cancelBtn;
 
     @Override
     public void initialize(URL url, ResourceBundle resBundle) {
-        appPreferences = AppPreferences.get();
-        pathToMplayerLbl.setText(appPreferences.getPath());
+        bindButtons();
+        loadFromPreferences();
+        fillLanguageSelector();
+    }
 
-        // Subtitles should be shown first? If TRUE, then set checkbox.
+    private void bindButtons() {
+        findPathToMplayerBtn.setOnAction(_ -> findPathToPlayer());
+        clearPathBtn.setOnAction(_ -> clearPath());
+        okBtn.setOnAction(_ -> ok());
+        applyBtn.setOnAction(_ -> apply());
+        cancelBtn.setOnAction(_ -> close());
+    }
+
+    private void loadFromPreferences() {
+        pathToMplayerLbl.setText(appPreferences.getPath());
         subtitlesFirstCheckBox.setSelected(appPreferences.getSubtitlesFirst());
+        openLatestPlaylistCheckBox.setSelected(appPreferences.getOpenLatestPlaylistOnStart());
+
         // Fill lists of extensions and encodings
         subExtensionListController.setList(appPreferences.getSubsExtensionsList(), true);
         subEncodingListController.setList(appPreferences.getSubsEncodingList(), false);
         videoExtensionListController.setList(appPreferences.getVideoExtensionsList(), true);
         audioExtensionListController.setList(appPreferences.getAudioExtensionsList(), true);
-        backEndEngineChoiceBox.getItems().addAll("mplayer", "mpv");
-        backEndEngineChoiceBox.getSelectionModel().select(appPreferences.getBackendEngineIndexId());
-        openLatestPlaylistCheckBox.setSelected(appPreferences.getOpenLatestPlaylistOnStart());
+        backEndEngineChoiceBox.getItems().setAll(BackendEngine.values());
+        backEndEngineChoiceBox.getSelectionModel().select(appPreferences.getBackendEngine());
+    }
 
+    private void fillLanguageSelector() {
         // Fill the language selector with the locales available in the application
         var settingsLanguagesSetup = new SettingsLanguagesSetup();
         recentLanguage = settingsLanguagesSetup.getRecentLanguage();
@@ -76,13 +102,12 @@ public class SettingsController implements Initializable {
         languageChoiceBox.getSelectionModel().select(recentLanguage);
     }
 
-    @FXML
-    private void findPathToMplayer() {
+    private void findPathToPlayer() {
         var fileChooser = new FileChooser();
         fileChooser.setTitle("mplayer");
 
         // In case we use Windows, limit selectable file to .exe
-        if (System.getProperty("os.name").contains("Windows"))
+        if (IS_WINDOWS)
             fileChooser.getExtensionFilters().setAll(new FileChooser.ExtensionFilter("mplayer", "*.exe"));
 
         var mplayerExecutableFile = fileChooser.showOpenDialog(null);
@@ -91,38 +116,35 @@ public class SettingsController implements Initializable {
             pathToMplayerLbl.setText(mplayerExecutableFile.toString());
     }
 
-    @FXML
     private void clearPath() {
-        if (System.getProperty("os.name").contains("Windows"))
-            pathToMplayerLbl.setText("mplayer\\mplayer.exe");
-        else
-            pathToMplayerLbl.setText("mplayer");
+        pathToMplayerLbl.setText(IS_WINDOWS ?
+                DEFAULT_PATH_WINDOWS :
+                DEFAULT_PATH);
     }
 
-    @FXML
-    private void Cancel() {
+    private void ok() {
+        apply();
         close();
     }
 
-    @FXML
-    private void Ok() {
-        Apply();
-        close();
+    private void apply() {
+        storePreferences();
+        onApply.run();
+        applyLanguageChange();
     }
 
-    @FXML
-    private void Apply() {
+    private void storePreferences() {
         appPreferences.setPath(pathToMplayerLbl.getText());
         appPreferences.setSubtitlesFirst(subtitlesFirstCheckBox.isSelected());
         appPreferences.setSubsExtensionsList(subExtensionListController.getList());
         appPreferences.setSubsEncodingList(subEncodingListController.getList());
         appPreferences.setVideoExtensionsList(videoExtensionListController.getList());
         appPreferences.setAudioExtensionsList(audioExtensionListController.getList());
-        appPreferences.setBackendEngineIndexId(backEndEngineChoiceBox.getSelectionModel().getSelectedIndex());
+        appPreferences.setBackendEngine(backEndEngineChoiceBox.getValue());
         appPreferences.setOpenLatestPlaylistOnStart(openLatestPlaylistCheckBox.isSelected());
+    }
 
-        MediatorControl.getInstance().updateAfterSettingsChanged();    // TODO: implement list to track what should be updated
-
+    private void applyLanguageChange() {
         var localeHolder = languageChoiceBox.getSelectionModel().getSelectedItem();
         if (Objects.equals(recentLanguage, localeHolder))
             return;

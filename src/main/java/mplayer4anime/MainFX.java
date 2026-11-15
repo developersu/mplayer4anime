@@ -53,7 +53,6 @@ public class MainFX extends Application {
 
         LandingController landingController = loader.getController();
         landingController.setHostServices(getHostServices());
-
         var startArgument = getParameters().getUnnamed().isEmpty() ?
                 null : getParameters().getUnnamed().getFirst();
         var singleInstanceGuard = new SingleInstanceGuard();

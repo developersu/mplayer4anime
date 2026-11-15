@@ -213,12 +213,12 @@ public class AppPreferences {
         preferences.putDouble("window_height", value);
     }
 
-    public int getBackendEngineIndexId() {
-        return preferences.getInt("backend_player", 0);
+    public BackendEngine getBackendEngine() {
+        return BackendEngine.valueOf(preferences.get("backend", BackendEngine.MPLAYER.name()));
     }
 
-    public void setBackendEngineIndexId(int value) {
-        preferences.putInt("backend_player", value);
+    public void setBackendEngine(BackendEngine engine) {
+        preferences.put("backend", engine.name());
     }
 
     public String getRecentPlaylist() {

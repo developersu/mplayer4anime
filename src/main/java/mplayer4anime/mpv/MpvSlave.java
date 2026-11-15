@@ -86,4 +86,9 @@ public class MpvSlave implements IPlayer {
     public void volumeDown() {
 
     }
+
+    @Override
+    public void dispose() {
+        // TODO: stop the active mpv session once MpvProcess exposes lifecycle control
+    }
 }

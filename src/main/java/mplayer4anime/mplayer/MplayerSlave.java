@@ -88,16 +88,30 @@ public class MplayerSlave implements IPlayer {
                           String subtitlesEncoding,
                           boolean subtitlesHidden,
                           boolean isFullscreen){
+        dispose();
+        playPause(mplayerPath, VideoFile, AudioFile, SubtitlesFile, subtitlesEncoding, subtitlesHidden, isFullscreen);
+    }
+
+    @Override
+    public void dispose(){
+        if (player == null)
+            return;
         try {
-            if (player != null && player.isAlive()){
+            if (player.isAlive()) {
                 playerSingleCommand("quit");
-                player.waitFor(500, TimeUnit.MILLISECONDS);
-                player.destroyForcibly();
+                if (!player.waitFor(1, TimeUnit.SECONDS))
+                    player.destroyForcibly();
             }
-            playPause(mplayerPath, VideoFile, AudioFile, SubtitlesFile, subtitlesEncoding, subtitlesHidden, isFullscreen);
         }
-        catch (InterruptedException e){
-            log.error("Interrupted while restarting mplayer", e);
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            player.destroyForcibly();
+            log.error("Interrupted while disposing mplayer process", e);
+        }
+        finally {
+            player = null;
+            playerIn = null;
+            playerOutErr = null;
         }
     }
     @Override

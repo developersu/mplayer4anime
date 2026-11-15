@@ -27,6 +27,7 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.SplitMenuButton;
 import mplayer4anime.AppPreferences;
 import mplayer4anime.IPlayer;
+import mplayer4anime.player.PlayerService;
 import mplayer4anime.ui.landing.panes.ControllerPane;
 import mplayer4anime.ui.landing.panes.ControllerPaneSubtitles;
 
@@ -44,9 +45,14 @@ public class PlayerToolbarController implements Initializable {
     private SplitMenuButton subsTriggerBtn, fullscreenBtn;
 
     private AppPreferences appPreferences;
-    private IPlayer player;
+    private PlayerService playerService;
     private ControllerPane mkvPaneController, mkaPaneController;
     private ControllerPaneSubtitles subPaneController;
+
+    // Player is resolved at the moment of each action
+    private IPlayer player() {
+        return playerService.getPlayer();
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -55,22 +61,22 @@ public class PlayerToolbarController implements Initializable {
         fullScreen.setSelected(appPreferences.getFullScreenSelected());
         subsHide.setSelected(appPreferences.getSubtitlesHideSelected());
 
-        stopBtn.setOnAction(_ -> player.stop());
-        volumeUpBtn.setOnAction(_ -> player.volumeUp());
-        volumeDownBtn.setOnAction(_ -> player.volumeDown());
-        muteBtn.setOnAction(_ -> player.mute());
+        stopBtn.setOnAction(_ -> player().stop());
+        volumeUpBtn.setOnAction(_ -> player().volumeUp());
+        volumeDownBtn.setOnAction(_ -> player().volumeDown());
+        muteBtn.setOnAction(_ -> player().mute());
         playBtn.setOnAction(_ -> play());
         playPrevTrackBtn.setOnAction(_ -> playPrevTrack());
         playNextTrackBtn.setOnAction(_ -> playNextTrack());
-        subsTriggerBtn.setOnAction(_ -> player.subtitlesSwitch());
-        fullscreenBtn.setOnAction(_ -> player.fullscreenSwitch());
+        subsTriggerBtn.setOnAction(_ -> player().subtitlesSwitch());
+        fullscreenBtn.setOnAction(_ -> player().fullscreenSwitch());
     }
 
-    public void initializeMainUiController(IPlayer player,
+    public void initializeMainUiController(PlayerService playerService,
                                            ControllerPane mkvPaneController,
                                            ControllerPane mkaPaneController,
                                            ControllerPaneSubtitles subPaneController) {
-        this.player = player;
+        this.playerService = playerService;
         this.mkvPaneController = mkvPaneController;
         this.mkaPaneController = mkaPaneController;
         this.subPaneController = subPaneController;
@@ -103,7 +109,7 @@ public class PlayerToolbarController implements Initializable {
         if (mkvPaneController.getSelectedAbsolutePath() == null)
             return;
 
-        player.playPause(appPreferences.getPath(),
+        player().playPause(appPreferences.getPath(),
                 mkvPaneController.getSelectedAbsolutePath(),
                 mkaPaneController.getSelectedAbsolutePath(),
                 subPaneController.getSelectedAbsolutePath(),
@@ -128,7 +134,7 @@ public class PlayerToolbarController implements Initializable {
         if (index > 0)
             subPaneController.setSelected(index - 1);
 
-        player.forcePlay(appPreferences.getPath(),
+        player().forcePlay(appPreferences.getPath(),
                 mkvPaneController.getSelectedAbsolutePath(),
                 mkaPaneController.getSelectedAbsolutePath(),
                 subPaneController.getSelectedAbsolutePath(),
@@ -153,7 +159,7 @@ public class PlayerToolbarController implements Initializable {
         if (index < subPaneController.getElementsSize())
             subPaneController.setSelected(index);
 
-        player.forcePlay(appPreferences.getPath(),
+        player().forcePlay(appPreferences.getPath(),
                 mkvPaneController.getSelectedAbsolutePath(),
                 mkaPaneController.getSelectedAbsolutePath(),
                 subPaneController.getSelectedAbsolutePath(),
