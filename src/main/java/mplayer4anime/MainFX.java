@@ -27,7 +27,7 @@ import javafx.stage.Stage;
 import mplayer4anime.ipc.SingleInstanceGuard;
 import mplayer4anime.ui.landing.LandingController;
 
-import java.util.ResourceBundle;
+import static java.util.ResourceBundle.getBundle;
 
 //TODO: Use one copy of AppPreferences object widely
 //TODO: Drag-n-drop playlist/files/audio
@@ -46,7 +46,7 @@ public class MainFX extends Application {
         var preferences = AppPreferences.get();
 
         var userLocale = preferences.getLocale();
-        var resourceBundle = ResourceBundle.getBundle("locale", userLocale);
+        var resourceBundle = getBundle("locale", userLocale);
         loader.setResources(resourceBundle);
 
         Parent root = loader.load();
@@ -71,7 +71,7 @@ public class MainFX extends Application {
                 new Image("/res/app_icon48x48.png"),
                 new Image("/res/app_icon64x64.png"),
                 new Image("/res/app_icon128x128.png"));
-        primaryStage.setTitle("mplayer4anime");
+        primaryStage.setTitle("mplayer4anime "+getBundle("app").getString("_version"));
         primaryStage.setMinWidth(500);
         primaryStage.setMinHeight(375);
         var scene = new Scene(root,

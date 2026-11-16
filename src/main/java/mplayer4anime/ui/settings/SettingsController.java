@@ -98,7 +98,6 @@ public class SettingsController implements Initializable {
     }
 
     private void fillLanguageSelector() {
-        // Fill the language selector with the locales available in the application
         var settingsLanguagesSetup = new SettingsLanguagesSetup();
         recentLanguage = settingsLanguagesSetup.getRecentLanguage();
         languageChoiceBox.setItems(settingsLanguagesSetup.getLanguages());

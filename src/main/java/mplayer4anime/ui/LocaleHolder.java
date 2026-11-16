@@ -29,9 +29,9 @@ public class LocaleHolder {
     public LocaleHolder(String localeFileName) {
         var language = localeFileName.substring(7, 9);
         var country = localeFileName.substring(10, 12);
-        this.locale = Locale.of(language, country);
-        this.localeCode = locale.toString();
-        this.languageName = locale.getDisplayLanguage(locale) + " (" + locale + ")";
+        locale = Locale.of(language, country);
+        localeCode = locale.toString();
+        languageName = locale.getDisplayLanguage(locale) + " (" + locale + ")";
     }
 
     @Override
