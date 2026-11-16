@@ -29,16 +29,14 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import mplayer4anime.AppPreferences;
+import mplayer4anime.player.PlayerService;
 import mplayer4anime.playlists.JsonStorage;
 import mplayer4anime.playlists.Playlists;
-import mplayer4anime.player.PlayerService;
 import mplayer4anime.ui.ServiceWindow;
 import mplayer4anime.ui.about.AboutWindow;
 import mplayer4anime.ui.landing.panes.ControllerPane;
 import mplayer4anime.ui.landing.panes.ControllerPaneSubtitles;
 import mplayer4anime.ui.settings.SettingsWindow;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
@@ -47,8 +45,6 @@ import java.util.ResourceBundle;
 import static mplayer4anime.ui.landing.panes.PaneType.*;
 
 public class LandingController implements Initializable {
-
-    private static final Logger log = LoggerFactory.getLogger(LandingController.class);
 
     private static final int MAX_RECENT_PLAYLISTS = 10;
 

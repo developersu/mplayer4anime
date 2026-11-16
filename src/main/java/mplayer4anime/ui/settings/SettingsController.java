@@ -36,6 +36,9 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
+import static mplayer4anime.ui.settings.ListSelectorController.InputMode.ENCODING;
+import static mplayer4anime.ui.settings.ListSelectorController.InputMode.EXTENSION;
+
 public class SettingsController implements Initializable {
     private static final boolean IS_WINDOWS = System.getProperty("os.name").contains("Windows");
     private static final String DEFAULT_PATH_WINDOWS = "mplayer\\mplayer.exe";
@@ -50,7 +53,7 @@ public class SettingsController implements Initializable {
     }
 
     @FXML
-    private ControllerListsSelector subExtensionListController,
+    private ListSelectorController subExtensionListController,
             subEncodingListController,
             videoExtensionListController,
             audioExtensionListController;
@@ -86,10 +89,10 @@ public class SettingsController implements Initializable {
         openLatestPlaylistCheckBox.setSelected(appPreferences.getOpenLatestPlaylistOnStart());
 
         // Fill lists of extensions and encodings
-        subExtensionListController.setList(appPreferences.getSubsExtensionsList(), true);
-        subEncodingListController.setList(appPreferences.getSubsEncodingList(), false);
-        videoExtensionListController.setList(appPreferences.getVideoExtensionsList(), true);
-        audioExtensionListController.setList(appPreferences.getAudioExtensionsList(), true);
+        subExtensionListController.configure(appPreferences.getSubsExtensionsList(), EXTENSION);
+        subEncodingListController.configure(appPreferences.getSubsEncodingList(), ENCODING);
+        videoExtensionListController.configure(appPreferences.getVideoExtensionsList(), EXTENSION);
+        audioExtensionListController.configure(appPreferences.getAudioExtensionsList(), EXTENSION);
         backEndEngineChoiceBox.getItems().setAll(BackendEngine.values());
         backEndEngineChoiceBox.getSelectionModel().select(appPreferences.getBackendEngine());
     }
