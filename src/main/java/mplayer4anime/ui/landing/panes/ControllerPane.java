@@ -28,6 +28,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 import mplayer4anime.AppPreferences;
@@ -37,6 +38,9 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
 
+import static javafx.scene.input.MouseEvent.*;
+import static mplayer4anime.ui.landing.panes.ControllerListCell.PreviewMode.*;
+
 public class ControllerPane implements Initializable {
     private static String folderToOpen = System.getProperty("user.home");
 
@@ -45,6 +49,14 @@ public class ControllerPane implements Initializable {
 
     private final ObservableList<File> paneFileList = FXCollections.observableArrayList();
     private PaneType paneType;
+
+    // --- Reorder-drag state
+    // Index of the entry being dragged; -1 when not dragging
+    private int dragFromIndex = -1;
+    // Cell of the entry being dragged
+    private ControllerListCell sourceCell;
+    // Cell currently showing the insertion marker
+    private ControllerListCell markerCell;
 
     @FXML
     private ListView<File> paneListView;
@@ -67,7 +79,7 @@ public class ControllerPane implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
 
-        paneListView.setCellFactory(_ -> new ControllerListCell());
+        paneListView.setCellFactory(_ -> new ControllerListCell(this));
         paneListView.setItems(paneFileList);
         preferences = AppPreferences.get();
 
@@ -78,6 +90,69 @@ public class ControllerPane implements Initializable {
         paneBtnDown.setOnAction(_ -> down());
         paneBtnDelete.setOnAction(_ -> delete());
         paneListView.setOnKeyPressed(this::keyPressed);
+
+        // Fallback handlers for drops in the empty area below the last entry
+        // (the cells handle drops over themselves and consume the events)
+        paneListView.setOnMouseDragOver(_ -> {
+            if (isDragging())
+                dragOverEmpty();
+        });
+        paneListView.setOnMouseDragReleased(_ -> {
+            if (isDragging())
+                dropAtEnd();
+        });
+
+        // While the drag is in progress and the pointer leaves the list area
+        // (button row, another pane, ...), hide the insertion marker; the
+        // dragged entry stays marked and the drag continues when the cursor
+        // comes back.
+        paneListView.sceneProperty().addListener((_, _, scene) -> {
+            if (scene == null)
+                return;
+            scene.addEventFilter(MOUSE_DRAGGED, e -> {
+                if (!isDragging() || isInsideList(e))
+                    return; // over the list — cells handle the preview
+                clearMarker();
+            });
+
+            // The pointer left the window: no further mouse events arrive
+            // until it re-enters — hide the insertion marker right away.
+            scene.addEventFilter(MOUSE_EXITED, _ -> {
+                if (isDragging())
+                    clearMarker();
+            });
+
+            // If the button is released outside the list area (over the
+            // button row, another pane, or outside the window entirely), no
+            // MOUSE_DRAG_RELEASED reaches the list view — cancel the drag
+            // and clear the preview.
+            //
+            // The check is by pointer position, not by event target: when the
+            // release happens outside the scene, the scene dispatches it to
+            // the pressed node (the drag source), so the target would always
+            // be inside the list while the pointer is not.
+            scene.addEventFilter(MOUSE_RELEASED, e -> {
+                if (!isDragging() || isInsideList(e))
+                    return;
+                resetDrag();
+            });
+
+            // If the pointer leaves the window, no events are dispatched at
+            // all. If the button was released while it was outside, the
+            // release is never delivered and the drag is orphaned; the first
+            // event on re-entry reveals it:
+            // - MOUSE_ENTERED without the button pressed,
+            // - any MOUSE_MOVED (a pressed-button move would be
+            //   MOUSE_DRAGGED).
+            scene.addEventFilter(MOUSE_ENTERED, e -> {
+                if (isDragging() && !e.isPrimaryButtonDown())
+                    resetDrag();
+            });
+            scene.addEventFilter(MOUSE_MOVED, _ -> {
+                if (isDragging())
+                    resetDrag();
+            });
+        });
     }
 
     public ObservableList<File> getPaneFileList() {
@@ -205,5 +280,177 @@ public class ControllerPane implements Initializable {
 
     private String str(String key) {
         return resourceBundle.getString(key);
+    }
+
+    // --- Reorder drag & drop (called by ControllerListCell)
+
+    /**
+     * Called by the cell when a drag on its entry starts.
+     */
+    void beginDrag(int index) {
+        dragFromIndex = index;
+        sourceCell = cellByIndex(index);
+        if (sourceCell != null)
+            sourceCell.setPreview(DRAGGING);
+    }
+
+    /**
+     * @return whether a drag is currently in progress in this pane.
+     */
+    boolean isDragging() {
+        return dragFromIndex >= 0;
+    }
+
+    /**
+     * Called by the cell while the cursor is over its entry.
+     *
+     * @param index        the index of the entry under the cursor
+     * @param cursorSceneY the cursor Y coordinate in scene coordinates
+     */
+    void dragOver(int index, double cursorSceneY) {
+        showInsertionMarker(insertionPosition(index, cursorSceneY));
+    }
+
+    /**
+     * Called while the cursor is in the empty area below the last entry.
+     */
+    void dragOverEmpty() {
+        showInsertionMarker(paneFileList.size());
+    }
+
+    /**
+     * Called by the cell when the drag is released over its entry.
+     *
+     * @param index        the index of the entry under the cursor
+     * @param cursorSceneY the cursor Y coordinate in scene coordinates
+     */
+    void dropAt(int index, double cursorSceneY) {
+        finishDrag(insertionPosition(index, cursorSceneY));
+    }
+
+    /**
+     * Called when the drag is released in the empty area below the last entry.
+     */
+    void dropAtEnd() {
+        finishDrag(paneFileList.size());
+    }
+
+    private void finishDrag(int insertion) {
+        var from = dragFromIndex;
+        clearPreviews();
+        dragFromIndex = -1;
+
+        if (from < 0 || from >= paneFileList.size() ||
+                insertion < 0 || insertion > paneFileList.size())
+            return;
+
+        // The insertion gap is defined with the dragged entry still in the
+        // list, so moving it down by one slot keeps the same gap
+        var to = insertion > from ?
+                insertion - 1 :
+                insertion;
+        if (to == from)
+            return;
+
+        paneFileList.add(to, paneFileList.remove(from));
+        paneListView.getSelectionModel().clearAndSelect(to);
+    }
+
+    /**
+     * @return the insertion gap (0..size) the cursor points at:
+     * <br/>upper half of entry → "insert before it"
+     * <br/>lower half of entry → "insert after it"
+     */
+    private int insertionPosition(int index, double cursorSceneY) {
+        var size = paneFileList.size();
+        if (index < 0 || index >= size)
+            return size;
+        return inUpperHalf(cellByIndex(index), cursorSceneY) ? index : index + 1;
+    }
+
+    private boolean inUpperHalf(ControllerListCell cell, double cursorSceneY) {
+        if (cell == null)
+            return false;
+        var bounds = cell.getBoundsInLocal();
+        var top = cell.localToScene(0, bounds.getMinY());
+        var bottom = cell.localToScene(0, bounds.getMaxY());
+        return cursorSceneY < (top.getY() + bottom.getY()) / 2;
+    }
+
+    /**
+     * Shows the live drop preview: a line at the gap where the dragged entry
+     * will be inserted (on the cell just below the gap, or below the last
+     * cell when the gap is at the end of the list).
+     */
+    private void showInsertionMarker(int gap) {
+        clearMarker();
+
+        var size = paneFileList.size();
+        if (size == 0)
+            return;
+
+        gap = Math.clamp(gap, 0, size);
+        markerCell = cellByIndex(gap < size ? gap : size - 1);
+        if (markerCell != null)
+            markerCell.setPreview(gap < size ? INSERT_ABOVE : INSERT_BELOW);
+    }
+
+    /**
+     * Removes the insertion marker, keeping the dragged entry marked.
+     */
+    private void clearMarker() {
+        if (markerCell == null || markerCell.getPreview() == NONE)
+            return;
+        if (markerCell == sourceCell) // marker drawn on source cell → restore its dragging look
+            markerCell.setPreview(DRAGGING);
+        else
+            markerCell.setPreview(NONE);
+        markerCell = null;
+    }
+
+    /**
+     * Cancels the drag in progress: clears all preview state and leaves the
+     * list unchanged.
+     */
+    private void resetDrag() {
+        clearPreviews();
+        dragFromIndex = -1;
+    }
+
+    /**
+     * Removes the marker and the dragging mark of the dragged entry.
+     */
+    private void clearPreviews() {
+        clearMarker();
+        if (sourceCell != null) {
+            if (sourceCell.getPreview() != NONE)
+                sourceCell.setPreview(NONE);
+            sourceCell = null;
+        }
+    }
+
+    /**
+     * @return the currently visible cell with the given index, or null.
+     */
+    private ControllerListCell cellByIndex(int index) {
+        for (var node : paneListView.lookupAll(".list-cell")) {
+            if (node instanceof ControllerListCell cell && cell.getIndex() == index)
+                return cell;
+        }
+        return null;
+    }
+
+    /**
+     * @return whether the pointer position carried by the event is inside
+     * the list view's bounds in scene coordinates.
+     */
+    private boolean isInsideList(MouseEvent e) {
+        var bounds = paneListView.getBoundsInLocal();
+        var topLeft = paneListView.localToScene(bounds.getMinX(), bounds.getMinY());
+        var bottomRight = paneListView.localToScene(bounds.getMaxX(), bounds.getMaxY());
+        return e.getSceneX() >= Math.min(topLeft.getX(), bottomRight.getX()) &&
+               e.getSceneX() <= Math.max(topLeft.getX(), bottomRight.getX()) &&
+               e.getSceneY() >= Math.min(topLeft.getY(), bottomRight.getY()) &&
+               e.getSceneY() <= Math.max(topLeft.getY(), bottomRight.getY());
     }
 }
