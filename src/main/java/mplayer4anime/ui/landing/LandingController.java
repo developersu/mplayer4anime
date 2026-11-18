@@ -151,6 +151,8 @@ public class LandingController implements Initializable {
     public void shutdown() {
         appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getEncoding());
         playerToolbarController.shutdown();
+        // Stop the player so its window (e.g. the mpv one) closes together with the app
+        playerService.dispose();
         // TODO: remove from here; too sophisticated
         var storeRecentArr = new String[10];
         for (var i = 0; i < recentlyOpenedMenu.getItems().size() - 2 && !(i > 9); i++) {       // Don't take separator and Clean button

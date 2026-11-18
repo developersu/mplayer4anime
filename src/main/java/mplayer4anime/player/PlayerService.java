@@ -39,6 +39,13 @@ public class PlayerService {
         return player;
     }
 
+    public void dispose() {
+        if (player != null) {
+            player.dispose();
+            player = null;
+        }
+    }
+
     public void switchEngine(BackendEngine engine) {
         if (engine == currentEngine)
             return;

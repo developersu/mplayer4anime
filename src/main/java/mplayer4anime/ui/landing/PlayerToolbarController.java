@@ -27,6 +27,7 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.SplitMenuButton;
 import mplayer4anime.AppPreferences;
 import mplayer4anime.IPlayer;
+import mplayer4anime.PlayRequest;
 import mplayer4anime.player.PlayerService;
 import mplayer4anime.ui.landing.panes.ControllerPane;
 import mplayer4anime.ui.landing.panes.ControllerPaneSubtitles;
@@ -109,14 +110,7 @@ public class PlayerToolbarController implements Initializable {
         if (mkvPaneController.getSelectedAbsolutePath() == null)
             return;
 
-        player().playPause(appPreferences.getPath(),
-                mkvPaneController.getSelectedAbsolutePath(),
-                mkaPaneController.getSelectedAbsolutePath(),
-                subPaneController.getSelectedAbsolutePath(),
-                subPaneController.getEncoding(),
-                subsHide.isSelected(),
-                fullScreen.isSelected()
-        );
+        player().playPause(request());
     }
 
     private void playPrevTrack() {
@@ -134,14 +128,7 @@ public class PlayerToolbarController implements Initializable {
         if (index > 0)
             subPaneController.setSelected(index - 1);
 
-        player().forcePlay(appPreferences.getPath(),
-                mkvPaneController.getSelectedAbsolutePath(),
-                mkaPaneController.getSelectedAbsolutePath(),
-                subPaneController.getSelectedAbsolutePath(),
-                subPaneController.getEncoding(),
-                subsHide.isSelected(),
-                fullScreen.isSelected()
-        );
+        player().forcePlay(request());
     }
 
     private void playNextTrack() {
@@ -159,7 +146,12 @@ public class PlayerToolbarController implements Initializable {
         if (index < subPaneController.getElementsSize())
             subPaneController.setSelected(index);
 
-        player().forcePlay(appPreferences.getPath(),
+        player().forcePlay(request());
+    }
+
+    // Everything the player needs to (re)start the selected track.
+    private PlayRequest request() {
+        return new PlayRequest(
                 mkvPaneController.getSelectedAbsolutePath(),
                 mkaPaneController.getSelectedAbsolutePath(),
                 subPaneController.getSelectedAbsolutePath(),

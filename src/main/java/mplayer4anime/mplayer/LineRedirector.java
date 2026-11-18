@@ -23,6 +23,12 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 
+/**
+ * A pure pump: forwards lines from the player's stdout/stderr into the
+ * shared output stream. It never closes that stream — the owner
+ * ({@link MplayerSlave}) closes it exactly once, in {@code dispose()},
+ * so the stream is not broken while a command reply is being read.
+ */
 public class LineRedirector extends Thread {
     private static final Logger log = LoggerFactory.getLogger(LineRedirector.class);
 
@@ -36,7 +42,10 @@ public class LineRedirector extends Thread {
 
     public void run() {
         try (var bufferReader = new BufferedReader(new InputStreamReader(inStream))) {
-            var printStream = new PrintStream(outStream);
+            // Flush after every line: the reader side (MplayerSlave) waits
+            // for specific ANS_* lines and must not block until the
+            // PrintStream's internal buffer happens to fill up.
+            var printStream = new PrintStream(outStream, true);
             String playerOutput;
             while ((playerOutput = bufferReader.readLine()) != null) {
                 printStream.println(playerOutput);
@@ -45,6 +54,5 @@ public class LineRedirector extends Thread {
         catch (IOException e) {
             log.warn("Error redirecting player output stream", e);
         }
-
     }
 }

@@ -1,6 +1,6 @@
 /*
     Copyright 2018-2026 Dmitry Isaenko
-     
+    
     This file is part of mplayer4anime.
 
     mplayer4anime is free software: you can redistribute it and/or modify
@@ -18,7 +18,9 @@
  */
 package mplayer4anime.mplayer;
 
+import mplayer4anime.AppPreferences;
 import mplayer4anime.IPlayer;
+import mplayer4anime.PlayRequest;
 import mplayer4anime.ui.ServiceWindow;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.ResourceBundle;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Stream;
 
 public class MplayerSlave implements IPlayer {
     private static final Logger log = LoggerFactory.getLogger(MplayerSlave.class);
@@ -33,67 +36,141 @@ public class MplayerSlave implements IPlayer {
     private Process player;
     private PrintStream playerIn;
     private BufferedReader playerOutErr;
+    // Sole owner of the shared pipe writer: the pumps never close it,
+    // only dispose() does, so reading from playerOutErr is not broken
+    // by a premature EOF while a command reply is awaited.
+    private PipedOutputStream playerOutErrWriter;
+    private boolean paused = false;
 
     private final ResourceBundle resourceBundle;
 
-    public MplayerSlave(ResourceBundle resourceBundle){
+    public MplayerSlave(ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
     }
 
-    private boolean playerSingleCommand(String command){
-        if (player == null || ! player.isAlive())
+    private boolean playerSingleCommand(String command) {
+        if (player == null || !player.isAlive())
             return false;
+
+        // In mplayer any slave command that arrives while paused resumes playback before it is executed.
+        // Prefixing with pausing_keep_force makes the command run and  keep the pause. `pause` itself must
+        // stay unprefixed: it is the toggle (mplayer drops the `pause` command that breaks out of the pause
+        // loop, so it resumes while paused).
+        if (paused && !"pause".equals(command))
+            command = "pausing_keep_force " + command;
 
         playerIn.print(command);
         playerIn.print("\n");
         playerIn.flush();
         return true;
     }
+
     @Override
-    public void subtitlesSwitch(){
-        if (! playerSingleCommand("get_sub_visibility"))
+    public void subtitlesSwitch() {
+        if (!playerSingleCommand("get_sub_visibility"))
             return;
 
         try {
             String returnedStr;
             var returnedInt = 1;
-            while ((returnedStr = playerOutErr.readLine()) != null) {
+            while (player.isAlive() && (returnedStr = playerOutErr.readLine()) != null) {
                 if (returnedStr.startsWith("ANS_SUB_VISIBILITY=")) {
                     returnedInt = Integer.parseInt(returnedStr.substring("ANS_SUB_VISIBILITY=".length()));
                     break;
                 }
             }
-            if (returnedInt == 1)
-                playerSingleCommand("sub_visibility 0");
-            else
-                playerSingleCommand("sub_visibility 1");
+            playerSingleCommand("sub_visibility %d".formatted((returnedInt == 1) ? 0 : 1));
         }
         catch (IOException e) {
             log.error("Can't determine whether subtitles enabled or disabled", e);
         }
     }
+
     @Override
-    public void fullscreenSwitch(){
+    public void fullscreenSwitch() {
         playerSingleCommand("vo_fullscreen");
-    }
-    @Override
-    public void mute(){
-        playerSingleCommand("mute");
-    }
-    @Override
-    public void forcePlay(String mplayerPath,
-                          String VideoFile,
-                          String AudioFile,
-                          String SubtitlesFile,
-                          String subtitlesEncoding,
-                          boolean subtitlesHidden,
-                          boolean isFullscreen){
-        dispose();
-        playPause(mplayerPath, VideoFile, AudioFile, SubtitlesFile, subtitlesEncoding, subtitlesHidden, isFullscreen);
     }
 
     @Override
-    public void dispose(){
+    public void mute() {
+        playerSingleCommand("mute");
+    }
+
+    @Override
+    public void forcePlay(PlayRequest request) {
+        dispose();
+        playPause(request);
+    }
+
+    @Override
+    public void playPause(PlayRequest request) {
+        if (togglePause())
+            return;
+
+        var isAudio = request.audio() != null;
+        var isSubtitles = request.subtitles() != null;
+        var SubEncodingDefault = request.subtitlesEncoding().equals("default");
+
+        try {
+            var args = Stream.of(
+                AppPreferences.get().getPath(),   // It's a chance for Windows ;)
+                "-slave",
+                isAudio ? "-audiofile" : "",
+                isAudio ? request.audio() : "",
+                "-quiet",
+                request.fullscreen() ? "-fs" : "",
+                request.video(),
+                request.subtitlesHidden() || isSubtitles ? "-nosub" : "",  // Turn off MKV-embedded subtitles and use external if needed
+                isSubtitles ? "-sub" : "",
+                isSubtitles ? request.subtitles() : "",
+                isSubtitles && !SubEncodingDefault ? "-subcp" : "",       // Use subtitles? Then check if encoding should be set
+                isSubtitles && !SubEncodingDefault ? request.subtitlesEncoding() : ""
+            ).toList();
+
+            player = new ProcessBuilder(args).start();
+            paused = false;
+
+            var readFrom = new PipedInputStream(256 * 1024);
+            playerOutErrWriter = new PipedOutputStream(readFrom);
+
+            playerOutErr = new BufferedReader(new InputStreamReader(readFrom));
+
+            new LineRedirector(player.getInputStream(), playerOutErrWriter).start();
+            new LineRedirector(player.getErrorStream(), playerOutErrWriter).start();
+
+            playerIn = new PrintStream(player.getOutputStream());
+
+            /* If the user selected a subtitle file in the SUB pane but wants it hidden, the file is
+             * still passed to mplayer at startup (see -sub above) and turned off right after.
+             * It must be loaded at startup, otherwise it could not be enabled later.
+             */
+            if (request.subtitlesHidden())
+                playerSingleCommand("sub_visibility 0");
+        }
+        catch (IOException e) {
+            ServiceWindow.getErrorNotification(resourceBundle.getString("Error"),
+                    resourceBundle.getString("ErrorUnableToStartMplayer"));
+        }
+    }
+
+    @Override
+    public void stop() {
+        playerSingleCommand("stop");
+        paused = false;
+    }
+
+    @Override
+    public void volumeUp() {
+        playerSingleCommand("volume +1 0");
+    }
+
+    @Override
+    public void volumeDown() {
+        playerSingleCommand("volume -1 0");
+    }
+
+    @Override
+    public void dispose() {
         if (player == null)
             return;
         try {
@@ -112,79 +189,28 @@ public class MplayerSlave implements IPlayer {
             player = null;
             playerIn = null;
             playerOutErr = null;
+            paused = false;
+            if (playerOutErrWriter != null) {
+                try {
+                    playerOutErrWriter.close();
+                }
+                catch (IOException e) {
+                    log.warn("Could not close the mplayer output pipe", e);
+                }
+                playerOutErrWriter = null;
+            }
         }
     }
-    @Override
-    public boolean pause(){
+
+    // The Play button toggles pause when a player is already running.
+    // mplayer's `pause` command is a true toggle on this build: it
+    // pauses while playing and resumes while paused, so the app just
+    // mirrors the state it requested.
+    private boolean togglePause() {
         if (player == null || !player.isAlive())
             return false;
-        playerIn.print("pause");
-        playerIn.print("\n");
-        playerIn.flush();
+        playerSingleCommand("pause");
+        paused = !paused;
         return true;
-    }
-    @Override
-    public void playPause(String mplayerPath,
-                          String VideoFile,
-                          String AudioFile,
-                          String SubtitlesFile,
-                          String subtitlesEncoding,
-                          boolean subtitlesHidden,
-                          boolean isFullscreen){
-        if (pause())
-            return;
-
-        var isAudio = AudioFile != null;
-        var isSubtitles = SubtitlesFile != null;
-        var SubEncodingDefault = subtitlesEncoding.equals("default");
-
-        try {
-            player = new ProcessBuilder(                        // FUCKING MAGIC! DON'T CHANGE SEQUENCE
-                    mplayerPath,        // It's a chance for Windows ;)
-                    "-slave",
-                    isAudio?"-audiofile":"",
-                    isAudio?AudioFile:"",
-                    "-quiet",
-                    isFullscreen ? "-fs" : "",
-                    VideoFile,
-                    subtitlesHidden||isSubtitles?"-nosub":"",      // Turn off subtitles embedded into MKV file (and replace by localy-stored subs file if needed)
-                    isSubtitles?"-sub":"",
-                    isSubtitles? SubtitlesFile:"",
-                    isSubtitles?SubEncodingDefault?"":"-subcp":"",                           // Use subtitles -> YES -> Check if we need encoding
-                    isSubtitles?SubEncodingDefault?"": subtitlesEncoding:""
-            ).start();
-
-            var readFrom = new PipedInputStream(256 * 1024);
-            var writeTo = new PipedOutputStream(readFrom);
-
-            playerOutErr = new BufferedReader(new InputStreamReader(readFrom));
-
-            new LineRedirector(player.getInputStream(), writeTo).start();
-            new LineRedirector(player.getErrorStream(), writeTo).start();
-
-            playerIn = new PrintStream(player.getOutputStream());
-
-            /* If user desired to disable subtitles but populated the list in the SUB pane, then load them and disable visibility.
-             * It should be done this way because if we didn't pass them to mplayer during start then user won't be able to enable them later on.
-             * There is another bike could be implemented such as passing input file during load but it's far more dumb idea than current implementation.
-             */
-            if (subtitlesHidden)
-                playerSingleCommand("sub_visibility 0");
-        }
-        catch (IOException e) {
-            ServiceWindow.getErrorNotification(resourceBundle.getString("Error"), resourceBundle.getString("ErrorUnableToStartMplayer"));
-        }
-    }
-    @Override
-    public void stop(){
-        playerSingleCommand("stop");
-    }
-    @Override
-    public void volumeUp(){
-        playerSingleCommand("volume +1 0");
-    }
-    @Override
-    public void volumeDown(){
-        playerSingleCommand("volume -1 0");
     }
 }

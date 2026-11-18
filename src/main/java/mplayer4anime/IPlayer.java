@@ -25,23 +25,9 @@ public interface IPlayer {
 
     void mute();
 
-    void forcePlay(String mplayerPath,
-                   String VideoFile,
-                   String AudioFile,
-                   String SubtitlesFile,
-                   String subtitlesEncoding,
-                   boolean subtitlesHidden,
-                   boolean isFullscreen);
+    void forcePlay(PlayRequest request);
 
-    boolean pause();
-
-    void playPause(String mplayerPath,
-                   String VideoFile,
-                   String AudioFile,
-                   String SubtitlesFile,
-                   String subtitlesEncoding,
-                   boolean subtitlesHidden,
-                   boolean isFullscreen);
+    void playPause(PlayRequest request);
 
     void stop();
 
