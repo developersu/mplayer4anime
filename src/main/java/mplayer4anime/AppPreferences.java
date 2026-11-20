@@ -196,6 +196,14 @@ public class AppPreferences {
         }
     }
 
+    public boolean getAutoImportExternalFiles() {
+        return preferences.getBoolean("AUTO_IMPORT_EXTERNAL_FILES", true);
+    }
+
+    public void setAutoImportExternalFiles(boolean set) {
+        preferences.putBoolean("AUTO_IMPORT_EXTERNAL_FILES", set);
+    }
+
     // Window size
     public double getSceneWidth() {
         return preferences.getDouble("window_width", 1200.0);

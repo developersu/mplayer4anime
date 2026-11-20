@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="8.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="mplayer4anime.ui.CollectionSelectionDialogController">
+   <children>
+      <Label fx:id="messageLbl" wrapText="true" />
+      <ListView fx:id="listView" prefHeight="260.0" prefWidth="520.0" VBox.vgrow="ALWAYS" />
+   </children>
+</VBox>

@@ -37,6 +37,7 @@ import java.io.File;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import static javafx.scene.input.MouseEvent.*;
 import static mplayer4anime.ui.landing.panes.ControllerListCell.PreviewMode.*;
@@ -57,6 +58,9 @@ public class ControllerPane implements Initializable {
     private ControllerListCell sourceCell;
     // Cell currently showing the insertion marker
     private ControllerListCell markerCell;
+    // Notified when the user adds files to this pane manually
+    // (via the 'open directory' or 'open files' buttons)
+    private Consumer<File[]> onFilesAdded;
 
     @FXML
     private ListView<File> paneListView;
@@ -155,6 +159,10 @@ public class ControllerPane implements Initializable {
         });
     }
 
+    public void setOnFilesAdded(Consumer<File[]> consumer) {
+        onFilesAdded = consumer;
+    }
+
     public ObservableList<File> getPaneFileList() {
         return paneFileList;
     }
@@ -202,7 +210,7 @@ public class ControllerPane implements Initializable {
 
         show(Arrays.stream(fileLocations)
                 .map(File::new)
-                .toArray(File[]::new));
+                .toArray(File[]::new), false);
     }
 
     private void selectDir() {
@@ -219,7 +227,7 @@ public class ControllerPane implements Initializable {
         var files = directoryReceived.listFiles((_, name) ->
                 Arrays.stream(filesExtensions).anyMatch(ext -> name.endsWith(ext.substring(1))));
 
-        show(files);
+        show(files, true);
     }
 
     private void selectFile() {
@@ -233,10 +241,10 @@ public class ControllerPane implements Initializable {
         if (files == null)
             return;
 
-        show(files.toArray(File[]::new));
+        show(files.toArray(File[]::new), true);
     }
 
-    private void show(File[] files) {
+    private void show(File[] files, boolean addedByUser) {
         if (files == null || files.length == 0)
             return;
 
@@ -246,6 +254,11 @@ public class ControllerPane implements Initializable {
 
         paneFileList.addAll(files);
         paneListView.getSelectionModel().select(0);
+
+        // Notify the parent controller about video files added by the user,
+        // so it can look for external audio/subtitle files next to them
+        if (addedByUser && paneType == PaneType.VIDEO && onFilesAdded != null)
+            onFilesAdded.accept(files);
     }
 
     private void clear() {

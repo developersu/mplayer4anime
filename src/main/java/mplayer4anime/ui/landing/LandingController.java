@@ -29,17 +29,21 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.control.TabPane;
 import javafx.stage.Stage;
 import mplayer4anime.AppPreferences;
+import mplayer4anime.media.MediaCollectionFinder;
 import mplayer4anime.player.PlayerService;
 import mplayer4anime.playlists.JsonStorage;
 import mplayer4anime.playlists.Playlists;
+import mplayer4anime.ui.CollectionSelectionDialog;
 import mplayer4anime.ui.ServiceWindow;
 import mplayer4anime.ui.about.AboutWindow;
 import mplayer4anime.ui.landing.panes.ControllerPane;
 import mplayer4anime.ui.landing.panes.ControllerPaneSubtitles;
+import mplayer4anime.ui.landing.panes.PaneType;
 import mplayer4anime.ui.settings.SettingsWindow;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.ResourceBundle;
 
 import static mplayer4anime.ui.landing.panes.PaneType.*;
@@ -102,6 +106,9 @@ public class LandingController implements Initializable {
         mkvPaneController.setPaneType(VIDEO);
         mkaPaneController.setPaneType(AUDIO);
         subPaneController.setPaneType(SUBTITLES);
+
+        // When the user adds videos, look for external audio/subtitle files next to them
+        mkvPaneController.setOnFilesAdded(this::importExternalMedia);
 
         // Disable Save/Save as if there is no video in the corresponding panes
         var saveActionsDisabled = Bindings.isEmpty(mkvPaneController.getPaneFileList());
@@ -176,6 +183,49 @@ public class LandingController implements Initializable {
         appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getEncoding());
         // A changed backend is applied to the player immediately, no restart required
         playerService.switchEngine(appPreferences.getBackendEngine());
+    }
+
+    // Called when the user adds video files: search for external audio
+    // and subtitle files in the same folders and import them (asking
+    // the user which collection to take when there is more than one)
+    private void importExternalMedia(File[] videoFiles) {
+        if (!appPreferences.getAutoImportExternalFiles())
+            return;
+        importExternalMediaFor(AUDIO, videoFiles);
+        importExternalMediaFor(SUBTITLES, videoFiles);
+    }
+
+    private void importExternalMediaFor(PaneType targetPane, File[] videoFiles) {
+        var collections = MediaCollectionFinder.findCollections(
+                Arrays.asList(videoFiles), appPreferences.getExtensionsForPane(targetPane));
+        if (collections.isEmpty())
+            return;
+
+        var collection = collections.size() == 1 ?
+                collections.getFirst() :
+                new CollectionSelectionDialog(
+                        (Stage) tabPane.getScene().getWindow(),
+                        resourceBundle,
+                        targetPane.getResourceKey(),
+                        collections).showAndWait().orElse(null);
+        if (collection == null)
+            return;
+
+        var targetController = targetPane == AUDIO ? mkaPaneController : subPaneController;
+        var targetList = targetController.getPaneFileList();
+        var files = collection.files();
+        Arrays.sort(files);
+
+        var firstNewIndex = -1;
+        for (var file : files) {
+            if (!targetList.contains(file)) {
+                if (firstNewIndex < 0)
+                    firstNewIndex = targetList.size();
+                targetList.add(file);
+            }
+        }
+        if (firstNewIndex >= 0)
+            targetController.setSelected(firstNewIndex);
     }
 
     private void setAllLists(JsonStorage jsonStorage) {

@@ -57,6 +57,7 @@
                         </HBox>
                         <CheckBox fx:id="subtitlesFirstCheckBox" mnemonicParsing="false" text="%settings_SubtitlesTabFirst" />
                         <CheckBox fx:id="openLatestPlaylistCheckBox" mnemonicParsing="false" text="%settings_OpenLatestOnStart" />
+                        <CheckBox fx:id="autoImportExternalFilesCheckBox" mnemonicParsing="false" text="%settings_AutoImportExternalFiles" />
                      </children>
                      <padding>
                         <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
