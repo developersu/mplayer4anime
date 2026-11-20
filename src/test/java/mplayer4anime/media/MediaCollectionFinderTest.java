@@ -155,7 +155,6 @@ class MediaCollectionFinderTest {
 
     @Test
     void splitsFilesOfDifferentReleaseGroupsInTheSameFolder() throws IOException {
-        // Two release groups mixed into a single folder (the Shirobako case)
         createFile(tempDir, "[LittleTests] Show 01 [BD 1080p].rus.[TesTing Group].mka");
         createFile(tempDir, "[LittleTests] Show 02 [BD 1080p].rus.[TesTing Group].mka");
         createFile(tempDir, "[LittleTests] Show 01 [BD 1080p].rus.[Midori].mka");
@@ -166,11 +165,11 @@ class MediaCollectionFinderTest {
 
         assertEquals(2, collections.size());
         // Same directory, sorted by the release marker
-        assertEquals(tempDir.getAbsoluteFile(), collections.get(0).directory());
-        assertEquals("Anything Group", collections.get(0).label());
+        assertEquals(tempDir.getAbsoluteFile(), collections.getFirst().directory());
+        assertEquals("Midori", collections.get(0).label());
         assertEquals(2, collections.get(0).files().length);
         assertEquals(tempDir.getAbsoluteFile(), collections.get(1).directory());
-        assertEquals("Miori", collections.get(1).label());
+        assertEquals("TesTing Group", collections.get(1).label());
         assertEquals(2, collections.get(1).files().length);
     }
 
@@ -229,7 +228,7 @@ class MediaCollectionFinderTest {
         assertEquals(2, collections.size());
         assertEquals("LNS", collections.get(0).label());
         assertEquals(3, collections.get(0).files().length);
-        assertEquals("MaverickSubs", collections.get(1).label());
+        assertEquals("TestingSubs", collections.get(1).label());
         assertEquals(1, collections.get(1).files().length);
     }
 
