@@ -295,9 +295,9 @@ class MediaCollectionFinderTest {
         assertEquals(3, collections.size());
         assertNull(collections.get(0).label());
         assertEquals(2, collections.get(0).files().length);
-        assertEquals("Malta70", collections.get(1).label());
+        assertEquals("Laza", collections.get(1).label());
         assertEquals(2, collections.get(1).files().length);
-        assertEquals("Laza", collections.get(2).label());
+        assertEquals("Malta70", collections.get(2).label());
         assertEquals(2, collections.get(2).files().length);
     }
 
