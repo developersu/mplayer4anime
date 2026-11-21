@@ -9,10 +9,7 @@ import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertArrayEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MediaCollectionFinderTest {
 
@@ -28,7 +25,7 @@ class MediaCollectionFinderTest {
                 List.of(video), new String[]{"*.mka"});
 
         assertEquals(1, collections.size());
-        assertEquals(tempDir.getAbsoluteFile(), collections.get(0).directory());
+        assertEquals(tempDir.getAbsoluteFile(), collections.getFirst().directory());
         assertArrayEquals(new File[]{new File(tempDir, "ep01.mka")},
                 collections.getFirst().files());
     }
@@ -98,7 +95,7 @@ class MediaCollectionFinderTest {
         assertEquals(1, collections.size());
         assertArrayEquals(
                 new File[]{new File(tempDir, "ep01.MKA"), new File(tempDir, "ep01.Mka")},
-                collections.get(0).files());
+                collections.getFirst().files());
     }
 
     @Test
@@ -185,8 +182,8 @@ class MediaCollectionFinderTest {
                 List.of(createFile(tempDir, "ep01.mkv")), new String[]{"*.mka"});
 
         assertEquals(1, collections.size());
-        assertNull(collections.get(0).label());
-        assertEquals(3, collections.get(0).files().length);
+        assertNull(collections.getFirst().label());
+        assertEquals(3, collections.getFirst().files().length);
     }
 
     @Test
@@ -198,7 +195,7 @@ class MediaCollectionFinderTest {
                 List.of(createFile(tempDir, "ep01.mkv")), new String[]{"*.mka"});
 
         assertEquals(1, collections.size());
-        assertEquals(2, collections.get(0).files().length);
+        assertEquals(2, collections.getFirst().files().length);
     }
 
     @Test
@@ -210,8 +207,8 @@ class MediaCollectionFinderTest {
                 List.of(createFile(tempDir, "ep01.mkv")), new String[]{"*.mka"});
 
         assertEquals(1, collections.size());
-        assertNull(collections.get(0).label());
-        assertEquals(2, collections.get(0).files().length);
+        assertNull(collections.getFirst().label());
+        assertEquals(2, collections.getFirst().files().length);
     }
 
     @Test
@@ -230,6 +227,69 @@ class MediaCollectionFinderTest {
         assertEquals(3, collections.get(0).files().length);
         assertEquals("TestingSubs", collections.get(1).label());
         assertEquals(1, collections.get(1).files().length);
+    }
+
+    @Test
+    void splitsFilesThatDifferOnlyByPlainWord() throws IOException {
+        // Two audio sets in one folder without "[bracket]" markers:
+        // the common part of the names ("Audio") is not a marker
+        createFile(tempDir, "Audio 01.mka");
+        createFile(tempDir, "Audio 02.mka");
+        createFile(tempDir, "Audio 01 Laza.mka");
+        createFile(tempDir, "Audio 02 Laza.mka");
+
+        var collections = MediaCollectionFinder.findCollections(
+                List.of(createFile(tempDir, "video1.mp4")), new String[]{"*.mka"});
+
+        assertEquals(2, collections.size());
+        // Same directory, the collection without a marker comes first
+        assertEquals(tempDir.getAbsoluteFile(), collections.getFirst().directory());
+        assertNull(collections.get(0).label());
+        assertArrayEquals(new File[]{
+                        new File(tempDir, "Audio 01.mka"), new File(tempDir, "Audio 02.mka")},
+                collections.get(0).files());
+        assertEquals("Laza", collections.get(1).label());
+        assertArrayEquals(new File[]{
+                        new File(tempDir, "Audio 01 Laza.mka"), new File(tempDir, "Audio 02 Laza.mka")},
+                collections.get(1).files());
+    }
+
+    @Test
+    void splitsFilesThatDifferOnlyByPlainWordBeforehand() throws IOException {
+        createFile(tempDir, "Audio 01.mka");
+        createFile(tempDir, "Audio 02.mka");
+        createFile(tempDir, "Test Audio 01.mka");
+        createFile(tempDir, "Test Audio 02.mka");
+
+        var collections = MediaCollectionFinder.findCollections(
+                List.of(createFile(tempDir, "video1.mp4")), new String[]{"*.mka"});
+
+        assertEquals(2, collections.size());
+        // Same directory, the collection without a marker comes first
+        assertEquals(tempDir.getAbsoluteFile(), collections.getFirst().directory());
+        assertNull(collections.get(0).label());
+        assertArrayEquals(new File[]{
+                        new File(tempDir, "Audio 01.mka"), new File(tempDir, "Audio 02.mka")},
+                collections.get(0).files());
+        assertEquals("Test", collections.get(1).label());
+        assertArrayEquals(new File[]{
+                        new File(tempDir, "Test Audio 01.mka"), new File(tempDir, "Test Audio 02.mka")},
+                collections.get(1).files());
+    }
+
+    @Test
+    void doesNotSplitOnPerEpisodePlainWords() throws IOException {
+        // Words containing digits (episode numbers, quality marks) are not
+        // release markers, so one release stays a single collection
+        createFile(tempDir, "Show S03E01 (1080p) track.mka");
+        createFile(tempDir, "Show S03E02 (1080p) track.mka");
+
+        var collections = MediaCollectionFinder.findCollections(
+                List.of(createFile(tempDir, "video1.mp4")), new String[]{"*.mka"});
+
+        assertEquals(1, collections.size());
+        assertNull(collections.getFirst().label());
+        assertEquals(2, collections.getFirst().files().length);
     }
 
     private File createFile(File dir, String name) throws IOException {
