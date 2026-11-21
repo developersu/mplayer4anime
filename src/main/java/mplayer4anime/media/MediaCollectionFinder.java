@@ -42,10 +42,10 @@ import java.util.stream.Collectors;
  * the "[token]" markers in its name that are neither an episode number
  * (e.g. "[01]") nor a per-episode release hash (e.g. "[26C6BE62]").
  * <p>
- * If all the files of a directory share the same "[token]" markers (or
- * have none at all), the files are additionally split by the plain words
- * in their names that are not episode numbers or release hashes (e.g.
- * "Audio 01.mka" and "Audio 01 Awesome.mka" form two collections).
+ * The files of every release (or of the files without markers) are
+ * additionally split by the plain words in their names that are not
+ * episode numbers or release hashes (e.g. "Audio 01.mka" and "Audio 01
+ * Awesome.mka" form two collections).
  * <p>
  * The search is depth-limited so a huge tree of folders does not get
  * traversed.
@@ -66,8 +66,8 @@ public final class MediaCollectionFinder {
     /**
      * @param videoFiles video files the external media is searched for
      * @param extensions patterns in the form of "*.ext" (case-insensitive)
-     * @return found collections sorted by the directory path, then by the
-     * collection label (so collections of the same folder stay together)
+     * @return found collections sorted by the directory path, then by the collection label
+     * (so collections of the same folder stay together)
      */
     public static List<MediaCollection> findCollections(List<File> videoFiles, String[] extensions) {
         var videoFolders = new LinkedHashSet<File>();
@@ -112,41 +112,52 @@ public final class MediaCollectionFinder {
 
     /**
      * Splits the files found in one directory into collections. Files of different release markers in their names
-     * are put into separate collections; files that only differ by an episode number or a per-episode release hash 
-     * stay in one collection. If all the files share the same "[token]" markers (or have none), they are additionally 
-     * split by the plain words in their names that are not episode numbers or release hashes (e.g. "Audio 01.mka" and
-     * "Audio 01 Awesome.mka"). A collection's label is the word(s) that distinguish it from the common part of the names.
+     * are put into separate collections; files that only differ by an episode number or a per-episode release hash
+     * stay in one collection. The files of every release are additionally split by the plain words in their names
+     * that are not episode numbers or release hashes (e.g. "Audio 01.mka" and "Audio 01 Awesome.mka"). A
+     * collection's label is the word(s) that distinguish it from the common part of the names; a directory with a
+     * single collection stays unlabeled.
      */
     private static List<MediaCollection> splitIntoCollections(File folder, File[] matching) {
         var groups = groupFiles(matching, MediaCollectionFinder::releaseKey);
-        if (groups.size() > 1) {
-            var result = new ArrayList<MediaCollection>();
-            for (var group : groups.entrySet())
-                result.add(new MediaCollection(folder,
-                        group.getValue().toArray(new File[0]),
-                        releaseLabel(group.getKey())));
-            return result;
-        }
+        var result = new ArrayList<MediaCollection>();
+        for (var group : groups.entrySet()) {
+            var groupFiles = group.getValue();
 
-        // One "[token]" group: try splitting by the plain words
-        var plainGroups = groupFiles(matching, MediaCollectionFinder::plainTokenKey);
-        if (plainGroups.size() > 1) {
-            // Words shared by every file are part of the common name, not a marker
-            var common = new HashSet<>(plainTokens(matching[0].getName()));
-            for (var file : matching)
-                common.retainAll(plainTokens(file.getName()));
-
-            var result = new ArrayList<MediaCollection>();
-            for (var group : plainGroups.entrySet()) {
-                var label = plainLabel(group.getKey(), common);
-                result.add(new MediaCollection(folder,
-                        group.getValue().toArray(new File[0]),
-                        label.isEmpty() ? null : label));
+            // Try splitting the release's files by the plain words
+            var plainGroups = groupFiles(groupFiles.toArray(new File[0]),
+                    MediaCollectionFinder::plainTokenKey);
+            if (plainGroups.size() > 1) {
+                // Words shared by every file of the release are part of the common name, not a marker
+                var common = new HashSet<>(plainTokens(groupFiles.getFirst().getName()));
+                for (var file : groupFiles)
+                    common.retainAll(plainTokens(file.getName()));
+                for (var plain : plainGroups.entrySet())
+                    result.add(new MediaCollection(folder,
+                            plain.getValue().toArray(new File[0]),
+                            label(group.getKey(), plainLabel(plain.getKey(), common))));
             }
-            return result;
+            else {
+                result.add(new MediaCollection(folder,
+                        groupFiles.toArray(new File[0]), label(group.getKey(), "")));
+            }
         }
 
-        return List.of(new MediaCollection(folder, matching));
+        // A directory with a single collection does not need a label
+        if (result.size() == 1)
+            return List.of(new MediaCollection(folder, result.getFirst().files()));
+        return result;
+    }
+
+    /**
+     * Joins the release marker and the plain words that distinguish the collection within the release
+     * into a single label. Returns {@code null} when the collection has no marker at all.
+     */
+    private static String label(String releaseKey, String plain) {
+        var release = releaseLabel(releaseKey);
+        if (release.isEmpty())
+            return plain.isEmpty() ? null : plain;
+        return plain.isEmpty() ? release : release + " " + plain;
     }
 
     private static LinkedHashMap<String, List<File>> groupFiles(File[] files, Function<String, String> key) {
@@ -157,9 +168,8 @@ public final class MediaCollectionFinder {
     }
 
     /**
-     * The part of a file name that identifies its release: all "[token]"
-     * markers that are neither an episode number (e.g. "[01]") nor a
-     * per-episode release hash (e.g. "[26C6BE62]"), joined by "|".
+     * The part of a file name that identifies its release: all "[token]" markers that are neither an episode number
+     * (e.g. "[01]") nor a per-episode release hash (e.g. "[26C6BE62]"), joined by "|".
      */
     static String releaseKey(String fileName) {
         var tokens = BRACKET_TOKEN.matcher(fileName);
@@ -211,10 +221,8 @@ public final class MediaCollectionFinder {
     }
 
     /**
-     * The tokens of a plain-token key that are not shared by every file of
-     * the directory (the {@code common} set), joined by a space. Empty for
-     * the collection whose name matches the common part (it stays
-     * unlabeled).
+     * The tokens of a plain-token key that are not shared by every file of the directory (the {@code common} set),
+     * joined by a space. Empty for the collection whose name matches the common part (it stays unlabeled).
      */
     static String plainLabel(String key, Set<String> common) {
         if (key.isEmpty())
@@ -234,8 +242,8 @@ public final class MediaCollectionFinder {
     }
 
     /**
-     * Checks if a file name ends with any of the given patterns in the
-     * form of "*.ext". The comparison is case-insensitive.
+     * Checks if a file name ends with any of the given patterns in the form of "*.ext".
+     * The comparison is case-insensitive.
      */
     static boolean matchesExtension(String name, String[] extensions) {
         if (name == null)

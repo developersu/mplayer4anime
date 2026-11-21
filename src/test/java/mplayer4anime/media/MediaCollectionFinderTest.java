@@ -278,6 +278,66 @@ class MediaCollectionFinderTest {
     }
 
     @Test
+    void splitsPlainWordsWithinEachReleaseGroup() throws IOException {
+        // Mixed case: a plain base set, a plain "Laza" set, and a
+        // bracketed release in the same folder - the plain-word split is
+        // applied within every release group
+        createFile(tempDir, "Audio 01.mka");
+        createFile(tempDir, "Audio 02.mka");
+        createFile(tempDir, "Audio 01 Laza.mka");
+        createFile(tempDir, "Audio 02 Laza.mka");
+        createFile(tempDir, "Audio 01 [Malta70].mka");
+        createFile(tempDir, "Audio 02 [Malta70].mka");
+
+        var collections = MediaCollectionFinder.findCollections(
+                List.of(createFile(tempDir, "video1.mp4")), new String[]{"*.mka"});
+
+        assertEquals(3, collections.size());
+        assertNull(collections.get(0).label());
+        assertEquals(2, collections.get(0).files().length);
+        assertEquals("Malta70", collections.get(1).label());
+        assertEquals(2, collections.get(1).files().length);
+        assertEquals("Laza", collections.get(2).label());
+        assertEquals(2, collections.get(2).files().length);
+    }
+
+    @Test
+    void labelsPlainWordVariantsOfAReleaseWithTheReleaseName() throws IOException {
+        // Plain-word variants inside a bracketed release keep the release
+        // name in the label
+        createFile(tempDir, "Audio 01 [Malta70].mka");
+        createFile(tempDir, "Audio 02 [Malta70].mka");
+        createFile(tempDir, "Audio 01 Laza [Malta70].mka");
+
+        var collections = MediaCollectionFinder.findCollections(
+                List.of(createFile(tempDir, "video1.mp4")), new String[]{"*.mka"});
+
+        assertEquals(2, collections.size());
+        assertEquals("Malta70", collections.get(0).label());
+        assertEquals(2, collections.get(0).files().length);
+        assertEquals("Malta70 Laza", collections.get(1).label());
+        assertEquals(1, collections.get(1).files().length);
+    }
+
+    @Test
+    void doesNotLabelPlainWordsSharedWithinOneRelease() throws IOException {
+        // The "RUS" set is a single release on its own: its own words are
+        // common within the release, so the collection is not labeled
+        createFile(tempDir, "Audio 01 RUS.mka");
+        createFile(tempDir, "Audio 02 RUS.mka");
+        createFile(tempDir, "Audio 01 [Malta70].mka");
+
+        var collections = MediaCollectionFinder.findCollections(
+                List.of(createFile(tempDir, "video1.mp4")), new String[]{"*.mka"});
+
+        assertEquals(2, collections.size());
+        assertNull(collections.get(0).label());
+        assertEquals(2, collections.get(0).files().length);
+        assertEquals("Malta70", collections.get(1).label());
+        assertEquals(1, collections.get(1).files().length);
+    }
+
+    @Test
     void doesNotSplitOnPerEpisodePlainWords() throws IOException {
         // Words containing digits (episode numbers, quality marks) are not
         // release markers, so one release stays a single collection

@@ -29,10 +29,8 @@ import mplayer4anime.ui.landing.LandingController;
 
 import static java.util.ResourceBundle.getBundle;
 
-//TODO: Use one copy of AppPreferences object widely
 //TODO: Drag-n-drop playlist/files/audio
-//TODO: remember selected
-//TODO: remember position
+//TODO: remember position played on last selected file within last selected playlist
 public class MainFX extends Application {
 
     public static void main(String[] args) {
