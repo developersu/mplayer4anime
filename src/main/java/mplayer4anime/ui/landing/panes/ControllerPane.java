@@ -18,11 +18,13 @@
  */
 package mplayer4anime.ui.landing.panes;
 
+import javafx.beans.binding.Bindings;
 import javafx.beans.property.ReadOnlyIntegerProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.css.PseudoClass;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -86,6 +88,14 @@ public class ControllerPane implements Initializable {
         paneListView.setCellFactory(_ -> new ControllerListCell(this));
         paneListView.setItems(paneFileList);
         preferences = AppPreferences.get();
+
+        // Show background image only when pane is blank. Fixes issue with background fragments leaking on filled pane
+        var populated = PseudoClass.getPseudoClass("populated");
+        var isPopulated = Bindings.createBooleanBinding(
+                () -> !paneFileList.isEmpty(), paneFileList);
+        isPopulated.addListener((_, _, value) ->
+                paneListView.pseudoClassStateChanged(populated, value));
+        paneListView.pseudoClassStateChanged(populated, isPopulated.get());
 
         paneBtnOpenDir.setOnAction(_ -> selectDir());
         paneBtnOpenFiles.setOnAction(_ -> selectFile());

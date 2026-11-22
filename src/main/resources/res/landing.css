@@ -1,7 +1,12 @@
 .landing {
     -fx-background-image: url(pocket.png);
     -fx-background-position: center;
-    -fx-background-repeat: no-repeat;    
+    -fx-background-repeat: no-repeat;
+}
+
+/* Hide the empty-state background image while the list has entries */
+.landing:populated {
+    -fx-background-image: none;
 }
 
 .btnLeft {
