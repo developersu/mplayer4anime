@@ -204,6 +204,14 @@ public class AppPreferences {
         preferences.putBoolean("AUTO_IMPORT_EXTERNAL_FILES", set);
     }
 
+    public boolean getPlayNextOnEnd() {
+        return preferences.getBoolean("PLAY_NEXT_ON_END", true);
+    }
+
+    public void setPlayNextOnEnd(boolean set) {
+        preferences.putBoolean("PLAY_NEXT_ON_END", set);
+    }
+
     // Window size
     public double getSceneWidth() {
         return preferences.getDouble("window_width", 1200.0);
@@ -247,6 +255,23 @@ public class AppPreferences {
 
     public void setLatestPositionVideo(int value) {
         preferences.putInt("latest_video_pos", Math.max(value, 0));
+    }
+
+    /**
+     * Save & recover the last played video file and the position it reached, so that pressing Play on that very file
+     * resumes from that position. Any other video starts from the beginning.
+     */
+    public String getLatestPlayedVideo() {
+        return preferences.get("latest_played_video", "");
+    }
+
+    public double getLatestPlayedVideoPosition() {
+        return preferences.getDouble("latest_played_video_pos", 0.0);
+    }
+
+    public void setLatestPlayedVideo(String video, double positionSeconds) {
+        preferences.put("latest_played_video", video == null ? "" : video);
+        preferences.putDouble("latest_played_video_pos", Math.max(positionSeconds, 0));
     }
 
     public int getLatestPositionAudio() {

@@ -60,7 +60,10 @@ public class SettingsController implements Initializable {
     @FXML
     private Label pathToMplayerLbl;
     @FXML
-    private CheckBox subtitlesFirstCheckBox, openLatestPlaylistCheckBox, autoImportExternalFilesCheckBox;
+    private CheckBox subtitlesFirstCheckBox,
+            openLatestPlaylistCheckBox,
+            autoImportExternalFilesCheckBox,
+            playNextOnEndCheckBox;
     @FXML
     private ChoiceBox<BackendEngine> backEndEngineChoiceBox;
     @FXML
@@ -88,6 +91,7 @@ public class SettingsController implements Initializable {
         subtitlesFirstCheckBox.setSelected(appPreferences.getSubtitlesFirst());
         openLatestPlaylistCheckBox.setSelected(appPreferences.getOpenLatestPlaylistOnStart());
         autoImportExternalFilesCheckBox.setSelected(appPreferences.getAutoImportExternalFiles());
+        playNextOnEndCheckBox.setSelected(appPreferences.getPlayNextOnEnd());
 
         // Fill lists of extensions and encodings
         subExtensionListController.configure(appPreferences.getSubsExtensionsList(), EXTENSION);
@@ -146,6 +150,7 @@ public class SettingsController implements Initializable {
         appPreferences.setBackendEngine(backEndEngineChoiceBox.getValue());
         appPreferences.setOpenLatestPlaylistOnStart(openLatestPlaylistCheckBox.isSelected());
         appPreferences.setAutoImportExternalFiles(autoImportExternalFilesCheckBox.isSelected());
+        appPreferences.setPlayNextOnEnd(playNextOnEndCheckBox.isSelected());
     }
 
     private void applyLanguageChange() {

@@ -18,9 +18,9 @@
  */
 package mplayer4anime.mpv;
 
+import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.Structure.FieldOrder;
-import com.sun.jna.ptr.IntByReference;
 
 @FieldOrder({"event_id","error","reply_userdata","data"})
 public class mpv_event extends Structure {
@@ -29,5 +29,5 @@ public class mpv_event extends Structure {
     public int event_id;
     public int error;
     public long reply_userdata; // long replaced originally uint64_t
-    public IntByReference data;
+    public Pointer data;
 }

@@ -158,6 +158,8 @@ public class LandingController implements Initializable {
     public void shutdown() {
         appPreferences.setLastTimeUsedSubsEncoding(subPaneController.getEncoding());
         playerToolbarController.shutdown();
+        // Remember the playback position of the current video, so it can be resumed on the next start
+        playerToolbarController.persistLivePosition();
         // Stop the player so its window (e.g. the mpv one) closes together with the app
         playerService.dispose();
         // TODO: remove from here; too sophisticated

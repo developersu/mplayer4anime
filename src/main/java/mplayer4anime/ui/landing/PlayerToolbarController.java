@@ -18,6 +18,7 @@
  */
 package mplayer4anime.ui.landing;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -49,6 +50,8 @@ public class PlayerToolbarController implements Initializable {
     private PlayerService playerService;
     private ControllerPane mkvPaneController, mkaPaneController;
     private ControllerPaneSubtitles subPaneController;
+    // currently  video (last one played or force-played), or null until the first file is played
+    private String currentVideo;
 
     // Player is resolved at the moment of each action
     private IPlayer player() {
@@ -62,7 +65,10 @@ public class PlayerToolbarController implements Initializable {
         fullScreen.setSelected(appPreferences.getFullScreenSelected());
         subsHide.setSelected(appPreferences.getSubtitlesHideSelected());
 
-        stopBtn.setOnAction(_ -> player().stop());
+        stopBtn.setOnAction(_ -> {
+            persistLivePosition();
+            player().stop();
+        });
         volumeUpBtn.setOnAction(_ -> player().volumeUp());
         volumeDownBtn.setOnAction(_ -> player().volumeDown());
         muteBtn.setOnAction(_ -> player().mute());
@@ -81,6 +87,10 @@ public class PlayerToolbarController implements Initializable {
         this.mkvPaneController = mkvPaneController;
         this.mkaPaneController = mkaPaneController;
         this.subPaneController = subPaneController;
+
+        // When a file ends on its own, start the next one, if any.
+        // Registered through the service so the listener survives an engine switch.
+        playerService.setOnFinishedListener(this::onPlaybackFinished);
 
         bindButtonToEmptyList(stopBtn);
         bindButtonToEmptyList(volumeUpBtn);
@@ -107,10 +117,22 @@ public class PlayerToolbarController implements Initializable {
     }
 
     private void play() {
-        if (mkvPaneController.getSelectedAbsolutePath() == null)
+        var selectedVideo = mkvPaneController.getSelectedAbsolutePath();
+        if (selectedVideo == null)
             return;
 
-        player().playPause(request());
+        // Remember where the live playback stands, so that a Stop (or an app restart) can be resumed from that spot.
+        persistLivePosition();
+
+        // A different file was selected: start it, instead of resuming the old file still loaded in the player.
+        if (currentVideo != null && !selectedVideo.equals(currentVideo)) {
+            forcePlay(request());
+        }
+        else {
+            // The player ends up handling the selected file (started fresh or toggled from pause), so remember it
+            currentVideo = selectedVideo;
+            player().playPause(request());
+        }
     }
 
     private void playPrevTrack() {
@@ -128,7 +150,7 @@ public class PlayerToolbarController implements Initializable {
         if (index > 0)
             subPaneController.setSelected(index - 1);
 
-        player().forcePlay(request());
+        forcePlay(request());
     }
 
     private void playNextTrack() {
@@ -146,7 +168,44 @@ public class PlayerToolbarController implements Initializable {
         if (index < subPaneController.getElementsSize())
             subPaneController.setSelected(index);
 
-        player().forcePlay(request());
+        forcePlay(request());
+    }
+
+    // Invoked by the player (on a thread other than the FX one) when the loaded file played to the end:
+    // start the next track, if any.
+    private void onPlaybackFinished() {
+        try {
+            Platform.runLater(() -> {
+                // The file played to the end, so any position saved for it during playback is stale:
+                // replaying the file must start from the beginning.
+                if (currentVideo != null)
+                    appPreferences.setLatestPlayedVideo(currentVideo, 0);
+                if (!appPreferences.getPlayNextOnEnd())
+                    return;
+                // Player loads a file right away when the user switches tracks manually; an unreadable time-pos
+                // means the session is truly empty, i.e. the finished file was not replaced.
+                if (player().getTimePos() >= 0)
+                    return;
+                playNextTrack();
+            });
+        }
+        catch (IllegalStateException _) {
+            // the FX toolkit is already shutting down
+        }
+    }
+
+    private void forcePlay(PlayRequest request) {
+        currentVideo = request.video();
+        player().forcePlay(request);
+    }
+
+    // mplayer reports 0 after Stop and storing 0 would wipe out the real resume point.
+    void persistLivePosition() {
+        if (currentVideo == null)
+            return;
+        var position = player().getTimePos();
+        if (position > 0)
+            appPreferences.setLatestPlayedVideo(currentVideo, position);
     }
 
     // Everything the player needs to (re)start the selected track.
@@ -157,8 +216,17 @@ public class PlayerToolbarController implements Initializable {
                 subPaneController.getSelectedAbsolutePath(),
                 subPaneController.getEncoding(),
                 subsHide.isSelected(),
-                fullScreen.isSelected()
+                fullScreen.isSelected(),
+                resumePosition()
         );
+    }
+
+    // The stored position applies to the very file it was recorded for; any other video starts from the beginning.
+    private double resumePosition() {
+        var selectedVideo = mkvPaneController.getSelectedAbsolutePath();
+        return selectedVideo != null && selectedVideo.equals(appPreferences.getLatestPlayedVideo())
+                ? Math.max(appPreferences.getLatestPlayedVideoPosition(), 0)
+                : 0;
     }
 
     void shutdown() {

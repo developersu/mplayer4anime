@@ -35,6 +35,7 @@ public class MpvSlave implements IPlayer {
 
     private final ResourceBundle resourceBundle;
     private MpvProcess process;
+    private Runnable onFinishedListener;
 
     public MpvSlave(ResourceBundle resourceBundle) {
         this.resourceBundle = resourceBundle;
@@ -96,14 +97,13 @@ public class MpvSlave implements IPlayer {
         if (nonSupportedOs())
             return;
 
-        // Reuse the live session when there is one: the session stays idle
-        // after a file ends, so reloading the file into it keeps
-        // the same player window. A new session is created only when none
-        // is alive.
+        // Reuse the live session when there is one: the session stays idle after a file ends, so reloading the file
+        // into it keeps the same player window. A new session is created only when none is alive.
         var mpvProcess = live();
         if (mpvProcess == null) {
             mpvProcess = new MpvProcess();
             process = mpvProcess;
+            mpvProcess.setEndFileListener(onFinishedListener);
             if (!awaitReady(mpvProcess)) {
                 log.error("mpv session did not start in time");
                 ServiceWindow.getErrorNotification(resourceBundle.getString("Error"),
@@ -124,6 +124,17 @@ public class MpvSlave implements IPlayer {
         mpvProcess.setBooleanProperty("sub-visibility", !request.subtitlesHidden());
         mpvProcess.setBooleanProperty("fullscreen", request.fullscreen());
         mpvProcess.setBooleanProperty("pause", false);
+        // "start" (renamed from "start-time" in mpv 0.40) is a global option that persists across files, so it is set
+        // explicitly before every load: the requested offset, or "none" to clear a previous resume point.
+        // Older mpv (< 0.40) only knows "start-time".
+        if (request.startPositionSeconds() > 0) {
+            if (!mpvProcess.setStringProperty("start", String.valueOf(request.startPositionSeconds())))
+                mpvProcess.setNumberProperty("start-time", request.startPositionSeconds());
+        }
+        else {
+            if (!mpvProcess.setStringProperty("start", "none"))
+                mpvProcess.setNumberProperty("start-time", 0.0);
+        }
 
         if (!mpvProcess.loadFile(request.video())) {
             log.error("Unable to load file {} in mpv", request.video());
@@ -138,6 +149,24 @@ public class MpvSlave implements IPlayer {
         var mpvProcess = live();
         if (mpvProcess != null)
             mpvProcess.command("stop");
+    }
+
+    @Override
+    public void setOnFinishedListener(Runnable onFinished) {
+        this.onFinishedListener = onFinished;
+        var mpvProcess = live();
+        if (mpvProcess != null)
+            mpvProcess.setEndFileListener(onFinished);
+    }
+
+    @Override
+    public double getTimePos() {
+        var mpvProcess = live();
+        if (mpvProcess == null)
+            return -1;
+        // time-pos is readable as long as a file is loaded (even paused), and becomes unreadable once session goes idle.
+        var timePos = mpvProcess.getNumberProperty("time-pos");
+        return timePos == null ? -1 : timePos;
     }
 
     @Override

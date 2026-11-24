@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 
+import static mplayer4anime.mpv.Mpv_Events.MPV_EVENT_END_FILE;
 import static mplayer4anime.mpv.Mpv_Events.MPV_EVENT_SHUTDOWN;
 import static mplayer4anime.mpv.Mpv_Format.MPV_FORMAT_DOUBLE;
 import static mplayer4anime.mpv.Mpv_Format.MPV_FORMAT_FLAG;
@@ -40,6 +41,8 @@ public class MpvProcess {
 
     private static final double EVENT_LOOP_TIMEOUT = 1.0;   // seconds between exit-checks
     private static final long DISPOSE_JOIN_TIMEOUT = 3_000; // ms to wait for the loop thread
+    private static final int MPV_ERROR_NONE = 0;            // error code of a fine event
+    private static final int MPV_END_FILE_REASON_EOF = 0;   // the file played to the end
 
     private final LibC libC = LibC.INSTANCE;
     private final LibMpv libMpv = LibMpv.INSTANCE;
@@ -50,6 +53,7 @@ public class MpvProcess {
     // that observes a non-zero ctx is guaranteed to find it usable.
     private volatile long ctx;
     private volatile boolean destroyed;
+    private volatile Runnable endFileListener;
 
     public MpvProcess() {
         thread = new Thread(this::run, "mpv-event-loop");
@@ -94,11 +98,32 @@ public class MpvProcess {
                 continue;
             log.debug("MPV event: {}", Mpv_Events.values()[event.event_id].name());
 
+            if (event.event_id == MPV_EVENT_END_FILE.ordinal()
+                    && event.error == MPV_ERROR_NONE
+                    && event.data != null) {
+                // reason EOF means the file really played to the end;
+                // STOP (2), QUIT (3), ERROR (4) and REDIRECT (5) — which is what a replaced file reports —
+                // must not be treated as such.
+                var endFile = new mpv_event_end_file(event.data);
+                endFile.read();
+                var listener = endFileListener;
+                if (listener != null && endFile.reason == MPV_END_FILE_REASON_EOF)
+                    listener.run();
+            }
+
             if (event.event_id == MPV_EVENT_SHUTDOWN.ordinal())
                 break;
         }
         libMpv.mpv_terminate_destroy(context);
         ctx = 0;
+    }
+
+    /**
+     * Register a listener invoked (on the event loop thread) when the file currently loaded in the session finishes
+     * playing on its own. Stop, errors, and shutdown do not trigger it.
+     */
+    public void setEndFileListener(Runnable listener) {
+        this.endFileListener = listener;
     }
 
     // --- Commands (thread-safe)

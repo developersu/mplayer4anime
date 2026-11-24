@@ -31,6 +31,14 @@ public interface IPlayer {
 
     void stop();
 
+    // Invoked when player finishes playing on its own. Stop, dispose, and loading another file do not trigger it.
+    void setOnFinishedListener(Runnable onFinished);
+
+    /**
+     * @return the current playback position in seconds, or -1 if unknown
+     */
+    double getTimePos();
+
     void volumeUp();
 
     void volumeDown();

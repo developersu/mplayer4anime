@@ -23,11 +23,13 @@ package mplayer4anime;
  * <p>
  * {@code audio}, {@code subtitles} and {@code subtitlesEncoding} may be null
  * or empty when no external track is selected.
+ * {@code startPositionSeconds} is the offset to start the file from
  */
 public record PlayRequest(String video,
                           String audio,
                           String subtitles,
                           String subtitlesEncoding,
                           boolean subtitlesHidden,
-                          boolean fullscreen) {
+                          boolean fullscreen,
+                          double startPositionSeconds) {
 }

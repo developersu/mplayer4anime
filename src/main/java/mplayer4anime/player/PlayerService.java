@@ -28,6 +28,7 @@ public class PlayerService {
     private BackendEngine currentEngine;
     private IPlayer player;
     private final ResourceBundle resourceBundle;
+    private Runnable onFinishedListener;
 
     public PlayerService(BackendEngine engine, ResourceBundle resourceBundle) {
         this.currentEngine = engine;
@@ -37,6 +38,15 @@ public class PlayerService {
 
     public IPlayer getPlayer() {
         return player;
+    }
+
+    /**
+     * Listener invoked when the loaded file finishes playing on its own. It survives an engine switch
+     */
+    public void setOnFinishedListener(Runnable onFinished) {
+        this.onFinishedListener = onFinished;
+        if (player != null)
+            player.setOnFinishedListener(onFinished);
     }
 
     public void dispose() {
@@ -53,5 +63,7 @@ public class PlayerService {
         if (player != null)
             player.dispose();
         player = engine.createPlayer(resourceBundle);
+        if (onFinishedListener != null)
+            player.setOnFinishedListener(onFinishedListener);
     }
 }
